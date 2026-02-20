@@ -59,7 +59,7 @@ Examples of analytical and planning questions:
 
 ## <a id="arquitectura"></a>Architecture and agents
 
-![alt text](../assets/image.png)
+![alt text](../assets/image-1.png)
 
 ### <a id="capa-datos"></a>Microsoft Fabric – Data layer
 
@@ -73,7 +73,7 @@ To better understand the data model used by the Fabric agents, detailed document
 - **ER diagram (Entity–Relationship)** showing relationships between the main tables
 - **Table schemas** with all columns and data types
 
-You can find the full documentation here: [Database Documentation](./assets/database.en.md)
+You can find the full documentation here: [Database Documentation](./assets/database.md)
 
 ### <a id="capa-razonamiento"></a>Microsoft Foundry – Reasoning layer
 
@@ -115,7 +115,7 @@ The workshop is divided into independent but connected labs, organized by archit
 
 ### 2. Azure AI Foundry labs
 
-- [Foundry infrastructure setup](./labs/foundry/README.md)
+- [Foundry infrastructure setup](./labs/foundry/setup.md)
 - [Lab 3 – Anders Agent: OpenAPI support, Function App deployment, and executor agent run](./labs/foundry/lab03-anders-executor-agent.md)
 - [Lab 4 – Julie Agent: workflow agent with SqlAgent and MarketingAgent sub‑agents](./labs/foundry/lab04-julie-planner-agent.md)
 
@@ -222,4 +222,4 @@ This allows running local scripts and downloaded scripts that are signed. It onl
 
 This workshop is designed as a **pedagogical and architectural** exercise. The focus is on flow design and collaboration between agents, not on extreme optimization of models or queries.
 
-[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.en.md)
+[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.md)

@@ -242,4 +242,4 @@ labs/foundry/
 
 ## Next step
 
-Once the setup is complete, continue with [Lab 4 — Anders (Executor Agent)](lab04-anders-executor-agent.md).
+Once the setup is complete, continue with [Lab 3 — Anders (Executor Agent)](lab03-anders-executor-agent.md).
