@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage__accountName": "stcontosoretailyuub2",
+    "StorageAccountName": "stcontosoretailyuub2",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "BillTemplate": "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.html"
+  }
+}

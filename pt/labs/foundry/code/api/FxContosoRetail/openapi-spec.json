@@ -1,0 +1,191 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "OpenAPI Document on Azure Functions",
+    "description": "This is the OpenAPI Document on Azure Functions",
+    "version": "1.0.0"
+  },
+  "host": "localhost:7071",
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/SqlExecutor": {
+      "post": {
+        "tags": [
+          "Data"
+        ],
+        "summary": "Ejecuta una consulta T-SQL para segmentos de clientes",
+        "description": "Recibe T-SQL en el body, ejecuta la consulta contra Fabric Warehouse y retorna una lista con FirstName, LastName, PrimaryEmail y FavoriteCategory.",
+        "operationId": "sqlExecutor",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto JSON con la propiedad 'tsql' que contiene la consulta a ejecutar",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/sqlExecutorRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados tipados del segmento de clientes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/sqlExecutorCustomerRecord"
+              }
+            }
+          },
+          "400": {
+            "description": "Mensaje de error por body inválido o columnas distintas al contrato esperado",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Error al ejecutar la consulta SQL",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/OrdersReporter": {
+      "post": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Genera un reporte HTML de órdenes",
+        "description": "Recibe líneas de órdenes de un cliente, genera un reporte HTML con el detalle, lo sube a Blob Storage y retorna la URL con SAS para visualizarlo/descargarlo.",
+        "operationId": "ordersReporter",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Datos del cliente y líneas de órdenes a incluir en el reporte",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ordersReportRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Objeto JSON con la propiedad 'reportUrl' que contiene la URL SAS del reporte generado",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Mensaje de error cuando el JSON es inválido o no contiene órdenes",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "orderLine": {
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string"
+        },
+        "orderDate": {
+          "type": "string"
+        },
+        "orderLineNumber": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "brandName": {
+          "type": "string"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "quantity": {
+          "format": "double",
+          "type": "number"
+        },
+        "unitPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "lineTotal": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "ordersReportRequest": {
+      "type": "object",
+      "properties": {
+        "customerName": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/orderLine"
+          }
+        }
+      }
+    },
+    "sqlExecutorCustomerRecord": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "primaryEmail": {
+          "type": "string"
+        },
+        "favoriteCategory": {
+          "type": "string"
+        }
+      }
+    },
+    "sqlExecutorRequest": {
+      "type": "object",
+      "properties": {
+        "tSql": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

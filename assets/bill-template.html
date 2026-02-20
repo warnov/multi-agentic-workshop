@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte de Órdenes - Contoso Retail</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f8;
+        color: #333;
+    }
+
+    header {
+        background: #004578;
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    .logo {
+        height: 150px;
+        margin-right: 25px;
+    }
+
+    .report-metadata {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .container {
+        padding: 40px;
+    }
+
+    h1 {
+        color: #004578;
+        margin-top: 0;
+    }
+
+    .order-block {
+        background: #ffffff;
+        padding: 20px;
+        margin-bottom: 35px;
+        border-left: 6px solid #0078d4;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }
+
+    th {
+        background: #e5e5e5;
+        padding: 8px;
+        border-bottom: 2px solid #ccc;
+        text-align: left;
+    }
+
+    td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    .order-total {
+        text-align: right;
+        font-weight: bold;
+        font-size: 15px;
+        padding-top: 10px;
+    }
+
+    .global-total {
+        text-align: right;
+        font-size: 20px;
+        font-weight: bold;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 6px;
+        border-left: 6px solid #107c10;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+</style>
+
+</head>
+<body>
+
+<header>
+    <img class="logo" src="https://raw.githubusercontent.com/warnov/taller-multi-agentic/main/assets/ContosoRetailLogo.png" alt="Contoso Retail Logo">
+    <div class="report-metadata">
+        <strong>Cliente:</strong> <span id="customer-name"></span><br>
+        <strong>Fecha de emisión:</strong> <span id="report-date"></span><br>
+        <strong>Rango consultado:</strong> <span id="report-date-range"></span>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Reporte de Órdenes del Cliente</h1>
+
+    <!-- 
+        Contenedor de órdenes: insertar aquí dinámicamente bloques .order-block.
+        Cada bloque debe seguir la estructura del template de orden a continuación.
+    -->
+    <div id="orders-container">
+
+        <!-- ============================================================
+             TEMPLATE DE ORDEN (repetir por cada orden)
+             ============================================================ -->
+        <!--
+        <div class="order-block">
+            <div class="order-header">
+                Orden: <span class="order-id"></span> &nbsp; | &nbsp; 
+                Fecha: <span class="order-date"></span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th># Línea</th>
+                        <th>Producto</th>
+                        <th>Marca</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Total Línea</th>
+                    </tr>
+                </thead>
+                <tbody class="order-lines">
+                    <!-- Insertar filas <tr> con estructura:
+                    <tr>
+                        <td class="line-number"></td>
+                        <td class="line-product"></td>
+                        <td class="line-brand"></td>
+                        <td class="line-category"></td>
+                        <td class="line-quantity"></td>
+                        <td class="line-unit-price"></td>
+                        <td class="line-total"></td>
+                    </tr>
+                    -->
+                </tbody>
+            </table>
+
+            <div class="order-total">
+                Total Orden: <strong class="order-total-amount"></strong>
+            </div>
+        </div>
+        -->
+        <!-- ============================================================
+             FIN TEMPLATE DE ORDEN
+             ============================================================ -->
+
+    </div>
+
+    <div class="global-total">
+        Total Reporte: <strong id="report-grand-total"></strong>
+    </div>
+
+</div>
+
+</body>
+</html>

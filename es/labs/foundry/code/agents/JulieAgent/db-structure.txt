@@ -1,0 +1,71 @@
+________________________________________
+customer
+•	CustomerId
+•	CustomerTypeId
+•	CustomerRelationshipTypeId
+•	DateOfBirth
+•	CustomerEstablishedDate
+•	IsActive
+•	FirstName
+•	LastName
+•	Gender
+•	PrimaryPhone
+•	SecondaryPhone
+•	PrimaryEmail
+•	SecondaryEmail
+•	CreatedBy
+•	UpdatedBy
+•	GoldLoadTimestamp
+________________________________________
+orderline
+•	OrderId
+•	OrderLineNumber
+•	ProductId
+•	Quantity
+•	UnitPrice
+•	LineTotal
+•	DiscountAmount
+•	TaxAmount
+•	GoldLoadTimestamp
+________________________________________
+orders
+•	OrderId
+•	SalesChannelId
+•	OrderNumber
+•	CustomerId
+•	CustomerAccountId
+•	OrderDate
+•	OrderStatus
+•	SubTotal
+•	TaxAmount
+•	OrderTotal
+•	PaymentMethod
+•	IsoCurrencyCode
+•	CreatedBy
+•	GoldLoadTimestamp
+________________________________________
+product
+•	ProductID
+•	ProductName
+•	ProductDescription
+•	BrandName
+•	ProductNumber
+•	Color
+•	ProductModel
+•	ProductCategoryID
+•	CategoryName
+•	ListPrice
+•	StandardCost
+•	Weight
+•	WeightUom
+•	ProductStatus
+•	CreatedDate
+•	SellStartDate
+•	SellEndDate
+•	IsoCurrencyCode
+•	UpdatedDate
+•	CreatedBy
+•	UpdatedBy
+•	GoldLoadTimestamp
+________________________________________
+ 

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte de Órdenes - Contoso Retail</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f8;
+        color: #333;
+    }
+
+    header {
+        background: #004578;
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    .logo {
+        height: 150px;
+        margin-right: 25px;
+    }
+
+    .report-metadata {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .container {
+        padding: 40px;
+    }
+
+    h1 {
+        color: #004578;
+        margin-top: 0;
+    }
+
+    .order-block {
+        background: #ffffff;
+        padding: 20px;
+        margin-bottom: 35px;
+        border-left: 6px solid #0078d4;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+    }
+
+    th {
+        background: #e5e5e5;
+        padding: 8px;
+        border-bottom: 2px solid #ccc;
+        text-align: left;
+    }
+
+    td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    .order-total {
+        text-align: right;
+        font-weight: bold;
+        font-size: 15px;
+        padding-top: 10px;
+    }
+
+    .global-total {
+        text-align: right;
+        font-size: 20px;
+        font-weight: bold;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 6px;
+        border-left: 6px solid #107c10;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+</style>
+
+</head>
+<body>
+
+<header>
+    <img class="logo" src="https://raw.githubusercontent.com/warnov/taller-multi-agentic/main/assets/ContosoRetailLogo.png" alt="Contoso Retail Logo">
+    <div class="report-metadata">
+        <strong>Cliente:</strong> Contoso Sportswear Ltd.<br>
+        <strong>Fecha de emisión:</strong> 06/02/2026<br>
+        <strong>Rango consultado:</strong> 01/01/2026 - 31/01/2026
+    </div>
+</header>
+
+<div class="container">
+    <h1>Reporte de Órdenes del Cliente</h1>
+
+    <!-- ORDEN 1 -->
+    <div class="order-block">
+        <div class="order-header">Orden: ORD-CID-069-001 &nbsp; | &nbsp; Fecha: 2026-01-04</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th># Línea</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total Línea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Sport-100 Helmet, Black</td><td>Contoso Outdoor</td><td>Helmets</td><td>6</td><td>$ 34,99</td><td>$ 209,94</td></tr>
+                <tr><td>2</td><td>HL Road Frame - Red, 62</td><td>Contoso Outdoor</td><td>Road Frames</td><td>10</td><td>$ 1.431,50</td><td>$ 14.315,00</td></tr>
+                <tr><td>3</td><td>Long-Sleeve Logo Jersey, S</td><td>Contoso Outdoor</td><td>Jerseys</td><td>8</td><td>$ 49,99</td><td>$ 399,92</td></tr>
+            </tbody>
+        </table>
+
+        <div class="order-total">Total Orden: <strong>$ 14.924,86</strong></div>
+    </div>
+
+    <!-- ORDEN 2 -->
+    <div class="order-block">
+        <div class="order-header">Orden: ORD-CID-069-003 &nbsp; | &nbsp; Fecha: 2026-01-08</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th># Línea</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total Línea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>HL Road Frame - Black, 58</td><td>Contoso Outdoor</td><td>Road Frames</td><td>3</td><td>$ 1.431,50</td><td>$ 4.294,50</td></tr>
+                <tr><td>2</td><td>HL Road Frame - Red, 44</td><td>Contoso Outdoor</td><td>Road Frames</td><td>7</td><td>$ 1.431,50</td><td>$ 10.020,50</td></tr>
+            </tbody>
+        </table>
+
+        <div class="order-total">Total Orden: <strong>$ 14.315,00</strong></div>
+    </div>
+
+    <!-- ORDEN 3 -->
+    <div class="order-block">
+        <div class="order-header">Orden: ORD-CID-069-002 &nbsp; | &nbsp; Fecha: 2026-01-17</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th># Línea</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total Línea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>HL Road Frame - Red, 62</td><td>Contoso Outdoor</td><td>Road Frames</td><td>2</td><td>$ 1.431,50</td><td>$ 2.863,00</td></tr>
+                <tr><td>2</td><td>LL Road Frame - Black, 60</td><td>Contoso Outdoor</td><td>Road Frames</td><td>4</td><td>$ 337,22</td><td>$ 1.348,88</td></tr>
+                <tr><td>3</td><td>HL Road Frame - Red, 56</td><td>Contoso Outdoor</td><td>Road Frames</td><td>6</td><td>$ 1.431,50</td><td>$ 8.589,00</td></tr>
+                <tr><td>4</td><td>Long-Sleeve Logo Jersey, S</td><td>Contoso Outdoor</td><td>Jerseys</td><td>10</td><td>$ 49,99</td><td>$ 499,90</td></tr>
+                <tr><td>5</td><td>AWC Logo Cap</td><td>Contoso Outdoor</td><td>Caps</td><td>3</td><td>$ 8,99</td><td>$ 26,97</td></tr>
+            </tbody>
+        </table>
+
+        <div class="order-total">Total Orden: <strong>$ 13.326,75</strong></div>
+    </div>
+
+    <!-- ORDEN 4 -->
+    <div class="order-block">
+        <div class="order-header">Orden: ORD-CID-069-004 &nbsp; | &nbsp; Fecha: 2026-01-22</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th># Línea</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total Línea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Long-Sleeve Logo Jersey, L</td><td>Contoso Outdoor</td><td>Jerseys</td><td>2</td><td>$ 49,99</td><td>$ 99,98</td></tr>
+                <tr><td>2</td><td>Sport-100 Helmet, Blue</td><td>Contoso Outdoor</td><td>Helmets</td><td>5</td><td>$ 34,99</td><td>$ 174,95</td></tr>
+                <tr><td>3</td><td>Sport-100 Helmet, Blue</td><td>Contoso Outdoor</td><td>Helmets</td><td>1</td><td>$ 34,99</td><td>$ 34,99</td></tr>
+                <tr><td>4</td><td>HL Road Frame - Red, 62</td><td>Contoso Outdoor</td><td>Road Frames</td><td>8</td><td>$ 1.431,50</td><td>$ 11.452,00</td></tr>
+                <tr><td>5</td><td>HL Road Frame - Red, 44</td><td>Contoso Outdoor</td><td>Road Frames</td><td>2</td><td>$ 1.431,50</td><td>$ 2.863,00</td></tr>
+            </tbody>
+        </table>
+
+        <div class="order-total">Total Orden: <strong>$ 14.624,92</strong></div>
+    </div>
+
+    <!-- ORDEN 5 -->
+    <div class="order-block">
+        <div class="order-header">Orden: ORD-CID-069-005 &nbsp; | &nbsp; Fecha: 2026-01-25</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th># Línea</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total Línea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>HL Road Frame - Black, 58</td><td>Contoso Outdoor</td><td>Road Frames</td><td>7</td><td>$ 1.431,50</td><td>$ 10.020,50</td></tr>
+                <tr><td>2</td><td>HL Road Frame - Black, 58</td><td>Contoso Outdoor</td><td>Road Frames</td><td>6</td><td>$ 1.431,50</td><td>$ 8.589,00</td></tr>
+                <tr><td>3</td><td>HL Road Frame - Red, 48</td><td>Contoso Outdoor</td><td>Road Frames</td><td>9</td><td>$ 1.431,50</td><td>$ 12.883,50</td></tr>
+                <tr><td>4</td><td>LL Road Frame - Black, 62</td><td>Contoso Outdoor</td><td>Road Frames</td><td>10</td><td>$ 337,22</td><td>$ 3.372,20</td></tr>
+                <tr><td>5</td><td>LL Road Frame - Black, 60</td><td>Contoso Outdoor</td><td>Road Frames</td><td>7</td><td>$ 337,22</td><td>$ 2.360,54</td></tr>
+            </tbody>
+        </table>
+
+        <div class="order-total">Total Orden: <strong>$ 37.225,74</strong></div>
+    </div>
+
+    <div class="global-total">
+        Total Reporte: <strong>$ 94.417,27</strong>
+    </div>
+
+</div>
+
+</body>
+</html>
