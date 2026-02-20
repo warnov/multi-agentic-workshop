@@ -59,7 +59,7 @@ Examples of analytical and planning questions:
 
 ## <a id="arquitectura"></a>Architecture and agents
 
-![alt text](../assets/image-1.png)
+![alt text](../assets/image.png)
 
 ### <a id="capa-datos"></a>Microsoft Fabric – Data layer
 
@@ -222,4 +222,4 @@ This allows running local scripts and downloaded scripts that are signed. It onl
 
 This workshop is designed as a **pedagogical and architectural** exercise. The focus is on flow design and collaboration between agents, not on extreme optimization of models or queries.
 
-[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.md)
+[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.en.md)
