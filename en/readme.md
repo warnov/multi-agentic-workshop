@@ -73,7 +73,7 @@ To better understand the data model used by the Fabric agents, detailed document
 - **ER diagram (Entity–Relationship)** showing relationships between the main tables
 - **Table schemas** with all columns and data types
 
-You can find the full documentation here: [Database Documentation](./assets/database.md)
+You can find the full documentation here: [Database Documentation](./assets/database.en.md)
 
 ### <a id="capa-razonamiento"></a>Microsoft Foundry – Reasoning layer
 
