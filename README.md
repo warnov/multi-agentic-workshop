@@ -19,8 +19,10 @@ Each language README describes the scenario, architecture and labs in detail for
 - 🇨🇴 María del Pilar Prieto – AIBS Architect
 - 🇨🇴 Maritza Mera – Data & AI Architect
 - 🇦🇷 Mariano Gonzalez – AIBS Architect
+- 🇧🇷 Djalma Franco – AIBS Architect
 - 🇨🇴 Ricardo Mejía – AIBS Architect
+- 🇨🇱 Octavio Carcamo – AIBS Architect
 - 🇲🇽 Alejandro Vargas – Security Architect
 - 🇲🇽 Jesús Hernández – Data & AI Architect
 - 🇨🇴 Oscar Gutiérrez – C&AI Architect
-- 🇨🇴 Walter Novoa – C&AI Architect
+- 🇨🇴 [Walter Novoa](https://github.com/warnov) – C&AI Architect
