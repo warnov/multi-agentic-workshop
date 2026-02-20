@@ -1,16 +1,15 @@
 # ============================================================================
-# Contoso Retail - Desbloquear Storage Account
-# Taller Multi-Agéntico
+# Contoso Retail - Unlock Storage Account
+# Multi-Agent Workshop
 # ============================================================================
-# Cuando una política de suscripción deshabilita el acceso público al
-# Storage Account, la Function App no puede arrancar (error 503) porque
-# el host de Functions no alcanza su propio almacenamiento de respaldo.
+# When a subscription policy disables public network access on the
+# Storage Account, the Function App fails to start (503 error) because
+# the Functions host cannot reach its own backing storage.
 #
-# Este script identifica el Storage Account del attendee a partir del
-# sufijo asignado durante el setup inicial y re-habilita el acceso
-# público de red.
+# This script identifies the attendee's Storage Account from the suffix
+# assigned during the initial setup and re-enables public network access.
 #
-# Uso:
+# Usage:
 #   .\unlock-storage.ps1
 #   .\unlock-storage.ps1 -ResourceGroupName "rg-contoso-retail"
 #   .\unlock-storage.ps1 -Suffix "sytao"
@@ -18,14 +17,14 @@
 # ============================================================================
 
 param(
-    [Parameter(Mandatory = $false, HelpMessage = "Sufijo de 5 caracteres asignado al attendee durante el setup inicial. Si no se provee, se detecta automaticamente desde la Function App.")]
+    [Parameter(Mandatory = $false, HelpMessage = "5-character suffix assigned to the attendee during initial setup. If not provided, it is detected automatically from the Function App.")]
     [ValidatePattern('^[a-z0-9]{5}$')]
     [string]$Suffix,
 
-    [Parameter(Mandatory = $false, HelpMessage = "Nombre del Resource Group (default: rg-contoso-retail).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Resource Group name (default: rg-contoso-retail).")]
     [string]$ResourceGroupName = "rg-contoso-retail",
 
-    [Parameter(Mandatory = $false, HelpMessage = "Nombre exacto de la Function App. Si se provee, se usa para derivar el sufijo.")]
+    [Parameter(Mandatory = $false, HelpMessage = "Exact Function App name. If provided, used to derive the suffix.")]
     [string]$FunctionAppName
 )
 
@@ -33,41 +32,41 @@ $ErrorActionPreference = "Stop"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Taller Multi-Agéntico" -ForegroundColor Cyan
-Write-Host " Desbloquear Storage Account" -ForegroundColor Cyan
+Write-Host " Multi-Agent Workshop" -ForegroundColor Cyan
+Write-Host " Unlock Storage Account" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Sufijo:          $(if ([string]::IsNullOrWhiteSpace($Suffix)) { '<auto>' } else { $Suffix })" -ForegroundColor Yellow
+Write-Host "  Suffix:          $(if ([string]::IsNullOrWhiteSpace($Suffix)) { '<auto>' } else { $Suffix })" -ForegroundColor Yellow
 Write-Host "  Storage Account: $(if ([string]::IsNullOrWhiteSpace($Suffix)) { '<auto>' } else { "stcontosoretail$Suffix" })" -ForegroundColor Yellow
 Write-Host "  Resource Group:  $ResourceGroupName" -ForegroundColor Yellow
 Write-Host ""
 
-# --- 1. Verificar Azure CLI ---
-Write-Host "[1/4] Verificando Azure CLI..." -ForegroundColor Green
+# --- 1. Check Azure CLI ---
+Write-Host "[1/4] Checking Azure CLI..." -ForegroundColor Green
 try {
     $azVersion = az version --output json | ConvertFrom-Json
-    Write-Host "  Azure CLI v$($azVersion.'azure-cli') detectado." -ForegroundColor Gray
+    Write-Host "  Azure CLI v$($azVersion.'azure-cli') detected." -ForegroundColor Gray
 } catch {
-    Write-Error "Azure CLI no esta instalado. Instalalo desde https://aka.ms/installazurecli"
+    Write-Error "Azure CLI is not installed. Install it from https://aka.ms/installazurecli"
     exit 1
 }
 
-# --- 2. Verificar sesión activa ---
-Write-Host "[2/4] Verificando sesion de Azure..." -ForegroundColor Green
+# --- 2. Check active session ---
+Write-Host "[2/4] Checking Azure session..." -ForegroundColor Green
 $account = az account show --output json 2>$null | ConvertFrom-Json
 if (-not $account) {
-    Write-Host "  No hay sesion activa. Iniciando login..." -ForegroundColor Yellow
+    Write-Host "  No active session found. Starting login..." -ForegroundColor Yellow
     az login
     $account = az account show --output json | ConvertFrom-Json
 }
-Write-Host "  Suscripcion: $($account.name) ($($account.id))" -ForegroundColor Gray
+Write-Host "  Subscription: $($account.name) ($($account.id))" -ForegroundColor Gray
 
 if ([string]::IsNullOrWhiteSpace($Suffix)) {
-    Write-Host "  Detectando sufijo automaticamente..." -ForegroundColor Yellow
+    Write-Host "  Detecting suffix automatically..." -ForegroundColor Yellow
 
     if (-not [string]::IsNullOrWhiteSpace($FunctionAppName)) {
         if ($FunctionAppName -notmatch '^func-contosoretail-([a-z0-9]{5})$') {
-            Write-Error "FunctionAppName '$FunctionAppName' no cumple el formato esperado 'func-contosoretail-<suffix>'."
+            Write-Error "FunctionAppName '$FunctionAppName' does not match the expected format 'func-contosoretail-<suffix>'."
             exit 1
         }
 
@@ -80,23 +79,23 @@ if ([string]::IsNullOrWhiteSpace($Suffix)) {
             --output tsv 2>$null
 
         if (-not $functionAppsTsv) {
-            Write-Error "No se encontraron Function Apps con prefijo 'func-contosoretail-' en el Resource Group '$ResourceGroupName'. Usa -Suffix o -FunctionAppName."
+            Write-Error "No Function Apps with prefix 'func-contosoretail-' were found in Resource Group '$ResourceGroupName'. Use -Suffix or -FunctionAppName."
             exit 1
         }
 
         $functionApps = @($functionAppsTsv -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
 
         if ($functionApps.Count -gt 1) {
-            Write-Host "  Se encontraron multiples Function Apps candidatas:" -ForegroundColor Yellow
+            Write-Host "  Multiple candidate Function Apps found:" -ForegroundColor Yellow
             $functionApps | ForEach-Object { Write-Host "   - $_" -ForegroundColor Yellow }
-            Write-Error "Especifica -Suffix o -FunctionAppName para evitar ambiguedad."
+            Write-Error "Specify -Suffix or -FunctionAppName to avoid ambiguity."
             exit 1
         }
 
         $FunctionAppName = $functionApps[0]
 
         if ($FunctionAppName -notmatch '^func-contosoretail-([a-z0-9]{5})$') {
-            Write-Error "No se pudo derivar el sufijo desde la Function App '$FunctionAppName'."
+            Write-Error "Could not derive the suffix from Function App '$FunctionAppName'."
             exit 1
         }
 
@@ -105,11 +104,11 @@ if ([string]::IsNullOrWhiteSpace($Suffix)) {
 }
 
 $storageAccountName = "stcontosoretail$Suffix"
-Write-Host "  Sufijo resuelto: $Suffix" -ForegroundColor Gray
-Write-Host "  Storage resuelto: $storageAccountName" -ForegroundColor Gray
+Write-Host "  Suffix resolved:  $Suffix" -ForegroundColor Gray
+Write-Host "  Storage resolved: $storageAccountName" -ForegroundColor Gray
 
-# --- 3. Verificar y desbloquear Storage Account ---
-Write-Host "[3/4] Verificando Storage Account '$storageAccountName'..." -ForegroundColor Green
+# --- 3. Check and unlock Storage Account ---
+Write-Host "[3/4] Checking Storage Account '$storageAccountName'..." -ForegroundColor Green
 
 $storageJson = az storage account show `
     --name $storageAccountName `
@@ -118,7 +117,7 @@ $storageJson = az storage account show `
     --output json 2>$null
 
 if (-not $storageJson) {
-    Write-Error "No se encontro el Storage Account '$storageAccountName' en el Resource Group '$ResourceGroupName'."
+    Write-Error "Storage Account '$storageAccountName' not found in Resource Group '$ResourceGroupName'."
     exit 1
 }
 
@@ -127,23 +126,23 @@ Write-Host "  Estado actual: publicNetworkAccess = $($storage.publicNetworkAcces
 
 if ($storage.publicNetworkAccess -eq "Enabled") {
     Write-Host ""
-    Write-Host "  El Storage Account ya tiene acceso publico habilitado. No se requiere accion." -ForegroundColor Green
+    Write-Host "  Storage Account already has public network access enabled. No action required." -ForegroundColor Green
     Write-Host ""
     exit 0
 }
 
-Write-Host "  Habilitando acceso publico de red..." -ForegroundColor Yellow
+Write-Host "  Enabling public network access..." -ForegroundColor Yellow
 az storage account update `
     --name $storageAccountName `
     --resource-group $ResourceGroupName `
     --public-network-access Enabled `
     --output none
 
-Write-Host "  Acceso publico habilitado." -ForegroundColor Green
+Write-Host "  Public network access enabled." -ForegroundColor Green
 
-# --- 4. Reiniciar Function App para que reconecte al storage ---
+# --- 4. Restart Function App so it reconnects to storage ---
 $functionAppName = if (-not [string]::IsNullOrWhiteSpace($FunctionAppName)) { $FunctionAppName } else { "func-contosoretail-$Suffix" }
-Write-Host "[4/4] Reiniciando Function App '$functionAppName'..." -ForegroundColor Green
+Write-Host "[4/4] Restarting Function App '$functionAppName'..." -ForegroundColor Green
 
 az functionapp restart `
     --name $functionAppName `
@@ -151,16 +150,16 @@ az functionapp restart `
     --output none 2>$null
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "  Function App reiniciada." -ForegroundColor Green
+    Write-Host "  Function App restarted." -ForegroundColor Green
 } else {
-    Write-Host "  No se pudo reiniciar la Function App (puede que no exista aun). Continuando..." -ForegroundColor Yellow
+    Write-Host "  Could not restart the Function App (it may not exist yet). Continuing..." -ForegroundColor Yellow
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " Storage Account desbloqueado" -ForegroundColor Green
+Write-Host " Storage Account unlocked" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  El Storage Account '$storageAccountName' ahora tiene acceso" -ForegroundColor Gray
-Write-Host "  publico habilitado y la Function App fue reiniciada." -ForegroundColor Gray
+Write-Host "  Storage Account '$storageAccountName' now has public" -ForegroundColor Gray
+Write-Host "  network access enabled and the Function App was restarted." -ForegroundColor Gray
 Write-Host ""

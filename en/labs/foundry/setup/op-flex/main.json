@@ -12,49 +12,49 @@
     "tenantName": {
       "type": "string",
       "metadata": {
-        "description": "Nombre del tenant temporal asignado al attendee (ej: \"contoso-abc123tenant\")."
+        "description": "Temporary tenant name assigned to the attendee (e.g. \"contoso-abc123tenant\")."
       }
     },
     "location": {
       "type": "string",
       "defaultValue": "eastus",
       "metadata": {
-        "description": "Ubicación de los recursos. Por defecto: eastus."
+        "description": "Resource location. Default: eastus."
       }
     },
     "gptModelName": {
       "type": "string",
       "defaultValue": "gpt-4.1",
       "metadata": {
-        "description": "Nombre del modelo GPT a desplegar en AI Services."
+        "description": "Name of the GPT model to deploy in AI Services."
       }
     },
     "gptModelVersion": {
       "type": "string",
       "defaultValue": "2025-04-14",
       "metadata": {
-        "description": "Versión del modelo GPT."
+        "description": "GPT model version."
       }
     },
     "gptDeploymentCapacity": {
       "type": "int",
       "defaultValue": 30,
       "metadata": {
-        "description": "Capacidad del deployment (tokens por minuto en miles)."
+        "description": "Deployment capacity (tokens per minute in thousands)."
       }
     },
     "fabricWarehouseSqlEndpoint": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Endpoint SQL del Warehouse de Fabric (sin protocolo), por ejemplo: xyz.datawarehouse.fabric.microsoft.com"
+        "description": "Fabric Warehouse SQL endpoint (no protocol), e.g.: xyz.datawarehouse.fabric.microsoft.com"
       }
     },
     "fabricWarehouseDatabase": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Nombre de la base de datos del Warehouse de Fabric."
+        "description": "Fabric Warehouse database name."
       }
     }
   },
@@ -271,13 +271,13 @@
             "storageAccountName": {
               "type": "string",
               "metadata": {
-                "description": "Nombre del Storage Account existente."
+                "description": "Name of the existing Storage Account."
               }
             },
             "principalId": {
               "type": "string",
               "metadata": {
-                "description": "Principal ID de la Managed Identity (ej: Function App)."
+                "description": "Principal ID of the Managed Identity (e.g. Function App)."
               }
             }
           },

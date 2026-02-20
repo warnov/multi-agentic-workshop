@@ -1,372 +1,372 @@
 # Lab 3: Anders — Executor Agent
 
-## Tabla de contenido
+## Table of contents
 
 - [Lab 3: Anders — Executor Agent](#lab-3-anders--executor-agent)
-  - [Tabla de contenido](#tabla-de-contenido)
-  - [Introducción](#introducción)
-    - [¿Qué vamos a hacer en este lab?](#qué-vamos-a-hacer-en-este-lab)
-    - [Prerrequisitos](#prerrequisitos)
-      - [Herramientas en tu máquina](#herramientas-en-tu-máquina)
-      - [Infraestructura Azure](#infraestructura-azure)
-      - [Permisos RBAC](#permisos-rbac)
-  - [3.1 — Verificar soporte OpenAPI (ya viene preconfigurado)](#31--verificar-soporte-openapi-ya-viene-preconfigurado)
-    - [Checklist rápido de validación](#checklist-rápido-de-validación)
-    - [Paso 1: Verificar paquetes NuGet](#paso-1-verificar-paquetes-nuget)
-    - [Paso 2: Verificar endpoints expuestos](#paso-2-verificar-endpoints-expuestos)
-    - [Paso 3: Verificar compilación](#paso-3-verificar-compilación)
-    - [Endpoints OpenAPI generados](#endpoints-openapi-generados)
-  - [3.2 — Redesplegar la Function App](#32--redesplegar-la-function-app)
-    - [¿Cómo obtener `FabricWarehouseSqlEndpoint` y `FabricWarehouseDatabase`?](#cómo-obtener-fabricwarehousesqlendpoint-y-fabricwarehousedatabase)
-    - [Opción 0: Re-ejecutar setup de infraestructura (si necesitas refrescar settings)](#opción-0-re-ejecutar-setup-de-infraestructura-si-necesitas-refrescar-settings)
-    - [Opción A: Usando Azure Functions Core Tools (recomendada)](#opción-a-usando-azure-functions-core-tools-recomendada)
-    - [Opción B: Usando Azure CLI](#opción-b-usando-azure-cli)
-  - [3.3 — Verificar la especificación OpenAPI](#33--verificar-la-especificación-openapi)
-    - [Obtener la especificación JSON](#obtener-la-especificación-json)
-    - [Explorar el Swagger UI](#explorar-el-swagger-ui)
-  - [3.4 — El agente Anders: Dos versiones de SDK](#34--el-agente-anders-dos-versiones-de-sdk)
-    - [¿Por qué dos versiones?](#por-qué-dos-versiones)
-    - [¿Cuál versión debo usar?](#cuál-versión-debo-usar)
-    - [Entendiendo el código (versión `ms-foundry/` — recomendada)](#entendiendo-el-código-versión-ms-foundry--recomendada)
-      - [Fase 1 — Descargar la especificación OpenAPI](#fase-1--descargar-la-especificación-openapi)
-      - [Fase 2 — Verificar agente existente o crear uno nuevo](#fase-2--verificar-agente-existente-o-crear-uno-nuevo)
-      - [Fase 3 — Chat interactivo con Responses API](#fase-3--chat-interactivo-con-responses-api)
-    - [Paso 1: Configurar `appsettings.json`](#paso-1-configurar-appsettingsjson)
-    - [Paso 2: Compilar y ejecutar](#paso-2-compilar-y-ejecutar)
-    - [Paso 3: Inspeccionar el agente en Microsoft Foundry](#paso-3-inspeccionar-el-agente-en-azure-ai-foundry)
-    - [Paso 4: Probar el agente](#paso-4-probar-el-agente)
-  - [Solución de problemas](#solución-de-problemas)
-    - [Storage Account bloqueado por política (error 503)](#storage-account-bloqueado-por-política-error-503)
-  - [Siguiente paso](#siguiente-paso)
+  - [Table of contents](#table-of-contents)
+  - [Introduction](#introduction)
+    - [What will we do in this lab?](#what-will-we-do-in-this-lab)
+    - [Prerequisites](#prerequisites)
+      - [Tools on your machine](#tools-on-your-machine)
+      - [Azure Infrastructure](#azure-infrastructure)
+      - [RBAC Permissions](#rbac-permissions)
+  - [3.1 — Verify OpenAPI support (already preconfigured)](#31--verify-openapi-support-already-preconfigured)
+    - [Quick validation checklist](#quick-validation-checklist)
+    - [Step 1: Verify NuGet packages](#step-1-verify-nuget-packages)
+    - [Step 2: Verify exposed endpoints](#step-2-verify-exposed-endpoints)
+    - [Step 3: Verify compilation](#step-3-verify-compilation)
+    - [Generated OpenAPI endpoints](#generated-openapi-endpoints)
+  - [3.2 — Redeploy the Function App](#32--redeploy-the-function-app)
+    - [How to get `FabricWarehouseSqlEndpoint` and `FabricWarehouseDatabase`?](#how-to-get-fabricwarehousesqlendpoint-and-fabricwarehousedatabase)
+    - [Option 0: Re-run the infrastructure setup (if you need to refresh settings)](#option-0-re-run-the-infrastructure-setup-if-you-need-to-refresh-settings)
+    - [Option A: Using Azure Functions Core Tools (recommended)](#option-a-using-azure-functions-core-tools-recommended)
+    - [Option B: Using Azure CLI](#option-b-using-azure-cli)
+  - [3.3 — Verify the OpenAPI specification](#33--verify-the-openapi-specification)
+    - [Get the JSON specification](#get-the-json-specification)
+    - [Explore the Swagger UI](#explore-the-swagger-ui)
+  - [3.4 — The Anders agent: Two SDK versions](#34--the-anders-agent-two-sdk-versions)
+    - [Why two versions?](#why-two-versions)
+    - [Which version should I use?](#which-version-should-i-use)
+    - [Understanding the code (version `ms-foundry/` — recommended)](#understanding-the-code-version-ms-foundry--recommended)
+      - [Phase 1 — Download the OpenAPI specification](#phase-1--download-the-openapi-specification)
+      - [Phase 2 — Check for existing agent or create a new one](#phase-2--check-for-existing-agent-or-create-a-new-one)
+      - [Phase 3 — Interactive chat with Responses API](#phase-3--interactive-chat-with-responses-api)
+    - [Step 1: Configure `appsettings.json`](#step-1-configure-appsettingsjson)
+    - [Step 2: Build and run](#step-2-build-and-run)
+    - [Step 3: Inspect the agent in Microsoft Foundry](#step-3-inspect-the-agent-in-microsoft-foundry)
+    - [Step 4: Test the agent](#step-4-test-the-agent)
+  - [Troubleshooting](#troubleshooting)
+    - [Storage Account locked by policy (error 503)](#storage-account-locked-by-policy-error-503)
+  - [Next step](#next-step)
 
 ---
 
-## Introducción
+## Introduction
 
-Anders es el **agente ejecutor** de la arquitectura multi-agéntica de Contoso Retail. Su rol es recibir solicitudes de acciones operativas — como la generación y publicación de reportes de órdenes — y ejecutarlas interactuando con servicios externos como la Azure Function `FxContosoRetail`.
+Anders is the **executor agent** in the Contoso Retail multi-agent architecture. Its role is to receive requests for operational actions — such as generating and publishing order reports — and execute them by interacting with external services like the Azure Function `FxContosoRetail`.
 
-Para que Anders pueda interactuar con la API de Contoso Retail, definiremos una **OpenAPI Tool** que permite al agente descubrir e invocar automáticamente los endpoints de la Function App a partir de su especificación OpenAPI. Adicionalmente, agregaremos soporte **OpenAPI** a la Function App para documentar la API y facilitar la exploración de sus endpoints.
+To allow Anders to interact with the Contoso Retail API, we will define an **OpenAPI Tool** that lets the agent automatically discover and invoke the Function App endpoints from its OpenAPI specification. We will also add **OpenAPI** support to the Function App to document the API and facilitate endpoint exploration.
 
-### ¿Qué vamos a hacer en este lab?
+### What will we do in this lab?
 
-| Paso | Descripción |
+| Step | Description |
 |------|-------------|
-| **3.1** | Agregar soporte OpenAPI a la Azure Function `FxContosoRetail` |
-| **3.2** | Redesplegar la Function App con los cambios |
-| **3.3** | Verificar la especificación OpenAPI |
-| **3.4** | Entender, configurar, ejecutar y probar el agente Anders |
+| **3.1** | Add OpenAPI support to the Azure Function `FxContosoRetail` |
+| **3.2** | Redeploy the Function App with the changes |
+| **3.3** | Verify the OpenAPI specification |
+| **3.4** | Understand, configure, run and test the Anders agent |
 
-### Prerrequisitos
+### Prerequisites
 
-#### Herramientas en tu máquina
+#### Tools on your machine
 
-| Herramienta | Descripción | Descarga |
-|-------------|-------------|----------|
-| **.NET 8 SDK** | Compilar y ejecutar la Function App y el agente Anders | [Descargar](https://dotnet.microsoft.com/download/dotnet/8.0) |
-| **Azure CLI** | Autenticarse en Azure, desplegar recursos y asignar roles RBAC | [Instalar](https://learn.microsoft.com/cli/azure/install-azure-cli) |
-| **Azure Functions Core Tools** | Publicar la Function App a Azure (opción recomendada) | [Instalar](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) |
-| **PowerShell 7+** | Ejecutar scripts de despliegue. **Requerido en todos los OS** (incluido Windows). No usar PowerShell 5.1. | [Instalar](https://learn.microsoft.com/powershell/scripting/install/installing-powershell) · Windows: `winget install Microsoft.PowerShell` |
-| **Git** | Clonar el repositorio del taller | [Descargar](https://git-scm.com/downloads) |
+| Tool | Description | Download |
+|------|-------------|----------|
+| **.NET 8 SDK** | Build and run the Function App and the Anders agent | [Download](https://dotnet.microsoft.com/download/dotnet/8.0) |
+| **Azure CLI** | Authenticate to Azure, deploy resources and assign RBAC roles | [Install](https://learn.microsoft.com/cli/azure/install-azure-cli) |
+| **Azure Functions Core Tools** | Publish the Function App to Azure (recommended option) | [Install](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) |
+| **PowerShell 7+** | Run deployment scripts. **Required on all OS** (including Windows). Do not use PowerShell 5.1. | [Install](https://learn.microsoft.com/powershell/scripting/install/installing-powershell) · Windows: `winget install Microsoft.PowerShell` |
+| **Git** | Clone the workshop repository | [Download](https://git-scm.com/downloads) |
 
 > [!IMPORTANT]
-> **Windows:** Después de instalar PowerShell 7, configura la ExecutionPolicy ejecutando **una vez** en `pwsh`:
+> **Windows:** After installing PowerShell 7, configure the ExecutionPolicy by running **once** in `pwsh`:
 > ```powershell
 > Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 > ```
 
 > [!TIP]
-> En **macOS**, puedes instalar las herramientas con Homebrew:
+> On **macOS**, you can install the tools with Homebrew:
 > ```bash
 > brew install dotnet-sdk azure-cli azure-functions-core-tools@4 powershell git
 > ```
 
 > [!TIP]
-> En **Linux** (Ubuntu/Debian), puedes instalar PowerShell 7 con:
+> On **Linux** (Ubuntu/Debian), you can install PowerShell 7 with:
 > ```bash
 > sudo apt-get update && sudo apt-get install -y wget apt-transport-https software-properties-common
 > wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
 > sudo dpkg -i packages-microsoft-prod.deb && rm packages-microsoft-prod.deb
 > sudo apt-get update && sudo apt-get install -y powershell
 > ```
-> Ver: [Instalar PowerShell en Linux](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux)
+> See: [Install PowerShell on Linux](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux)
 
-#### Infraestructura Azure
+#### Azure Infrastructure
 
-- Haber completado el **setup de infraestructura** descrito en el [Setup de Foundry](README.md)
-- Tener anotados **todos los valores generados en el despliegue** de la infraestructura (nombres de recursos, URLs, sufijo, endpoint de AI Foundry, etc.)
-- Tener identificados estos 2 valores del Warehouse de Fabric (se usan en el setup actualizado):
+- Have completed the **infrastructure setup** described in [Foundry Setup](README.md)
+- Have noted **all values generated during the infrastructure deployment** (resource names, URLs, suffix, AI Foundry endpoint, etc.)
+- Have identified these 2 Fabric Warehouse values (used in the updated setup):
     - `FabricWarehouseSqlEndpoint`
     - `FabricWarehouseDatabase`
 
-#### Permisos RBAC
+#### RBAC Permissions
 
-Tu usuario necesita el rol **Cognitive Services User** sobre el recurso de AI Services para poder crear y ejecutar agentes. Como tu usuario es **Owner del tenant**, puedes asignarte el rol tú mismo.
+Your user needs the **Cognitive Services User** role on the AI Services resource to create and run agents. Since your user is the **tenant Owner**, you can assign the role to yourself.
 
-Ejecuta los siguientes comandos (reemplaza `{suffix}` con tu sufijo de 5 caracteres):
+Run the following commands (replace `{suffix}` with your 5-character suffix):
 
 ```powershell
-# 1. Obtener tu nombre de usuario (UPN)
+# 1. Get your username (UPN)
 $upn = az account show --query "user.name" -o tsv
 
-# 2. Obtener el nombre del recurso de AI Services (si no lo recuerdas)
+# 2. Get the AI Services resource name (if you don't remember it)
 az cognitiveservices account list --resource-group rg-contoso-retail --query "[].name" -o tsv
 
-# 3. Asignar el rol Cognitive Services User
+# 3. Assign the Cognitive Services User role
 az role assignment create `
     --assignee $upn `
     --role "Cognitive Services User" `
     --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/ais-contosoretail-{suffix}"
 ```
 
-> **Nota:** La propagación de RBAC puede tardar hasta 1 minuto. Espera antes de continuar con el lab.
+> **Note:** RBAC propagation can take up to 1 minute. Wait before continuing with the lab.
 
 ---
 
-## 3.1 — Verificar soporte OpenAPI (ya viene preconfigurado)
+## 3.1 — Verify OpenAPI support (already preconfigured)
 
-En la versión actual del taller, la Function App `FxContosoRetail` **ya incluye** OpenAPI y endpoints decorados en el código base. En este paso no vas a implementar OpenAPI desde cero: solo validar que todo está correcto antes del despliegue.
+In the current version of the workshop, the `FxContosoRetail` Function App **already includes** OpenAPI and decorated endpoints in the code base. In this step you will not implement OpenAPI from scratch: just validate that everything is correct before deployment.
 
-### Checklist rápido de validación
+### Quick validation checklist
 
-### Paso 1: Verificar paquetes NuGet
+### Step 1: Verify NuGet packages
 
-Abre `FxContosoRetail.csproj` y confirma que existen estas referencias:
+Open `FxContosoRetail.csproj` and confirm that these references exist:
 
 - `Microsoft.Azure.Functions.Worker.Extensions.OpenApi`
 - `Microsoft.Data.SqlClient`
 
-### Paso 2: Verificar endpoints expuestos
+### Step 2: Verify exposed endpoints
 
-Abre `FxContosoRetail.cs` y confirma que existen estos endpoints:
+Open `FxContosoRetail.cs` and confirm that these endpoints exist:
 
 - `HolaMundo`
 - `OrdersReporter`
 - `SqlExecutor`
 
-Además, valida que `OrdersReporter` y `SqlExecutor` tengan atributos OpenAPI (`OpenApiOperation`, `OpenApiRequestBody`, `OpenApiResponseWithBody`).
+Also validate that `OrdersReporter` and `SqlExecutor` have OpenAPI attributes (`OpenApiOperation`, `OpenApiRequestBody`, `OpenApiResponseWithBody`).
 
-### Paso 3: Verificar compilación
+### Step 3: Verify compilation
 
 ```powershell
 cd labs\foundry\code\api\FxContosoRetail
 dotnet build
 ```
 
-Si compila sin errores, puedes pasar al redespliegue del paso 3.2.
+If it compiles without errors, you can proceed to the redeployment in step 3.2.
 
-> **Nota:** OpenAPI ya está registrado en el proyecto. No necesitas agregar paquetes ni modificar `Program.cs` en este lab.
+> **Note:** OpenAPI is already registered in the project. You do not need to add packages or modify `Program.cs` in this lab.
 
 > [!IMPORTANT]
-> **Sobre la autenticación de los endpoints**
+> **About endpoint authentication**
 >
-> En este taller usamos `AuthorizationLevel.Anonymous` para simplificar la configuración y permitir que Microsoft Foundry pueda invocar la Function App directamente como OpenAPI Tool sin necesidad de gestionar secrets ni configurar autenticación adicional.
+> In this workshop we use `AuthorizationLevel.Anonymous` to simplify configuration and allow Microsoft Foundry to invoke the Function App directly as an OpenAPI Tool without needing to manage secrets or configure additional authentication.
 >
-> **En un entorno de producción, esto no es recomendable.** La práctica correcta es proteger la Function App con **Azure Entra ID (Easy Auth)** y hacer que Foundry se autentique usando **Managed Identity**. El flujo sería:
+> **In a production environment, this is not recommended.** The correct practice is to protect the Function App with **Azure Entra ID (Easy Auth)** and have Foundry authenticate using **Managed Identity**. The flow would be:
 >
-> 1. **Registrar una aplicación en Entra ID** que represente la Function App, obteniendo un Application (client) ID y un Application ID URI (por ejemplo, `api://<client-id>`).
-> 2. **Habilitar Easy Auth** en la Function App con `az webapp auth update`, configurándola para validar tokens emitidos por Entra ID contra la app registration. Esto protege todos los endpoints a nivel de plataforma — las peticiones sin un bearer token válido se rechazan con 401 antes de llegar al código.
-> 3. **Asignar permisos a la Managed Identity** del recurso de AI Services (`ais-contosoretail-{suffix}`) como principal autorizado en la app registration, ya sea agregándola como miembro de un app role o como identidad permitida en la configuración de Easy Auth.
-> 4. **Usar `OpenApiManagedAuthDetails`** en el código del agente en lugar de `OpenApiAnonymousAuthDetails`, especificando el audience de la app registration:
+> 1. **Register an application in Entra ID** that represents the Function App, obtaining an Application (client) ID and an Application ID URI (e.g. `api://<client-id>`).
+> 2. **Enable Easy Auth** on the Function App with `az webapp auth update`, configuring it to validate tokens issued by Entra ID against the app registration. This protects all endpoints at the platform level — requests without a valid bearer token are rejected with 401 before reaching the code.
+> 3. **Assign permissions to the Managed Identity** of the AI Services resource (`ais-contosoretail-{suffix}`) as an authorized principal in the app registration, either by adding it as a member of an app role or as an allowed identity in the Easy Auth configuration.
+> 4. **Use `OpenApiManagedAuthDetails`** in the agent code instead of `OpenApiAnonymousAuthDetails`, specifying the app registration audience:
 >    ```csharp
 >    openApiAuthentication: new OpenApiManagedAuthDetails(
 >        audience: "api://<app-registration-client-id>")
 >    ```
 >
-> Con esta configuración, cuando Foundry necesita llamar a la Function App, obtiene un token de Entra ID usando la managed identity del recurso de AI Services, lo envía como `Authorization: Bearer <token>`, y Easy Auth lo valida automáticamente. Los endpoints de la Function pueden mantener `AuthorizationLevel.Anonymous` en el código C# porque la autenticación ocurre en la capa de plataforma.
+> With this configuration, when Foundry needs to call the Function App, it obtains an Entra ID token using the AI Services resource managed identity, sends it as `Authorization: Bearer <token>`, and Easy Auth validates it automatically. The Function endpoints can keep `AuthorizationLevel.Anonymous` in C# code because authentication occurs at the platform layer.
 
-### Endpoints OpenAPI generados
+### Generated OpenAPI endpoints
 
-Una vez desplegada, la Function App expondrá estos endpoints adicionales:
+Once deployed, the Function App will expose these additional endpoints:
 
-| Endpoint | Descripción |
+| Endpoint | Description |
 |----------|-------------|
-| `/api/openapi/v3.json` | Especificación OpenAPI 3.0 en formato JSON |
-| `/api/swagger/ui` | Interfaz Swagger UI interactiva |
+| `/api/openapi/v3.json` | OpenAPI 3.0 specification in JSON format |
+| `/api/swagger/ui` | Interactive Swagger UI interface |
 
 ---
 
-## 3.2 — Redesplegar la Function App
+## 3.2 — Redeploy the Function App
 
-La infraestructura ya está desplegada desde el setup inicial. Solo necesitas **publicar el código actualizado** de la Function App.
+The infrastructure is already deployed from the initial setup. You only need to **publish the updated code** of the Function App.
 
 > [!IMPORTANT]
-> El setup de infraestructura actualizado (`op-flex/deploy.ps1` y `op-consumption/deploy.ps1`) acepta estos parámetros para configurar SQL del Lab 4:
+> The updated infrastructure setup (`op-flex/deploy.ps1` and `op-consumption/deploy.ps1`) accepts these parameters to configure the Lab 4 SQL:
 > - `FabricWarehouseSqlEndpoint`
 > - `FabricWarehouseDatabase`
 >
-> Si no se proporcionan, el despliegue continúa y solo omite la configuración automática del app setting `FabricWarehouseConnectionString`.
+> If not provided, the deployment continues and only skips the automatic configuration of the `FabricWarehouseConnectionString` app setting.
 
-### ¿Cómo obtener `FabricWarehouseSqlEndpoint` y `FabricWarehouseDatabase`?
+### How to get `FabricWarehouseSqlEndpoint` and `FabricWarehouseDatabase`?
 
-En Fabric, abre tu **Warehouse** y copia el **connection string** (SQL). Verás algo similar a:
+In Fabric, open your **Warehouse** and copy the **connection string** (SQL). You will see something like:
 
 ```text
 Data Source=kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com,1433;Initial Catalog=retail_sqldatabase_xxx;... 
 ```
 
-Mapeo de valores:
+Value mapping:
 
-- `FabricWarehouseSqlEndpoint` = valor de `Data Source` **sin** `,1433`
-    - Ejemplo: `kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com`
-- `FabricWarehouseDatabase` = valor de `Initial Catalog`
-    - Ejemplo: `retail_sqldatabase_xxx`
+- `FabricWarehouseSqlEndpoint` = value of `Data Source` **without** `,1433`
+    - Example: `kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com`
+- `FabricWarehouseDatabase` = value of `Initial Catalog`
+    - Example: `retail_sqldatabase_xxx`
 
 > [!TIP]
-> Estos valores se obtienen del entorno de **Fabric desplegado en el Lab 1** (`../fabric/lab01-data-setup.md`).
+> These values come from the **Fabric environment deployed in Lab 1** (`../fabric/lab01-data-setup.md`).
 >
-> Si no estás siguiendo la secuencia completa de laboratorios, en este lab solo necesitamos una base SQL para ejecutar consultas. Puedes usar una base SQL standalone (por ejemplo Azure SQL Database) y ajustar la conexión:
-> - `FabricWarehouseSqlEndpoint` por el host SQL de tu base standalone
-> - `FabricWarehouseDatabase` por el nombre de tu base
+> If you are not following the complete lab sequence, in this lab we only need a SQL database to run queries. You can use a standalone SQL database (e.g. Azure SQL Database) and adjust the connection:
+> - `FabricWarehouseSqlEndpoint` with the SQL host of your standalone database
+> - `FabricWarehouseDatabase` with your database name
 >
-> En ese escenario, asegúrate también de configurar permisos de la identidad de la Function App sobre esa base.
+> In that scenario, also make sure to configure permissions for the Function App identity on that database.
 
-### Opción 0: Re-ejecutar setup de infraestructura (si necesitas refrescar settings)
+### Option 0: Re-run the infrastructure setup (if you need to refresh settings)
 
-Si quieres redeploy completo (infra + publish) usando el setup:
+If you want a full redeploy (infra + publish) using the setup:
 
 ```powershell
 # Flex Consumption
 cd labs\foundry\setup\op-flex
 .\deploy.ps1 `
-    -TenantName "<tu-tenant>" `
+    -TenantName "<your-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
     -Location "eastus" `
-    -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
-    -FabricWarehouseDatabase "<database-warehouse>"
+    -FabricWarehouseSqlEndpoint "<fabric-sql-endpoint>" `
+    -FabricWarehouseDatabase "<warehouse-database>"
 ```
 
 ```powershell
 # Consumption (Y1)
 cd labs\foundry\setup\op-consumption
 .\deploy.ps1 `
-    -TenantName "<tu-tenant>" `
+    -TenantName "<your-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
     -Location "eastus" `
-    -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
-    -FabricWarehouseDatabase "<database-warehouse>"
+    -FabricWarehouseSqlEndpoint "<fabric-sql-endpoint>" `
+    -FabricWarehouseDatabase "<warehouse-database>"
 ```
 
-> Si solo cambiaste código de la Function App y no necesitas tocar infraestructura, usa la Opción A u Opción B de abajo.
+> If you only changed Function App code and don't need to touch infrastructure, use Option A or Option B below.
 
-### Opción A: Usando Azure Functions Core Tools (recomendada)
+### Option A: Using Azure Functions Core Tools (recommended)
 
-Si tienes instalado [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools), el redespliegue es un solo comando:
+If you have [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) installed, redeployment is a single command:
 
 ```powershell
 cd labs\foundry\code\api\FxContosoRetail
 func azure functionapp publish func-contosoretail-<suffix>
 ```
 
-> Reemplaza `<suffix>` con el sufijo de 5 caracteres que obtuviste durante el setup (por ejemplo, `func-contosoretail-a1b2c`).
+> Replace `<suffix>` with the 5-character suffix you got during setup (e.g. `func-contosoretail-a1b2c`).
 
-### Opción B: Usando Azure CLI
+### Option B: Using Azure CLI
 
-Si no tienes `func` CLI, puedes publicar manualmente con `az`:
+If you don't have the `func` CLI, you can publish manually with `az`:
 
 ```powershell
-# 1. Compilar el proyecto
+# 1. Build the project
 cd labs\foundry\code\api\FxContosoRetail
 dotnet publish --configuration Release --output bin\publish
 
-# 2. Crear el paquete zip
+# 2. Create the zip package
 Compress-Archive -Path "bin\publish\*" -DestinationPath "$env:TEMP\fxcontosoretail.zip" -Force
 
-# 3. Desplegar a Azure
+# 3. Deploy to Azure
 az functionapp deployment source config-zip `
     --resource-group rg-contoso-retail `
     --name func-contosoretail-<suffix> `
     --src "$env:TEMP\fxcontosoretail.zip"
 
-# 4. Limpiar archivos temporales
+# 4. Clean up temporary files
 Remove-Item "$env:TEMP\fxcontosoretail.zip" -Force
 Remove-Item "bin\publish" -Recurse -Force
 ```
 
 ---
 
-## 3.3 — Verificar la especificación OpenAPI
+## 3.3 — Verify the OpenAPI specification
 
-Una vez desplegada, verifica que los endpoints OpenAPI están disponibles.
+Once deployed, verify that the OpenAPI endpoints are available.
 
-### Obtener la especificación JSON
+### Get the JSON specification
 
-Abre en el navegador o con `curl`:
+Open in a browser or with `curl`:
 
 ```
 https://func-contosoretail-<suffix>.azurewebsites.net/api/openapi/v3.json
 ```
 
-Deberías ver un JSON con la estructura OpenAPI que describe los endpoints `HolaMundo`, `OrdersReporter` y `SqlExecutor`, incluyendo los esquemas de request/response.
+You should see a JSON with the OpenAPI structure describing the `HolaMundo`, `OrdersReporter` and `SqlExecutor` endpoints, including the request/response schemas.
 
-### Explorar el Swagger UI
+### Explore the Swagger UI
 
-Navega a:
+Navigate to:
 
 ```
 https://func-contosoretail-<suffix>.azurewebsites.net/api/swagger/ui
 ```
 
-Desde la interfaz de Swagger UI puedes explorar los endpoints y probarlos interactivamente.
+From the Swagger UI you can explore the endpoints and test them interactively.
 
-> **Importante:** La especificación OpenAPI documenta la API y sirve como referencia para entender qué parámetros enviar y qué respuesta esperar. El agente Anders usará esta información indirectamente a través de la Function Tool que definiremos en el siguiente paso.
+> **Important:** The OpenAPI specification documents the API and serves as a reference for understanding what parameters to send and what response to expect. The Anders agent will use this information indirectly through the Function Tool we will define in the next step.
 
 ---
 
-## 3.4 — El agente Anders: Dos versiones de SDK
+## 3.4 — The Anders agent: Two SDK versions
 
-La implementación del agente Anders se proporciona en **dos versiones separadas**, cada una ubicada bajo `labs/foundry/code/agents/AndersAgent/`:
+The Anders agent implementation is provided in **two separate versions**, each located under `labs/foundry/code/agents/AndersAgent/`:
 
-| Carpeta | SDK | Paradigma de API | Estado |
-|---------|-----|------------------|--------|
-| `ai-foundry/` | `Azure.AI.Projects` + `Azure.AI.Agents.Persistent` | Persistent Agents (threads, runs, polling) | GA — se conserva por retrocompatibilidad |
-| `ms-foundry/` | `Azure.AI.Projects` + `Azure.AI.Projects.OpenAI` | Responses API (conversaciones, respuestas de proyecto) | **Preview** (a febrero 2026) — **recomendada** |
+| Folder | SDK | API Paradigm | Status |
+|--------|-----|--------------|--------|
+| `ai-foundry/` | `Azure.AI.Projects` + `Azure.AI.Agents.Persistent` | Persistent Agents (threads, runs, polling) | GA — kept for backwards compatibility |
+| `ms-foundry/` | `Azure.AI.Projects` + `Azure.AI.Projects.OpenAI` | Responses API (conversations, project responses) | **Preview** (as of February 2026) — **recommended** |
 
-### ¿Por qué dos versiones?
+### Why two versions?
 
-A finales de 2025, Microsoft introdujo una **nueva experiencia para Microsoft Foundry** basada en la **Responses API** y una superficie de gestión de agentes rediseñada. Esta nueva experiencia — expuesta a través del paquete `Azure.AI.Projects.OpenAI` — reemplaza el modelo anterior de Persistent Agents (`Azure.AI.Agents.Persistent`) con un enfoque más ágil que utiliza **agentes con nombre y versionado**, **conversaciones** y la **Responses API** en lugar de threads y runs con polling.
+In late 2025, Microsoft introduced a **new Microsoft Foundry experience** based on the **Responses API** and a redesigned agent management surface. This new experience — exposed through the `Azure.AI.Projects.OpenAI` package — replaces the previous Persistent Agents model (`Azure.AI.Agents.Persistent`) with a more agile approach that uses **named and versioned agents**, **conversations**, and the **Responses API** instead of threads and runs with polling.
 
-Las diferencias clave entre ambos enfoques son:
+The key differences between both approaches are:
 
-| Aspecto | `ai-foundry/` (Persistent Agents) | `ms-foundry/` (Responses API) |
-|---------|-----------------------------------|-------------------------------|
-| **Ciclo de vida del agente** | Se crea con un ID generado; se busca por nombre iterando la lista | Se crea/actualiza por nombre con versionado explícito (`CreateAgentVersionAsync`) |
-| **Modelo de conversación** | `PersistentAgentThread` + `ThreadRun` con polling | `ProjectConversation` + `ProjectResponsesClient` — respuesta síncrona |
-| **Definición de herramientas** | `OpenApiToolDefinition` con clases tipadas | Protocol method vía `BinaryContent` (los tipos son internos en SDK 1.2.x) |
-| **Patrón de chat** | Crear run → hacer polling hasta completar → leer mensajes | Una sola llamada a `CreateResponse()` retorna la salida directamente |
+| Aspect | `ai-foundry/` (Persistent Agents) | `ms-foundry/` (Responses API) |
+|--------|-----------------------------------|-------------------------------|
+| **Agent lifecycle** | Created with a generated ID; searched by name by iterating the list | Created/updated by name with explicit versioning (`CreateAgentVersionAsync`) |
+| **Conversation model** | `PersistentAgentThread` + `ThreadRun` with polling | `ProjectConversation` + `ProjectResponsesClient` — synchronous response |
+| **Tool definition** | `OpenApiToolDefinition` with typed classes | Protocol method via `BinaryContent` (types are internal in SDK 1.2.x) |
+| **Chat pattern** | Create run → poll until complete → read messages | Single call to `CreateResponse()` returns the output directly |
 
-### ¿Cuál versión debo usar?
+### Which version should I use?
 
-**Se recomienda la versión `ms-foundry/`** para desarrollo nuevo. Está alineada con la dirección de la plataforma Microsoft Foundry y ofrece un modelo de programación más simple — particularmente la eliminación del loop de polling en favor de una sola llamada síncrona de respuesta.
+**The `ms-foundry/` version is recommended** for new development. It is aligned with the Microsoft Foundry platform direction and offers a simpler programming model — particularly the elimination of the polling loop in favor of a single synchronous response call.
 
-La versión `ai-foundry/` se conserva en este taller por **retrocompatibilidad**: los asistentes cuyos recursos de Azure AI Services fueron aprovisionados antes de que la nueva experiencia estuviera disponible pueden completar el lab usando la API de Persistent Agents.
+The `ai-foundry/` version is kept in this workshop for **backwards compatibility**: attendees whose Azure AI Services resources were provisioned before the new experience was available can complete the lab using the Persistent Agents API.
 
 > [!IMPORTANT]
-> A febrero de 2026, el paquete `Azure.AI.Projects.OpenAI` y la Responses API están en **preview pública**. Las formas de la API, schemas de payload y tipos del SDK pueden cambiar antes de alcanzar disponibilidad general (GA). Si encuentras problemas como propiedades faltantes o renombradas (por ejemplo, el campo `kind` requerido en el payload de definición del agente), consulta las últimas [notas de versión de Azure.AI.Projects.OpenAI](https://www.nuget.org/packages/Azure.AI.Projects.OpenAI) para conocer los cambios que rompen compatibilidad.
+> As of February 2026, the `Azure.AI.Projects.OpenAI` package and the Responses API are in **public preview**. API shapes, payload schemas and SDK types may change before reaching general availability (GA). If you encounter issues such as missing or renamed properties (e.g. the `kind` field required in the agent definition payload), consult the latest [Azure.AI.Projects.OpenAI release notes](https://www.nuget.org/packages/Azure.AI.Projects.OpenAI) for breaking changes.
 
 ---
 
-### Entendiendo el código (versión `ms-foundry/` — recomendada)
+### Understanding the code (version `ms-foundry/` — recommended)
 
-Abre el archivo `labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` y observa que está organizado en **3 fases**:
+Open the file `labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` and note that it is organized in **3 phases**:
 
-#### Fase 1 — Descargar la especificación OpenAPI
+#### Phase 1 — Download the OpenAPI specification
 
 ```csharp
 var openApiSpecUrl = $"{functionAppBaseUrl}/openapi/v3.json";
 var openApiSpec = await httpClient.GetStringAsync(openApiSpecUrl);
 ```
 
-El programa descarga la especificación OpenAPI de la Function App **en tiempo de ejecución**. Esto significa que si la API cambia (nuevos endpoints, nuevos parámetros), el agente lo detecta automáticamente al reiniciarse.
+The program downloads the OpenAPI specification from the Function App **at runtime**. This means that if the API changes (new endpoints, new parameters), the agent detects it automatically on restart.
 
-#### Fase 2 — Verificar agente existente o crear uno nuevo
+#### Phase 2 — Check for existing agent or create a new one
 
-Esta fase tiene dos partes clave:
+This phase has two key parts:
 
-**Detección de agente existente:**
+**Existing agent detection:**
 
-Antes de crear una nueva versión, el programa verifica si el agente ya existe llamando a `GetAgent`. Si lo encuentra, le pregunta al usuario si desea conservar el agente existente o sobreescribirlo con una nueva versión. Esto evita la proliferación innecesaria de versiones del agente durante el desarrollo iterativo.
+Before creating a new version, the program checks whether the agent already exists by calling `GetAgent`. If found, it asks the user whether to keep the existing agent or overwrite it with a new version. This avoids unnecessary proliferation of agent versions during iterative development.
 
-**Definición del agente con herramienta OpenAPI (protocol method):**
+**Agent definition with OpenAPI tool (protocol method):**
 
 ```csharp
 var agentDefinitionJson = new
@@ -394,11 +394,11 @@ var agentDefinitionJson = new
 };
 ```
 
-Dado que los tipos `OpenApiAgentTool` son internos en el SDK 1.2.x, la definición de la herramienta se construye como un objeto anónimo y se serializa vía `BinaryContent`. El campo `kind = "prompt"` es requerido por la API para indicar un agente basado en prompt.
+Since the `OpenApiAgentTool` types are internal in SDK 1.2.x, the tool definition is constructed as an anonymous object and serialized via `BinaryContent`. The `kind = "prompt"` field is required by the API to indicate a prompt-based agent.
 
-**System prompt (instrucciones):**
+**System prompt (instructions):**
 
-El system prompt incluye el schema JSON exacto que Anders debe construir al invocar la API:
+The system prompt includes the exact JSON schema that Anders must construct when invoking the API:
 
 ```json
 {
@@ -407,12 +407,12 @@ El system prompt incluye el schema JSON exacto que Anders debe construir al invo
   "endDate": "YYYY-MM-DD",
   "orders": [
     {
-      "orderNumber": "código de la orden",
+      "orderNumber": "order code",
       "orderDate": "YYYY-MM-DD",
       "orderLineNumber": 1,
-      "productName": "nombre del producto",
-      "brandName": "nombre de la marca",
-      "categoryName": "nombre de la categoría",
+      "productName": "product name",
+      "brandName": "brand name",
+      "categoryName": "category name",
       "quantity": 1.0,
       "unitPrice": 0.00,
       "lineTotal": 0.00
@@ -422,25 +422,25 @@ El system prompt incluye el schema JSON exacto que Anders debe construir al invo
 ```
 
 > [!TIP]
-> Incluir el schema en las instrucciones es una buena práctica cuando el agente debe construir payloads complejos. Aunque la especificación OpenAPI ya describe el schema, reforzarlo en el system prompt reduce significativamente los errores de formato.
+> Including the schema in the instructions is a good practice when the agent must construct complex payloads. Although the OpenAPI specification already describes the schema, reinforcing it in the system prompt significantly reduces formatting errors.
 
-**Reutilización del agente:**
+**Agent reuse:**
 
 ```csharp
 try
 {
     existingAgent = projectClient.Agents.GetAgent(agentName);
-    // Pregunta al usuario si desea sobreescribir o conservar
+    // Ask the user whether to overwrite or keep
 }
 catch (ClientResultException ex) when (ex.Status == 404)
 {
-    // Agente no encontrado — crear uno nuevo
+    // Agent not found — create a new one
 }
 ```
 
-Antes de crear una nueva versión del agente, el programa intenta recuperar el agente existente por nombre. Si lo encuentra, le pide al usuario que confirme si desea sobreescribirlo. Esto evita crear versiones innecesarias en Foundry al reiniciar la aplicación.
+Before creating a new version of the agent, the program tries to retrieve the existing agent by name. If found, it asks the user to confirm whether to overwrite it. This avoids creating unnecessary versions in Foundry when restarting the application.
 
-#### Fase 3 — Chat interactivo con Responses API
+#### Phase 3 — Interactive chat with Responses API
 
 ```csharp
 ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
@@ -452,132 +452,132 @@ ResponseResult response = responseClient.CreateResponse(input);
 Console.WriteLine(response.GetOutputText());
 ```
 
-El patrón de interacción en la versión `ms-foundry/` es más simple que el enfoque de Persistent Agents:
-1. Se crea una `ProjectConversation` (el contexto de conversación)
-2. Se obtiene un `ProjectResponsesClient`, vinculado al agente y la conversación
-3. Cada mensaje del usuario se envía vía `CreateResponse()` que retorna la salida **síncronamente** — sin necesidad de loop de polling
-4. El texto de respuesta se extrae con `GetOutputText()`
+The interaction pattern in the `ms-foundry/` version is simpler than the Persistent Agents approach:
+1. A `ProjectConversation` is created (the conversation context)
+2. A `ProjectResponsesClient` is obtained, bound to the agent and conversation
+3. Each user message is sent via `CreateResponse()`, which returns the output **synchronously** — no polling loop needed
+4. The response text is extracted with `GetOutputText()`
 
-> **¿Qué pasa durante una llamada de respuesta?** Cuando el modelo decide que necesita llamar a la API, Foundry ejecuta la llamada HTTP automáticamente usando la especificación OpenAPI. El resultado se envía de vuelta al modelo, que formula la respuesta final al usuario. Todo esto ocurre dentro de la única llamada a `CreateResponse()` — el código simplemente recibe la respuesta terminada.
+> **What happens during a response call?** When the model decides it needs to call the API, Foundry executes the HTTP call automatically using the OpenAPI specification. The result is sent back to the model, which formulates the final response to the user. All of this occurs within the single call to `CreateResponse()` — the code simply receives the finished response.
 
-**Limpieza al salir:**
+**Cleanup on exit:**
 
-Cuando el usuario escribe `salir`, el loop de chat termina. El agente **persiste** en Foundry y se reutiliza automáticamente en la siguiente ejecución.
+When the user types `exit`, the chat loop ends. The agent **persists** in Foundry and is reused automatically on the next run.
 
-### Paso 1: Configurar `appsettings.json`
+### Step 1: Configure `appsettings.json`
 
-Abre el archivo `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` y reemplaza los valores con los de tu entorno:
+Open the file `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` and replace the values with your environment's:
 
 ```json
 {
-  "FoundryProjectEndpoint": "<TU-AI-FOUNDRY-PROJECT-ENDPOINT>",
+  "FoundryProjectEndpoint": "<YOUR-AI-FOUNDRY-PROJECT-ENDPOINT>",
   "ModelDeploymentName": "gpt-4.1",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api"
 }
 ```
 
-> **¿Dónde encuentro estos valores?**
-> - **FoundryProjectEndpoint**: El `AI Foundry Endpoint` de la salida del despliegue.
-> - **ModelDeploymentName**: `gpt-4.1` (nombre del deployment creado por el Bicep).
-> - **FunctionAppBaseUrl**: La URL de tu Function App + `/api`.
+> **Where do I find these values?**
+> - **FoundryProjectEndpoint**: The `AI Foundry Endpoint` from the deployment output.
+> - **ModelDeploymentName**: `gpt-4.1` (name of the deployment created by Bicep).
+> - **FunctionAppBaseUrl**: Your Function App URL + `/api`.
 
-### Paso 2: Compilar y ejecutar
+### Step 2: Build and run
 
 ```powershell
 cd labs\foundry\code\agents\AndersAgent\ms-foundry
 dotnet build
 ```
 
-Asegúrate de que no haya errores de compilación. Luego ejecuta:
+Make sure there are no compilation errors. Then run:
 
 ```powershell
 dotnet run
 ```
 
-Verás en consola que el agente verifica si ya existe una versión en Foundry. Si la encuentra, te preguntará si deseas conservarla o sobreescribirla. Si no existe, se crea un agente nuevo automáticamente.
+You will see in the console that the agent checks whether a version already exists in Foundry. If found, it will ask whether you want to keep it or overwrite it. If it does not exist, a new agent is created automatically.
 
-### Paso 3: Inspeccionar el agente en Microsoft Foundry
+### Step 3: Inspect the agent in Microsoft Foundry
 
-**Antes de interactuar con Anders**, ve al portal para inspeccionar lo que se creó:
+**Before interacting with Anders**, go to the portal to inspect what was created:
 
-1. Abre [Microsoft Foundry](https://ai.azure.com) y navega a tu proyecto
-2. En el menú lateral, selecciona **Agents**
-3. Busca el agente **"Anders"** y haz clic en él
+1. Open [Microsoft Foundry](https://ai.azure.com) and navigate to your project
+2. In the left menu, select **Agents**
+3. Find the **"Anders"** agent and click on it
 
-Observa dos cosas clave:
+Note two key things:
 
-- **System prompt (instrucciones):** Verás las instrucciones completas que le dimos al agente, incluyendo el schema JSON. Esto es lo que guía su comportamiento al decidir cuándo y cómo invocar la API.
-- **Tools (herramientas):** Verás **ContosoRetailAPI** listada como herramienta OpenAPI. Puedes expandirla para ver la especificación completa con el endpoint `ordersReporter`, los schemas de request/response, y la configuración de autenticación anónima.
+- **System prompt (instructions):** You will see the complete instructions given to the agent, including the JSON schema. This is what guides its behavior when deciding when and how to invoke the API.
+- **Tools:** You will see **ContosoRetailAPI** listed as an OpenAPI tool. You can expand it to see the complete specification with the `ordersReporter` endpoint, request/response schemas, and the anonymous authentication configuration.
 
 > [!TIP]
-> El system prompt y las tools son los dos pilares que determinan qué puede hacer un agente y cómo lo hace. Entender esta relación es clave para diseñar agentes efectivos.
+> The system prompt and tools are the two pillars that determine what an agent can do and how it does it. Understanding this relationship is key to designing effective agents.
 
-### Paso 4: Probar el agente
+### Step 4: Test the agent
 
-De vuelta en la consola, pruébalo primero con un saludo:
-
-```
-Tú: Hola Anders, ¿qué puedes hacer?
-```
-
-Anders debería responder explicando que puede generar reportes de órdenes. Luego, prueba con datos reales (pega todo en una sola línea):
+Back in the console, test it first with a greeting:
 
 ```
-Tú: Genera un reporte para Izabella Celma (periodo: 1-31 enero 2026). Orden ORD-CID-069-001 (2026-01-04): Sport-100 Helmet Black, Contoso Outdoor, Helmets, 6x$34.99=$209.94 | HL Road Frame Red 62, Contoso Outdoor, Road Frames, 10x$1431.50=$14315.00 | Long-Sleeve Logo Jersey S, Contoso Outdoor, Jerseys, 8x$49.99=$399.92. Orden ORD-CID-069-003 (2026-01-08): HL Road Frame Black 58, Contoso Outdoor, Road Frames, 3x$1431.50=$4294.50 | HL Road Frame Red 44, Contoso Outdoor, Road Frames, 7x$1431.50=$10020.50. Orden ORD-CID-069-002 (2026-01-17): HL Road Frame Red 62, Contoso Outdoor, Road Frames, 2x$1431.50=$2863.00 | LL Road Frame Black 60, Contoso Outdoor, Road Frames, 4x$337.22=$1348.88.
+You: Hello Anders, what can you do?
 ```
 
-Lo que ocurre internamente:
-1. Anders analiza el mensaje y decide que necesita llamar al endpoint `ordersReporter`
-2. **Foundry ejecuta la llamada HTTP** automáticamente a la Function App con los datos estructurados según el schema
-3. La Function App genera el reporte HTML, lo sube a Blob Storage y retorna la URL
-4. Foundry envía el resultado de vuelta al modelo
-5. Anders formula su respuesta y presenta la URL al usuario
-
-Abre la URL del reporte en el navegador para verificar que se generó correctamente.
-
-Ahora prueba con un caso más sencillo — un solo pedido con dos productos:
+Anders should respond explaining it can generate order reports. Then, test with real data (paste all on a single line):
 
 ```
-Tú: Genera un reporte para Marco Rivera (periodo: 5-10 febrero 2026). Orden ORD-CID-112-001 (2026-02-07): Mountain Bike Socks M, Contoso Outdoor, Socks, 3x$9.50=$28.50 | Water Bottle 30oz, Contoso Outdoor, Bottles and Cages, 1x$6.99=$6.99.
+You: Generate a report for Izabella Celma (period: January 1-31 2026). Order ORD-CID-069-001 (2026-01-04): Sport-100 Helmet Black, Contoso Outdoor, Helmets, 6x$34.99=$209.94 | HL Road Frame Red 62, Contoso Outdoor, Road Frames, 10x$1431.50=$14315.00 | Long-Sleeve Logo Jersey S, Contoso Outdoor, Jerseys, 8x$49.99=$399.92. Order ORD-CID-069-003 (2026-01-08): HL Road Frame Black 58, Contoso Outdoor, Road Frames, 3x$1431.50=$4294.50 | HL Road Frame Red 44, Contoso Outdoor, Road Frames, 7x$1431.50=$10020.50. Order ORD-CID-069-002 (2026-01-17): HL Road Frame Red 62, Contoso Outdoor, Road Frames, 2x$1431.50=$2863.00 | LL Road Frame Black 60, Contoso Outdoor, Road Frames, 4x$337.22=$1348.88.
 ```
 
-> **Nota:** Al escribir `salir`, solo se termina la conversación. El agente **persiste** en Foundry y se reutiliza automáticamente en la siguiente ejecución.
+What happens internally:
+1. Anders analyses the message and decides it needs to call the `ordersReporter` endpoint
+2. **Foundry executes the HTTP call** automatically to the Function App with the structured data according to the schema
+3. The Function App generates the HTML report, uploads it to Blob Storage and returns the URL
+4. Foundry sends the result back to the model
+5. Anders formulates its response and presents the URL to the user
+
+Open the report URL in the browser to verify it was generated correctly.
+
+Now try a simpler case — a single order with two products:
+
+```
+You: Generate a report for Marco Rivera (period: February 5-10 2026). Order ORD-CID-112-001 (2026-02-07): Mountain Bike Socks M, Contoso Outdoor, Socks, 3x$9.50=$28.50 | Water Bottle 30oz, Contoso Outdoor, Bottles and Cages, 1x$6.99=$6.99.
+```
+
+> **Note:** Typing `exit` only ends the conversation. The agent **persists** in Foundry and is reused automatically on the next run.
 
 ---
 
-## Solución de problemas
+## Troubleshooting
 
-### Storage Account bloqueado por política (error 503)
+### Storage Account locked by policy (error 503)
 
-En suscripciones con políticas estrictas de Azure, el Storage Account que respalda la Function App puede tener su **acceso público de red deshabilitado** automáticamente después del aprovisionamiento. Esto impide que el host de Functions alcance su propio almacenamiento, causando un error persistente **503 (Site Unavailable)** — aunque la app reporte como `Running` y `Enabled`.
+In subscriptions with strict Azure policies, the Storage Account backing the Function App may have its **public network access automatically disabled** after provisioning. This prevents the Functions host from reaching its own storage, causing a persistent **503 (Site Unavailable)** error — even though the app reports as `Running` and `Enabled`.
 
-**Síntomas:**
-- La Function App aparece como `Running` en el Portal de Azure y CLI
-- Todas las restricciones de acceso de red muestran "Allow all"
-- Cada solicitud HTTP a cualquier endpoint retorna 503 después de un timeout de ~60 segundos
+**Symptoms:**
+- The Function App appears as `Running` in the Azure Portal and CLI
+- All network access restrictions show "Allow all"
+- Every HTTP request to any endpoint returns 503 after a ~60 second timeout
 
-**Diagnóstico:**
+**Diagnosis:**
 ```powershell
 az storage account show --name stcontosoretail<suffix> --resource-group rg-contoso-retail --query "publicNetworkAccess" -o tsv
 ```
 
-Si retorna `Disabled`, esa es la causa raíz.
+If it returns `Disabled`, that is the root cause.
 
-**Solución:**
+**Solution:**
 
-Se incluye un script de conveniencia en el repositorio:
+A convenience script is included in the repository:
 
 ```powershell
 cd labs/foundry/setup
 .\unlock-storage.ps1
 ```
 
-El script detecta automáticamente el sufijo desde la Function App. Si necesitas forzarlo, también acepta `-Suffix` o `-FunctionAppName`.
+The script automatically detects the suffix from the Function App. If you need to force it, it also accepts `-Suffix` or `-FunctionAppName`.
 
-Este script habilita el acceso público de red en el Storage Account y reinicia la Function App. Ver [unlock-storage.ps1](setup/unlock-storage.ps1) para detalles.
+This script enables public network access on the Storage Account and restarts the Function App. See [unlock-storage.ps1](setup/unlock-storage.ps1) for details.
 
 ---
 
-## Siguiente paso
+## Next step
 
-Continúa con el [Lab 4 — Julie (Planner Agent)](lab04-julie-planner-agent.md).
+Continue with [Lab 4 — Julie (Planner Agent)](lab04-julie-planner-agent.md).

@@ -1,49 +1,49 @@
 // ============================================================================
-// Contoso Retail - Infraestructura Azure (Flex Consumption)
-// Taller Multi-Agéntico
+// Contoso Retail - Azure Infrastructure (Flex Consumption)
+// Multi-Agent Workshop
 // ============================================================================
-// Cada attendee despliega en su propia suscripción.
-// El sufijo único (5 chars) se genera a partir del nombre del tenant temporal.
+// Each attendee deploys into their own subscription.
+// The unique suffix (5 chars) is derived from the temporary tenant name.
 //
 // Plan: Flex Consumption (FC1 / Linux)
-// - Identity-based storage completo (sin connection strings para runtime)
-// - No requiere file share pre-creado
+// - Full identity-based storage (no connection strings for runtime)
+// - No pre-created file share required
 // - Deployment via blob container
-// Basado en: https://github.com/Azure-Samples/azure-functions-flex-consumption-samples
+// Based on: https://github.com/Azure-Samples/azure-functions-flex-consumption-samples
 // ============================================================================
 
 targetScope = 'resourceGroup'
 
 // ============================================================================
-// Parámetros
+// Parameters
 // ============================================================================
 
-@description('Nombre del tenant temporal asignado al attendee (ej: "contoso-abc123tenant").')
+@description('Temporary tenant name assigned to the attendee (e.g. "contoso-abc123tenant").')
 param tenantName string
 
-@description('Ubicación de los recursos. Por defecto: eastus.')
+@description('Resource location. Default: eastus.')
 param location string = 'eastus'
 
-@description('Nombre del modelo GPT a desplegar en AI Services.')
+@description('Name of the GPT model to deploy in AI Services.')
 param gptModelName string = 'gpt-4.1'
 
-@description('Versión del modelo GPT.')
+@description('GPT model version.')
 param gptModelVersion string = '2025-04-14'
 
-@description('Capacidad del deployment (tokens por minuto en miles).')
+@description('Deployment capacity (tokens per minute in thousands).')
 param gptDeploymentCapacity int = 30
 
-@description('Endpoint SQL del Warehouse de Fabric (sin protocolo), por ejemplo: xyz.datawarehouse.fabric.microsoft.com')
+@description('Fabric Warehouse SQL endpoint (no protocol), e.g.: xyz.datawarehouse.fabric.microsoft.com')
 param fabricWarehouseSqlEndpoint string = ''
 
-@description('Nombre de la base de datos del Warehouse de Fabric.')
+@description('Fabric Warehouse database name.')
 param fabricWarehouseDatabase string = ''
 
-@description('Connection string SQL completa de Fabric. Se usa para preservar un valor existente cuando no se envían endpoint/database.')
+@description('Full Fabric SQL connection string. Used to preserve an existing value when endpoint/database are not provided.')
 param fabricWarehouseConnectionString string = ''
 
 // ============================================================================
-// Variables - Sufijo y nombres
+// Variables - Suffix and names
 // ============================================================================
 
 var suffix = substring(uniqueString(tenantName), 0, 5)
@@ -56,7 +56,7 @@ var aiProjectName = 'aip-contosoretail-${suffix}'
 var bingGroundingName = 'bingsearch-${suffix}'
 var bingConnectionName = '${aiFoundryName}-bingsearchconnection'
 
-// Container para el paquete de deployment de la Function App
+// Container for the Function App deployment package
 var deploymentContainerName = 'app-package-${toLower(functionAppName)}'
 var hasFabricWarehouseConfig = !empty(fabricWarehouseSqlEndpoint) && !empty(fabricWarehouseDatabase)
 var computedFabricWarehouseConnectionString = 'Server=tcp:${fabricWarehouseSqlEndpoint},1433;Database=${fabricWarehouseDatabase};Encrypt=True;TrustServerCertificate=False;Authentication=Active Directory Default;Connection Timeout=30;'
@@ -90,11 +90,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: false // Flex Consumption soporta identity-based completo
+    allowSharedKeyAccess: false // Flex Consumption supports full identity-based access
   }
 }
 
 // Blob containers: reports (app) + deployment package
+
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
   parent: storageAccount
   name: 'default'
@@ -110,7 +111,7 @@ resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/con
   name: deploymentContainerName
 }
 
-// Flex Consumption no requiere file share, pero sí table y queue services
+// Flex Consumption does not require a file share, but does need table and queue services
 resource tableService 'Microsoft.Storage/storageAccounts/tableServices@2023-05-01' = {
   parent: storageAccount
   name: 'default'
@@ -134,7 +135,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
     tier: 'FlexConsumption'
   }
   properties: {
-    reserved: true // Linux
+    reserved: true // Linux required for Flex Consumption
   }
 }
 
@@ -189,11 +190,11 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
 // ============================================================================
 // 3b. Role Assignments - Function App → Storage Account
 // ============================================================================
-// La Function App usa Managed Identity para TODO: runtime + código.
-// Se requieren 3 roles:
-//   - Storage Blob Data Owner       → triggers, bindings, blob storage, deployment
-//   - Storage Queue Data Contributor → queue triggers
-//   - Storage Account Contributor   → gestión general
+// The Function App uses Managed Identity for everything: runtime + code.
+// Three roles are required:
+//   - Storage Blob Data Owner         → triggers, bindings, blob storage, deployment
+//   - Storage Queue Data Contributor  → queue triggers
+//   - Storage Account Contributor     → general management
 
 module functionStorageRbac 'storage-rbac.bicep' = {
   name: 'functionStorageRbacDeployment'
@@ -204,10 +205,10 @@ module functionStorageRbac 'storage-rbac.bicep' = {
 }
 
 // ============================================================================
-// 7. AI Foundry Resource (CognitiveServices/accounts con allowProjectManagement)
+// 7. AI Foundry Resource (CognitiveServices/accounts with allowProjectManagement)
 // ============================================================================
-// Este recurso unifica AI Services + Foundry Hub en un solo recurso.
-// Reemplaza el antiguo patrón Hub (MachineLearningServices/workspaces kind:Hub).
+// This resource combines AI Services + Foundry Hub into a single resource.
+// Replaces the old Hub pattern (MachineLearningServices/workspaces kind:Hub).
 // Ref: https://learn.microsoft.com/azure/ai-foundry/how-to/create-resource-template
 
 resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
@@ -230,7 +231,7 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
 }
 
 // ============================================================================
-// 8. AI Foundry Project (hijo directo del Foundry Resource)
+// 8. AI Foundry Project (direct child of the Foundry Resource)
 // ============================================================================
 
 resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
@@ -245,7 +246,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = 
 }
 
 // ============================================================================
-// 9. Model Deployment (GPT sobre el Foundry Resource)
+// 9. Model Deployment (GPT on the Foundry Resource)
 // ============================================================================
 
 resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
@@ -265,7 +266,7 @@ resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06
 }
 
 // ============================================================================
-// 10. Grounding with Bing Search + Connection para Foundry
+// 10. Grounding with Bing Search + Connection for Foundry
 // ============================================================================
 
 #disable-next-line BCP081

@@ -1,46 +1,46 @@
 # ============================================================================
-# Contoso Retail - Script de Despliegue (Flex Consumption FC1 / Linux)
-# Taller Multi-Agéntico
+# Contoso Retail - Deployment Script (Flex Consumption FC1 / Linux)
+# Multi-Agent Workshop
 # ============================================================================
-# Uso:
-#   .\deploy.ps1 -TenantName "mi-tenant-temporal"
-#   .\deploy.ps1 -TenantName "mi-tenant-temporal" -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" -FabricWarehouseDatabase "<database>"
-#   .\deploy.ps1 -TenantName "mi-tenant-temporal" -Location "eastus" -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" -FabricWarehouseDatabase "<database>"
+# Usage:
+#   .\deploy.ps1 -TenantName "my-temporary-tenant"
+#   .\deploy.ps1 -TenantName "my-temporary-tenant" -FabricWarehouseSqlEndpoint "<fabric-sql-endpoint>" -FabricWarehouseDatabase "<database>"
+#   .\deploy.ps1 -TenantName "my-temporary-tenant" -Location "eastus" -FabricWarehouseSqlEndpoint "<fabric-sql-endpoint>" -FabricWarehouseDatabase "<database>"
 # ============================================================================
 
 param(
-    [Parameter(Mandatory = $true, HelpMessage = "Nombre del tenant temporal asignado al attendee.")]
+    [Parameter(Mandatory = $true, HelpMessage = "Temporary tenant name assigned to the attendee.")]
     [string]$TenantName,
 
-    [Parameter(Mandatory = $false, HelpMessage = "Región de Azure (default: eastus).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Azure region (default: eastus).")]
     [string]$Location = "eastus",
 
-    [Parameter(Mandatory = $false, HelpMessage = "Nombre del Resource Group (default: rg-contoso-retail).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Resource Group name (default: rg-contoso-retail).")]
     [string]$ResourceGroupName = "rg-contoso-retail",
 
-    [Parameter(Mandatory = $false, HelpMessage = "Endpoint SQL del Warehouse de Fabric (sin protocolo). Ej: xyz.datawarehouse.fabric.microsoft.com")]
+    [Parameter(Mandatory = $false, HelpMessage = "Fabric Warehouse SQL endpoint (no protocol). E.g.: xyz.datawarehouse.fabric.microsoft.com")]
     [string]$FabricWarehouseSqlEndpoint = "",
 
-    [Parameter(Mandatory = $false, HelpMessage = "Nombre de la base de datos del Warehouse de Fabric.")]
+    [Parameter(Mandatory = $false, HelpMessage = "Fabric Warehouse database name.")]
     [string]$FabricWarehouseDatabase = ""
 )
 
 $ErrorActionPreference = "Stop"
 
-# --- Verificar PowerShell 7+ ---
+# --- Check PowerShell 7+ ---
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Host ""
-    Write-Host "ERROR: Este script requiere PowerShell 7 o superior." -ForegroundColor Red
-    Write-Host "  Version detectada: PowerShell $($PSVersionTable.PSVersion)" -ForegroundColor Red
+    Write-Host "ERROR: This script requires PowerShell 7 or higher." -ForegroundColor Red
+    Write-Host "  Detected version: PowerShell $($PSVersionTable.PSVersion)" -ForegroundColor Red
     Write-Host ""
-    Write-Host "  Descarga PowerShell 7:" -ForegroundColor Yellow
+    Write-Host "  Download PowerShell 7:" -ForegroundColor Yellow
     Write-Host "    Windows : https://aka.ms/powershell-release?tag=stable  (MSI installer)" -ForegroundColor Cyan
-    Write-Host "             o ejecuta:  winget install Microsoft.PowerShell" -ForegroundColor Gray
+    Write-Host "             or run:  winget install Microsoft.PowerShell" -ForegroundColor Gray
     Write-Host "    Linux   : https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux" -ForegroundColor Cyan
     Write-Host "    macOS   : https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-macos" -ForegroundColor Cyan
-    Write-Host "             o ejecuta:  brew install powershell/tap/powershell" -ForegroundColor Gray
+    Write-Host "             or run:  brew install powershell/tap/powershell" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "  Una vez instalado, abre una terminal 'pwsh' (no 'powershell') y vuelve a ejecutar el script." -ForegroundColor Yellow
+    Write-Host "  Once installed, open a 'pwsh' terminal (not 'powershell') and run the script again." -ForegroundColor Yellow
     Write-Host ""
     exit 1
 }
@@ -49,24 +49,24 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
-# --- Verificar ExecutionPolicy ---
+# --- Check ExecutionPolicy ---
 $execPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($execPolicy -eq 'Restricted' -or $execPolicy -eq 'Undefined') {
     $systemPolicy = Get-ExecutionPolicy -Scope LocalMachine
     if ($systemPolicy -eq 'Restricted' -or $systemPolicy -eq 'Undefined') {
         Write-Host ""
-        Write-Host "ERROR: La ExecutionPolicy no permite ejecutar scripts." -ForegroundColor Red
-        Write-Host "  Policy actual (CurrentUser): $execPolicy" -ForegroundColor Red
-        Write-Host "  Policy actual (LocalMachine): $systemPolicy" -ForegroundColor Red
+        Write-Host "ERROR: The ExecutionPolicy does not allow running scripts." -ForegroundColor Red
+        Write-Host "  Current policy (CurrentUser): $execPolicy" -ForegroundColor Red
+        Write-Host "  Current policy (LocalMachine): $systemPolicy" -ForegroundColor Red
         Write-Host ""
-        Write-Host "  Ejecuta este comando en pwsh y vuelve a intentar:" -ForegroundColor Yellow
+        Write-Host "  Run this command in pwsh and try again:" -ForegroundColor Yellow
         Write-Host "    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser" -ForegroundColor Cyan
         Write-Host ""
         exit 1
     }
 }
 
-Write-Host "Presiona Enter para default." -ForegroundColor DarkGray
+Write-Host "Press Enter to accept defaults." -ForegroundColor DarkGray
 
 if (-not $PSBoundParameters.ContainsKey('Location')) {
     $locationInput = Read-Host "Location [$Location]"
@@ -83,32 +83,32 @@ if (-not $PSBoundParameters.ContainsKey('ResourceGroupName')) {
 }
 
 if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint) -and [string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) {
-    $configureFabricNow = Read-Host "¿Deseas configurar ahora la conexión SQL de Fabric para Lab04? (s/N)"
-    if ($configureFabricNow -match '^(s|si|sí|y|yes)$') {
-        $FabricWarehouseSqlEndpoint = (Read-Host "FabricWarehouseSqlEndpoint (sin protocolo, sin puerto)").Trim()
+    $configureFabricNow = Read-Host "Do you want to configure the Fabric SQL connection for Lab04 now? (y/N)"
+    if ($configureFabricNow -match '^(y|yes)$') {
+        $FabricWarehouseSqlEndpoint = (Read-Host "FabricWarehouseSqlEndpoint (no protocol, no port)").Trim()
         $FabricWarehouseDatabase = (Read-Host "FabricWarehouseDatabase").Trim()
     }
 }
 
 if (-not [string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint) -and [string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) {
-    $FabricWarehouseDatabase = (Read-Host "Falta FabricWarehouseDatabase. Ingresa el valor o deja vacío para omitir").Trim()
+    $FabricWarehouseDatabase = (Read-Host "FabricWarehouseDatabase is missing. Enter a value or leave blank to skip").Trim()
 }
 
 if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint) -and -not [string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) {
-    $FabricWarehouseSqlEndpoint = (Read-Host "Falta FabricWarehouseSqlEndpoint. Ingresa el valor o deja vacío para omitir").Trim()
+    $FabricWarehouseSqlEndpoint = (Read-Host "FabricWarehouseSqlEndpoint is missing. Enter a value or leave blank to skip").Trim()
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Taller Multi-Agéntico - Despliegue" -ForegroundColor Cyan
+Write-Host " Multi-Agent Workshop - Deployment" -ForegroundColor Cyan
 Write-Host " Plan: Flex Consumption (FC1 / Linux)" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Tenant:         $TenantName" -ForegroundColor Yellow
 Write-Host "  Location:       $Location" -ForegroundColor Yellow
 Write-Host "  Resource Group: $ResourceGroupName" -ForegroundColor Yellow
-Write-Host "  Fabric SQL:     $(if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint)) { '<omitido>' } else { $FabricWarehouseSqlEndpoint })" -ForegroundColor Yellow
-Write-Host "  Fabric DB:      $(if ([string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) { '<omitido>' } else { $FabricWarehouseDatabase })" -ForegroundColor Yellow
+Write-Host "  Fabric SQL:     $(if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint)) { '<skipped>' } else { $FabricWarehouseSqlEndpoint })" -ForegroundColor Yellow
+    Write-Host "  Fabric DB:      $(if ([string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) { '<skipped>' } else { $FabricWarehouseDatabase })" -ForegroundColor Yellow
 Write-Host ""
 
 $hasFabricSql = -not [string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint)
@@ -117,44 +117,44 @@ $hasCompleteFabricConfig = $hasFabricSql -and $hasFabricDb
 $FabricWarehouseConnectionString = ""
 
 if ($hasFabricSql -xor $hasFabricDb) {
-    Write-Warning "Se recibió solo uno de los parámetros de Fabric. Se omitirán ambos para no configurar una conexión incompleta."
+    Write-Warning "Only one of the Fabric parameters was provided. Both will be skipped to avoid an incomplete connection."
     $FabricWarehouseSqlEndpoint = ""
     $FabricWarehouseDatabase = ""
     $hasCompleteFabricConfig = $false
 }
 
 if (-not $hasCompleteFabricConfig) {
-    Write-Warning "No se configurará conexión SQL para Lab04 en este despliegue. Deberás ajustarla manualmente luego."
+    Write-Warning "SQL connection for Lab04 will not be configured in this deployment. You will need to set it manually later."
 }
 
-# --- 1. Verificar Azure CLI ---
-Write-Host "[1/5] Verificando Azure CLI..." -ForegroundColor Green
+# --- 1. Check Azure CLI ---
+Write-Host "[1/5] Checking Azure CLI..." -ForegroundColor Green
 try {
     $azVersion = az version --output json | ConvertFrom-Json
-    Write-Host "  Azure CLI v$($azVersion.'azure-cli') detectado." -ForegroundColor Gray
-    Write-Host "  Registrando provider Microsoft.Bing (si aplica)..." -ForegroundColor Gray
+    Write-Host "  Azure CLI v$($azVersion.'azure-cli') detected." -ForegroundColor Gray
+    Write-Host "  Registering Microsoft.Bing provider (if needed)..." -ForegroundColor Gray
     az provider register --namespace Microsoft.Bing --output none 2>$null
 } catch {
-    Write-Error "Azure CLI no está instalado. Instálalo desde https://aka.ms/installazurecli"
+    Write-Error "Azure CLI is not installed. Install it from https://aka.ms/installazurecli"
     exit 1
 }
 
-# --- 2. Verificar sesión activa ---
-Write-Host "[2/5] Verificando sesión de Azure..." -ForegroundColor Green
+# --- 2. Check active session ---
+Write-Host "[2/5] Checking Azure session..." -ForegroundColor Green
 $account = az account show --output json 2>$null | ConvertFrom-Json
 if (-not $account) {
-    Write-Host "  No hay sesión activa. Iniciando login..." -ForegroundColor Yellow
+    Write-Host "  No active session found. Starting login..." -ForegroundColor Yellow
     az login
     $account = az account show --output json | ConvertFrom-Json
 }
-Write-Host "  Suscripción: $($account.name) ($($account.id))" -ForegroundColor Gray
+Write-Host "  Subscription: $($account.name) ($($account.id))" -ForegroundColor Gray
 
-# --- 3. Crear Resource Group ---
-Write-Host "[3/5] Creando Resource Group '$ResourceGroupName'..." -ForegroundColor Green
+# --- 3. Create Resource Group ---
+Write-Host "[3/5] Creating Resource Group '$ResourceGroupName'..." -ForegroundColor Green
 az group create --name $ResourceGroupName --location $Location --output none
-Write-Host "  Resource Group listo." -ForegroundColor Gray
+Write-Host "  Resource Group ready." -ForegroundColor Gray
 
-# Intentar preservar configuración existente (requiere que el RG ya exista)
+# Attempt to preserve existing configuration (requires the RG to already exist)
 $suffixForNames = $null
 if (-not [string]::IsNullOrWhiteSpace($TenantName)) {
     $suffixTemplateForPreserve = @'
@@ -188,14 +188,14 @@ if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffix
 
     if (-not [string]::IsNullOrWhiteSpace($existingConnection) -and $existingConnection -ne "null") {
         $FabricWarehouseConnectionString = $existingConnection
-        Write-Host "  Se preservará FabricWarehouseConnectionString existente en la Function App." -ForegroundColor Yellow
+        Write-Host "  Existing FabricWarehouseConnectionString from the Function App will be preserved." -ForegroundColor Yellow
     }
 }
 
-# --- 4. Desplegar Bicep ---
-Write-Host "[4/5] Desplegando infraestructura..." -ForegroundColor Green
+# --- 4. Deploy Bicep ---
+Write-Host "[4/5] Deploying infrastructure..." -ForegroundColor Green
 
-# Calcular y mostrar el sufijo antes de desplegar
+# Calculate and display the suffix before deploying
 $suffixTemplate = @'
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -215,10 +215,10 @@ $suffixResult = az deployment group create `
     --query 'properties.outputs.s.value' `
     --output tsv 2>$null
 Remove-Item $suffixTempFile -Force -ErrorAction SilentlyContinue
-Write-Host "  Sufijo:         $suffixResult" -ForegroundColor Yellow
+Write-Host "  Suffix:         $suffixResult" -ForegroundColor Yellow
 
 Write-Host "" -ForegroundColor Gray
-Write-Host "  Esto puede tomar ~5 minutos." -ForegroundColor Yellow
+Write-Host "  This may take ~5 minutes." -ForegroundColor Yellow
 Write-Host ""
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $templateFile = Join-Path $scriptDir "main.bicep"
@@ -234,7 +234,7 @@ az deployment group create `
     --output none
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "No se pudo iniciar el despliegue. Verifica que no haya recursos soft-deleted (az cognitiveservices account list-deleted)."
+    Write-Error "Could not start the deployment. Check that there are no soft-deleted resources (az cognitiveservices account list-deleted)."
     exit 1
 }
 
@@ -251,7 +251,7 @@ do {
 } while (-not $depState -and $retries -lt 10)
 
 if (-not $depState) {
-    Write-Error "El deployment '$deploymentName' no se registró en Azure. Verifica errores de validación."
+    Write-Error "Deployment '$deploymentName' was not registered in Azure. Check for validation errors."
     exit 1
 }
 
@@ -295,7 +295,7 @@ while ($true) {
         }
     }
 
-    # Verificar si el deployment terminó
+    # Check if the deployment has finished
     $depJson = az deployment group show `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
@@ -311,13 +311,13 @@ while ($true) {
 
 if ($depJson -ne 'Succeeded') {
     Write-Host ""
-    # Mostrar error detallado
+    # Show detailed error
     az deployment group show `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
         --query 'properties.error' `
         --output json
-    Write-Error "El despliegue falló. Revisa los errores anteriores."
+    Write-Error "Deployment failed. Review the errors above."
     exit 1
 }
 
@@ -330,20 +330,20 @@ $result = az deployment group show `
 $outputs = $result.properties.outputs
 $functionAppName = $outputs.functionAppName.value
 
-# --- 5. Publicar código de la Function App ---
-Write-Host "[5/5] Publicando código de FxContosoRetail..." -ForegroundColor Green
+# --- 5. Publish Function App code ---
+Write-Host "[5/5] Publishing FxContosoRetail code..." -ForegroundColor Green
 $projectDir = Join-Path (Join-Path (Join-Path (Join-Path $scriptDir "..") "..") "code") "api"
 $projectDir = Join-Path $projectDir "FxContosoRetail"
 $publishDir = Join-Path (Join-Path $projectDir "bin") "publish"
 
-Write-Host "  Compilando proyecto..." -ForegroundColor Gray
+Write-Host "  Building project..." -ForegroundColor Gray
 $publishOutput = dotnet publish $projectDir --configuration Release --output $publishDir 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "" 
-    Write-Host "===== Detalle de error de compilación =====" -ForegroundColor Red
+    Write-Host "===== Build error details =====" -ForegroundColor Red
     $publishOutput | ForEach-Object { Write-Host $_ }
-    Write-Host "==========================================" -ForegroundColor Red
-    Write-Error "Error al compilar el proyecto. Verifica el código."
+    Write-Host "===============================" -ForegroundColor Red
+    Write-Error "Error building the project. Check the code."
     exit 1
 }
 
@@ -352,9 +352,9 @@ $zipPath = Join-Path $env:TEMP "fxcontosoretail-publish.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
 
-# Esperar a que el SCM endpoint esté resolvible por DNS (Flex Consumption tarda)
+# Wait for the SCM endpoint to be resolvable via DNS (Flex Consumption takes a moment)
 $scmHost = "$functionAppName.scm.azurewebsites.net"
-Write-Host "  Esperando a que el endpoint SCM esté disponible..." -ForegroundColor Gray
+Write-Host "  Waiting for the SCM endpoint to become available..." -ForegroundColor Gray
 $dnsReady = $false
 for ($i = 0; $i -lt 30; $i++) {
     try {
@@ -366,14 +366,14 @@ for ($i = 0; $i -lt 30; $i++) {
     }
 }
 if (-not $dnsReady) {
-    Write-Warning "  El DNS de $scmHost no resolvió tras 5 minutos. Intentando deploy de todas formas..."
+    Write-Warning "  DNS for $scmHost did not resolve after 5 minutes. Attempting deploy anyway..."
 }
 
 # Deploy con reintentos (hasta 3 intentos con espera incremental)
 $maxRetries = 3
 $deploySuccess = $false
 for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
-    Write-Host "  Desplegando a $functionAppName (intento $attempt/$maxRetries)..." -ForegroundColor Gray
+    Write-Host "  Deploying to $functionAppName (attempt $attempt/$maxRetries)..." -ForegroundColor Gray
     az functionapp deployment source config-zip `
         --resource-group $ResourceGroupName `
         --name $functionAppName `
@@ -388,13 +388,13 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
 
     if ($attempt -lt $maxRetries) {
         $waitSecs = $attempt * 30
-        Write-Host "  ⚠️  Intento $attempt falló. Reintentando en $waitSecs segundos..." -ForegroundColor Yellow
+        Write-Host "  ⚠️  Attempt $attempt failed. Retrying in $waitSecs seconds..." -ForegroundColor Yellow
         Start-Sleep -Seconds $waitSecs
     }
 }
 
 if (-not $deploySuccess) {
-    Write-Error "Error al publicar el código tras $maxRetries intentos. Puedes reintentar manualmente con: az functionapp deployment source config-zip --resource-group $ResourceGroupName --name $functionAppName --src `"$zipPath`""
+    Write-Error "Error publishing the code after $maxRetries attempts. You can retry manually with: az functionapp deployment source config-zip --resource-group $ResourceGroupName --name $functionAppName --src `"$zipPath`""
     exit 1
 }
 
@@ -402,19 +402,19 @@ if (-not $deploySuccess) {
 Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
 Remove-Item $publishDir -Recurse -Force -ErrorAction SilentlyContinue
 
-Write-Host "  ✅ Código publicado exitosamente." -ForegroundColor Green
+Write-Host "  ✅ Code published successfully." -ForegroundColor Green
 
-# --- Resumen final ---
+# --- Final summary ---
 $functionAppUrl = $outputs.functionAppUrl.value
 
 $apiUrl = "$functionAppUrl/api/OrdersReporter"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " ¡Despliegue completo!" -ForegroundColor Green
+Write-Host " Deployment complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Sufijo único:        $($outputs.suffix.value)" -ForegroundColor White
+Write-Host "  Unique suffix:       $($outputs.suffix.value)" -ForegroundColor White
 Write-Host "  Storage Account:     $($outputs.storageAccountName.value)" -ForegroundColor White
 Write-Host "  Function App:        $functionAppName" -ForegroundColor White
 Write-Host "  Function App Base URL:      $functionAppUrl/api" -ForegroundColor White
@@ -424,15 +424,15 @@ Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" 
 Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
 Write-Host "  Bing Connection ID (Julie):  $($outputs.bingConnectionId.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
-    Write-Host "  Fabric SQL Connection:       actualizada desde parámetros" -ForegroundColor White
+    Write-Host "  Fabric SQL Connection:       updated from parameters" -ForegroundColor White
 }
 elseif (-not [string]::IsNullOrWhiteSpace($FabricWarehouseConnectionString)) {
-    Write-Host "  Fabric SQL Connection:       preservada desde configuración existente" -ForegroundColor White
+    Write-Host "  Fabric SQL Connection:       preserved from existing configuration" -ForegroundColor White
 }
 else {
-    Write-Host "  Fabric SQL Connection:       no configurada" -ForegroundColor Yellow
+    Write-Host "  Fabric SQL Connection:       not configured" -ForegroundColor Yellow
 }
 if (-not $hasCompleteFabricConfig -and [string]::IsNullOrWhiteSpace($FabricWarehouseConnectionString)) {
-    Write-Host "  Aviso Lab04:                 No se configuró la conexión SQL (FabricWarehouseConnectionString). Configúrala manualmente en la Function App." -ForegroundColor Yellow
+    Write-Host "  Lab04 notice:                SQL connection (FabricWarehouseConnectionString) was not configured. Set it manually in the Function App." -ForegroundColor Yellow
 }
 Write-Host ""

@@ -59,7 +59,7 @@ Ejemplos de preguntas analíticas y de planificación:
 
 ## <a id="arquitectura"></a>Arquitectura y agentes
 
-![alt text](assets/image-1.png)
+![alt text](../assets/image-1.png)
 
 ### <a id="capa-datos"></a>Microsoft Fabric – Capa de datos
 
@@ -221,3 +221,5 @@ Esto permite ejecutar scripts locales y scripts descargados que estén firmados.
 ## <a id="notas"></a>Notas finales
 
 Este workshop está pensado como un ejercicio **pedagógico y arquitectónico**. El foco está en el diseño del flujo y la colaboración entre agentes, no en optimizar modelos ni consultas al extremo.
+
+[➡️ Siguiente: Lab 1 – Setup del ambiente en Microsoft Fabric](./labs/fabric/lab01-data-setup.md)

@@ -1,35 +1,35 @@
-# Como obtener los parámetros de SQL Database para nuestros Agentes?
+# How to obtain the SQL Database parameters for our Agents?
 
-Si estás siguiendo todos los laboratorios del workshop en orden, estos valores se obtienen del entorno de Fabric desplegado en el [Lab 1](../../fabric/lab01-data-setup.md). De lo contrario, usa el endpoint e identificación de tu base de datos propia.
+If you are following all the workshop labs in order, these values come from the Fabric environment deployed in [Lab 1](../../fabric/lab01-data-setup.md). Otherwise, use the endpoint and identifier of your own database.
 
-## Obteniendo los parámetros desde Microsoft Fabric
+## Obtaining the parameters from Microsoft Fabric
 
-- En tu Workspace de Fabric, abre la base de datos y copia el **connection string** SQL. Verás algo como: 
+- In your Fabric Workspace, open the database and copy the SQL **connection string**. You will see something like:
 
 ```text
 Data Source=xxxxx.database.fabric.microsoft.com,1433;Initial Catalog=retail_sqldatabase_xxx;...
 ```
 
-- Mapeo:
+- Mapping:
 
-  - `FabricWarehouseSqlEndpoint` = `Data Source` sin `,1433`
+  - `FabricWarehouseSqlEndpoint` = `Data Source` without `,1433`
 
   - `FabricWarehouseDatabase` = `Initial Catalog`
 
-- Ejemplo:
+- Example:
 
   - `FabricWarehouseSqlEndpoint`:
     - `kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com`
 
-  - ``FabricWarehouseDatabase`:
+  - `FabricWarehouseDatabase`:
     - `retail_sqldatabase_danrdol6ases3c-6d18d61e-43a5-4281-a754-b255fc9a6c9b`
 
 
 
 > [!TIP]
-> Para la ejecución de este laboratorio solo es necesaria la base de datos de Contoso Retail. > Si no estás siguiendo toda la secuencia de laboratorios, no es necesario tener desplegado > Microsoft Fabric. Así que para las consultas del Lab 5 (Julie), puedes apuntar directamente > a una base SQL standalone (por ejemplo Azure SQL Database) usando:
+> Only the Contoso Retail database is required to run this lab. If you are not following the full lab sequence, you do not need to have Microsoft Fabric deployed. For the queries in Lab 5 (Julie), you can point directly to a standalone SQL database (e.g. Azure SQL Database) using:
 >
-> - `FabricWarehouseSqlEndpoint` = host SQL de tu base standalone
-> - `FabricWarehouseDatabase` = nombre de tu base
+> - `FabricWarehouseSqlEndpoint` = SQL host of your standalone database
+> - `FabricWarehouseDatabase` = name of your database
 >
-> Si no proporcionas estos valores, el despliegue no falla: omite la configuración de DB para > Lab 5 y te mostrará un aviso para configurarla manualmente después.
+> If you do not provide these values, the deployment does not fail: it skips the DB configuration for Lab 5 and will show a notice to configure it manually afterwards.
