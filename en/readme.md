@@ -1,4 +1,4 @@
-## <a id="descripcion-general"></a>Overview
+## <a id="general-description"></a>Overview
 
 This workshop guides participants through the design and implementation of a **multi‑agent** architecture using Microsoft services, applied to a **Contoso Retail**-style business scenario. The goal is not to build a production system, but to understand how to **orchestrate agents with clearly defined responsibilities** to answer different kinds of business questions over the same dataset.
 
@@ -12,7 +12,7 @@ We will explore orchestration capabilities in both Copilot Studio and Microsoft 
 
 ------
 
-## <a id="escenario"></a>Business scenario: Contoso Retail
+## <a id="scenarios"></a>Business scenario: Contoso Retail
 
 Contoso is a retail company that sells products to both corporate and individual customers. Its data model includes information about customers, accounts, orders, order lines, invoices, payments, products, and categories.
 
@@ -25,9 +25,9 @@ The workshop shows how a single architecture can serve both needs without duplic
 
 ------
 
-## <a id="flujos"></a>Business flows covered
+## <a id="flows"></a>Business flows covered
 
-### <a id="flujo-operativo"></a>Operational flow
+### <a id="operational-flow"></a>Operational flow
 
 The operational flow answers concrete requests about customers, orders, and billing. In this flow, the objective is to reconstruct transactional facts precisely and produce visual artifacts (HTML reports) that summarize the information.
 
@@ -44,7 +44,7 @@ Examples of operational questions:
 - What are the orders and products for Marco Rivera?
 - I need a visual summary of a customer’s recent purchases.
 
-### <a id="flujo-analitico"></a>Analytical and planning flow
+### <a id="analytical-flow"></a>Analytical and planning flow
 
 The analytical flow answers strategic and exploratory questions. Here the goal is not to explain a single case, but to identify relevant signals that help prioritize actions and generate concrete plans.
 
@@ -57,11 +57,11 @@ Examples of analytical and planning questions:
 
 ------
 
-## <a id="arquitectura"></a>Architecture and agents
+## <a id="architecture"></a>Architecture and agents
 
 ![alt text](../assets/image-1.png)
 
-### <a id="capa-datos"></a>Microsoft Fabric – Data layer
+### <a id="data-layer"></a>Microsoft Fabric – Data layer
 
 - **Mark (Data Agent)**
   Fabric Data Agent that interprets natural language and queries the semantic model built over the `db_retail` SQL database (tables `customer`, `orders`, `orderline`, `product`). It reconstructs exact transactional facts and returns them as traceable data, without interpretation.
@@ -75,14 +75,14 @@ To better understand the data model used by the Fabric agents, detailed document
 
 You can find the full documentation here: [Database Documentation](./assets/database.md)
 
-### <a id="capa-razonamiento"></a>Microsoft Foundry – Reasoning layer
+### <a id="reasoning-layer"></a>Microsoft Foundry – Reasoning layer
 
 - **Anders (Executor Agent)**
   Executes operational actions by calling external services through an OpenAPI tool. It receives order data and calls the `OrdersReporter` endpoint on the `FxContosoRetail` Azure Function, which generates an HTML report and publishes it to Blob Storage, returning the document URL. It uses the `Azure.AI.Agents.Persistent` SDK with a GPT‑4.1 model to interpret the request, build the JSON payload, and orchestrate the API call.
 - **Julie (Planner Agent)**
   Orchestrator agent for marketing campaigns, defined as `kind: "workflow"`. It coordinates three tools: **SqlAgent** (`type: "agent"`), which generates T‑SQL queries from natural language; an Azure Function tool called **SqlExecutor** (`type: "openapi"`), which executes the SQL against the Fabric database (the same Function App `FxContosoRetail` used earlier by Anders); and **MarketingAgent** (`type: "agent"`), which uses Bing Search to find relevant events and generates personalized marketing messages per customer. The final result is a JSON campaign with email drafts ready to send.
 
-### <a id="capa-orquestacion"></a>Copilot Studio – Orchestration layer
+### <a id="orchestration-layer"></a>Copilot Studio – Orchestration layer
 
 - **Charles (Product Q&A Agent)**
   Product analyst agent that answers questions using documentation stored in SharePoint as its knowledge base. It can also perform competitive analysis and market comparisons using public information on demand.
@@ -93,7 +93,7 @@ You can find the full documentation here: [Database Documentation](./assets/data
 
 ------
 
-## <a id="objetivo"></a>Workshop goals
+## <a id="goals"></a>Workshop goals
 
 By the end of the workshop, participants will understand:
 
@@ -104,28 +104,28 @@ By the end of the workshop, participants will understand:
 
 This repository serves as a practical, reusable guide to understand and replicate this architectural pattern in real‑world scenarios.
 
-## <a id="laboratorios"></a>Workshop contents
+## <a id="laboratories"></a>Workshop contents
 
 The workshop is divided into independent but connected labs, organized by architectural layer. It is recommended to follow them in order.
 
 ### 1. Microsoft Fabric labs
 
-- [Lab 1 – Environment setup: Fabric capacity, workspace, SQL database, and semantic model](./labs/fabric/lab01-data-setup.md)
-- [Lab 2 – Mark Agent: Data Agent over the retail semantic model](./labs/fabric/lab02-mark-facts-agent.md)
+- [Lab 1 – Environment setup: Fabric capacity, workspace, SQL database, and semantic model](./labs/fabric/lab01-data-setup.en.md)
+- [Lab 2 – Mark Agent: Data Agent over the retail semantic model](./labs/fabric/lab02-mark-facts-agent.en.md)
 
 ### 2. Azure AI Foundry labs
 
-- [Foundry infrastructure setup](./labs/foundry/setup.md)
-- [Lab 3 – Anders Agent: OpenAPI support, Function App deployment, and executor agent run](./labs/foundry/lab03-anders-executor-agent.md)
-- [Lab 4 – Julie Agent: workflow agent with SqlAgent and MarketingAgent sub‑agents](./labs/foundry/lab04-julie-planner-agent.md)
+- [Foundry infrastructure setup](./labs/foundry/setup.en.md)
+- [Lab 3 – Anders Agent: OpenAPI support, Function App deployment, and executor agent run](./labs/foundry/lab03-anders-executor-agent.en.md)
+- [Lab 4 – Julie Agent: workflow agent with SqlAgent and MarketingAgent sub‑agents](./labs/foundry/lab04-julie-planner-agent.en.md)
 
 ### 3. Copilot Studio labs
 
-- [Lab 5 – Copilot Studio setup: environment, solution, and publisher](./labs/copilot/lab05-mcs-setup.md)
-- [Lab 6 – Charles Agent: product Q&A with SharePoint and market analysis](./labs/copilot/lab06-charles-copilot-agent.md)
-- [Lab 7 – Ric Agent: child agent for email sending + initial Bill configuration](./labs/copilot/lab07-ric-child-agent.md)
-- [Lab 8 – Bill Orchestrator: connecting external (Mark, Anders) and internal (Charles) agents and defining orchestration rules](./labs/copilot/lab08-bill-orchestrator.md)
-- [Lab 9 – Publishing Bill in Microsoft 365 / Teams and end‑to‑end tests](./labs/copilot/lab09-bill-publishing.md)
+- [Lab 5 – Copilot Studio setup: environment, solution, and publisher](./labs/copilot/lab05-mcs-setup.en.md)
+- [Lab 6 – Charles Agent: product Q&A with SharePoint and market analysis](./labs/copilot/lab06-charles-copilot-agent.en.md)
+- [Lab 7 – Ric Agent: child agent for email sending + initial Bill configuration](./labs/copilot/lab07-ric-child-agent.en.md)
+- [Lab 8 – Bill Orchestrator: connecting external (Mark, Anders) and internal (Charles) agents and defining orchestration rules](./labs/copilot/lab08-bill-orchestrator.en.md)
+- [Lab 9 – Publishing Bill in Microsoft 365 / Teams and end‑to‑end tests](./labs/copilot/lab09-bill-publishing.en.md)
 
 ---
 
@@ -222,4 +222,4 @@ This allows running local scripts and downloaded scripts that are signed. It onl
 
 This workshop is designed as a **pedagogical and architectural** exercise. The focus is on flow design and collaboration between agents, not on extreme optimization of models or queries.
 
-[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.md)
+[➡️ Next: Lab 1 – Environment setup in Microsoft Fabric](./labs/fabric/lab01-data-setup.en.md)
