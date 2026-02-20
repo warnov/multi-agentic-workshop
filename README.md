@@ -6,9 +6,9 @@ Choose your preferred language below to read the full workshop description and s
 
 ### Languages / Idiomas
 
-- 🇪🇸 [Español](es/README.md)
-- 🇺🇸 [English](en/README.md)
-- 🇧🇷 [Português](pt/README.md)
+- 🇪🇸 [Español](es/readme.md)
+- 🇺🇸 [English](en/readme.md)
+- 🇧🇷 [Português](pt/readme.md)
 
 Each language README describes the scenario, architecture and labs in detail for that language.
 
