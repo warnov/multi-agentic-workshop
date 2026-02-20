@@ -33,7 +33,7 @@
       - [Fase 3 — Chat interactivo con Responses API](#fase-3--chat-interactivo-con-responses-api)
     - [Paso 1: Configurar `appsettings.json`](#paso-1-configurar-appsettingsjson)
     - [Paso 2: Compilar y ejecutar](#paso-2-compilar-y-ejecutar)
-    - [Paso 3: Inspeccionar el agente en Azure AI Foundry](#paso-3-inspeccionar-el-agente-en-azure-ai-foundry)
+    - [Paso 3: Inspeccionar el agente en Microsoft Foundry](#paso-3-inspeccionar-el-agente-en-azure-ai-foundry)
     - [Paso 4: Probar el agente](#paso-4-probar-el-agente)
   - [Solución de problemas](#solución-de-problemas)
     - [Storage Account bloqueado por política (error 503)](#storage-account-bloqueado-por-política-error-503)
@@ -159,7 +159,7 @@ Si compila sin errores, puedes pasar al redespliegue del paso 3.2.
 > [!IMPORTANT]
 > **Sobre la autenticación de los endpoints**
 >
-> En este taller usamos `AuthorizationLevel.Anonymous` para simplificar la configuración y permitir que Azure AI Foundry pueda invocar la Function App directamente como OpenAPI Tool sin necesidad de gestionar secrets ni configurar autenticación adicional.
+> En este taller usamos `AuthorizationLevel.Anonymous` para simplificar la configuración y permitir que Microsoft Foundry pueda invocar la Function App directamente como OpenAPI Tool sin necesidad de gestionar secrets ni configurar autenticación adicional.
 >
 > **En un entorno de producción, esto no es recomendable.** La práctica correcta es proteger la Function App con **Azure Entra ID (Easy Auth)** y hacer que Foundry se autentique usando **Managed Identity**. El flujo sería:
 >
@@ -496,11 +496,11 @@ dotnet run
 
 Verás en consola que el agente verifica si ya existe una versión en Foundry. Si la encuentra, te preguntará si deseas conservarla o sobreescribirla. Si no existe, se crea un agente nuevo automáticamente.
 
-### Paso 3: Inspeccionar el agente en Azure AI Foundry
+### Paso 3: Inspeccionar el agente en Microsoft Foundry
 
 **Antes de interactuar con Anders**, ve al portal para inspeccionar lo que se creó:
 
-1. Abre [Azure AI Foundry](https://ai.azure.com) y navega a tu proyecto
+1. Abre [Microsoft Foundry](https://ai.azure.com) y navega a tu proyecto
 2. En el menú lateral, selecciona **Agents**
 3. Busca el agente **"Anders"** y haz clic en él
 

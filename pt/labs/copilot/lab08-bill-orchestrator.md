@@ -8,7 +8,7 @@ En este laboratorio vamos a conectar los agentes **Mark**, **Anders**, **Charlie
 
 Al completar este laboratorio, ustedes van a aprender:
 
-- Cómo conectar Agentes externos de Fabric y Azure AI Foundry.
+- Cómo conectar Agentes externos de Fabric y Microsoft Foundry.
 - Cómo conectar Agentes internos desarrollados en Copilot Studio.
 - Cómo generar reglas de orquestación para que Copilot Studio pueda navegar entre agentes.
 
@@ -54,14 +54,14 @@ Al completar este laboratorio, ustedes van a aprender:
 
 ## Agente Anders
 
-1. Vamos a repetir el proceso realizado en Mark, pero seleccionando como conector externo a **Azure AI Foundry**.
-2. Repite el paso 1 de Mark y selecciona Azure AI Foundry. Luego vamos a crear una conexión.
+1. Vamos a repetir el proceso realizado en Mark, pero seleccionando como conector externo a **Microsoft Foundry**.
+2. Repite el paso 1 de Mark y selecciona Microsoft Foundry. Luego vamos a crear una conexión.
 3. En la ventana de conexión, los datos a configurar son distintos a los que vimos con Mark.
 
    ![imagen](img/image7_Bill.png)
 
-4. En "Tipo de autentificación" vamos a mantener Microsoft Entra, para que el agente delegue la autentificación al usuario final. En el siguiente campo vamos a agregar la URL del proyecto de Azure AI Foundry.
-5. Navega al portal de Azure AI Foundry, donde crearon Anders. En la sección "Overview" copia el link del endpoint y pégalo en la ventana de Copilot Studio.
+4. En "Tipo de autentificación" vamos a mantener Microsoft Entra, para que el agente delegue la autentificación al usuario final. En el siguiente campo vamos a agregar la URL del proyecto de Microsoft Foundry.
+5. Navega al portal de Microsoft Foundry, donde crearon Anders. En la sección "Overview" copia el link del endpoint y pégalo en la ventana de Copilot Studio.
 
    ![imagen](img/image8_Bill.png)
 
@@ -232,5 +232,5 @@ Resumen mental
 
 ¡Gran trabajo! Hemos aprendido:
 
-- ✅ Cómo agregar un agente de Fabric, Azure AI Foundry y un Agente de Copilot Studio bajo una misma arquitectura.
+- ✅ Cómo agregar un agente de Fabric, Microsoft Foundry y un Agente de Copilot Studio bajo una misma arquitectura.
 - ✅ Cómo generar instrucciones en Copilot Studio para orquestar múltiples agentes.

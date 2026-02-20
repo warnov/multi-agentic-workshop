@@ -1,6 +1,6 @@
 ## Contoso Retail Multi‑Agent Workshop
 
-This repository contains a hands‑on lab where you build and understand a multi‑agent architecture for Contoso Retail using Microsoft Fabric (data), Azure AI Foundry (reasoning/execution) and Copilot Studio (orchestration and user experience).
+This repository contains a hands‑on lab where you build and understand a multi‑agent architecture for Contoso Retail using Microsoft Fabric (data), Microsoft Foundry (reasoning/execution) and Copilot Studio (orchestration and user experience).
 
 Choose your preferred language below to read the full workshop description and step‑by‑step labs.
 
