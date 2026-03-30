@@ -59,7 +59,7 @@ Examples of analytical and planning questions:
 
 ## <a id="architecture"></a>Architecture and agents
 
-![alt text](../assets/image.png)
+![alt text](../assets/image-1.png)
 
 ### <a id="data-layer"></a>Microsoft Fabric – Data layer
 
