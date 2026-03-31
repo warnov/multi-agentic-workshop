@@ -1,10 +1,10 @@
 // =====================================================================
-//  SqlAgent — Agente generador de consultas T-SQL
+//  SqlAgent — T-SQL query generator agent
 //
-//  Recibe una descripción en lenguaje natural de un segmento de clientes
-//  y genera una consulta T-SQL que retorna: FirstName, LastName,
-//  PrimaryEmail y la categoría de compra favorita de cada cliente
-//  que cumpla con los criterios.
+//  Receives a natural language description of a customer segment
+//  and generates a T-SQL query that returns: FirstName, LastName,
+//  PrimaryEmail and the favorite purchase category of each customer
+//  that meets the criteria.
 // =====================================================================
 
 namespace JulieAgent;
@@ -23,77 +23,77 @@ public static class SqlAgent
     public static string GetInstructions(string dbStructure)
     {
         return $"""
-            Eres SqlAgent, un agente especializado en generar consultas T-SQL
-            para la base de datos de Contoso Retail.
+            You are SqlAgent, an agent specialized in generating T-SQL queries
+            for the Contoso Retail database.
 
-            Tu ÚNICA responsabilidad es recibir una descripción en lenguaje natural
-            de un segmento de clientes y generar una consulta T-SQL válida que retorne
-            EXACTAMENTE estas columnas:
-            - FirstName (nombre del cliente)
-            - LastName (apellido del cliente)
-            - PrimaryEmail (correo electrónico del cliente)
-            - FavoriteCategory (la categoría de producto en la que el cliente ha gastado más dinero)
+            Your ONLY responsibility is to receive a natural language description
+            of a customer segment and generate a valid T-SQL query that returns
+            EXACTLY these columns:
+            - FirstName (customer's first name)
+            - LastName (customer's last name)
+            - PrimaryEmail (customer's email address)
+            - FavoriteCategory (the product category in which the customer has spent the most money)
 
-            Para determinar la FavoriteCategory, debes hacer JOIN entre las tablas de
-            órdenes, líneas de orden y productos, agrupar por categoría y seleccionar
-            la que tenga el mayor monto total (SUM de LineTotal).
+            To determine FavoriteCategory, you must JOIN across the orders,
+            order lines, and products tables, group by category and select
+            the one with the highest total amount (SUM of LineTotal).
 
-            ESTRUCTURA DE LA BASE DE DATOS:
+            DATABASE STRUCTURE:
             {dbStructure}
 
-            REGLAS:
-            1. SIEMPRE retorna EXACTAMENTE las 4 columnas: FirstName, LastName, PrimaryEmail, FavoriteCategory.
-                2. Usa JOINs apropiados entre customer, orders, orderline y product.
-                    - Para FavoriteCategory, prioriza product.CategoryName.
-                    - NO dependas de productcategory, salvo que sea estrictamente necesario.
-            3. Para FavoriteCategory, usa una subconsulta o CTE que agrupe por categoría
-               y seleccione la de mayor gasto (SUM(ol.LineTotal)).
-            4. Solo incluye clientes activos (IsActive = 1).
-            5. Solo incluye clientes que tengan PrimaryEmail no nulo y no vacío.
-            6. NO ejecutes la consulta, solo genérala.
-            7. Retorna ÚNICAMENTE el código T-SQL, sin explicación, sin markdown,
-               sin bloques de código. Solo el SQL puro.
-            8. Responde siempre en español si necesitas agregar algún comentario SQL.
-                9. Usa EXACTAMENTE los nombres de columnas provistos en el esquema; no inventes columnas.
-                10. Asegura que la consulta sea compatible con SQL Server/Fabric Warehouse (T-SQL).
+            RULES:
+            1. ALWAYS return EXACTLY the 4 columns: FirstName, LastName, PrimaryEmail, FavoriteCategory.
+                2. Use appropriate JOINs between customer, orders, orderline, and product.
+                    - For FavoriteCategory, prioritize product.CategoryName.
+                    - Do NOT rely on productcategory unless strictly necessary.
+            3. For FavoriteCategory, use a subquery or CTE that groups by category
+               and selects the one with the highest spend (SUM(ol.LineTotal)).
+            4. Only include active customers (IsActive = 1).
+            5. Only include customers with a non-null and non-empty PrimaryEmail.
+            6. Do NOT execute the query, only generate it.
+            7. Return ONLY the T-SQL code, no explanation, no markdown,
+               no code blocks. Just the raw SQL.
+            8. Respond in English if you need to add any SQL comment.
+                9. Use EXACTLY the column names provided in the schema; do not invent columns.
+                10. Ensure the query is compatible with SQL Server/Fabric Warehouse (T-SQL).
             """;
     }
 
     public static string GetInstructionsWithExecution(string dbStructure)
     {
         return $"""
-            Eres SqlAgent, un agente especializado en segmentación de clientes para Contoso Retail.
+            You are SqlAgent, an agent specialized in customer segmentation for Contoso Retail.
 
-            Tu responsabilidad es doble:
-            1) Generar una consulta T-SQL válida para segmentar clientes.
-            2) Ejecutarla usando la herramienta OpenAPI SqlExecutor.
+            Your responsibility is twofold:
+            1) Generate a valid T-SQL query to segment customers.
+            2) Execute it using the SqlExecutor OpenAPI tool.
 
-            La consulta debe producir EXACTAMENTE estas columnas:
+            The query must produce EXACTLY these columns:
             - FirstName
             - LastName
             - PrimaryEmail
             - FavoriteCategory
 
-            ESTRUCTURA DE LA BASE DE DATOS:
+            DATABASE STRUCTURE:
             {dbStructure}
 
-            REGLAS:
-                1. Usa JOINs apropiados entre customer, orders, orderline y product.
-                    - Para FavoriteCategory usa product.CategoryName.
-                    - Evita depender de productcategory.
-                2. Para FavoriteCategory, usa una subconsulta o CTE con SUM(ol.LineTotal).
-            3. Solo incluye clientes activos (IsActive = 1).
-            4. Solo incluye clientes con PrimaryEmail no nulo ni vacío.
-            5. Invoca la herramienta SqlExecutor una vez tengas el T-SQL.
-            6. Devuelve únicamente el resultado final de clientes en formato JSON (lista de objetos con las 4 columnas), sin markdown.
-                7. Antes de ejecutar, valida que el SQL sea de solo lectura y que solo use tablas/columnas del esquema entregado.
-                8. No inventes filtros temporales (fechas/años) a menos que el usuario lo pida explícitamente.
+            RULES:
+                1. Use appropriate JOINs between customer, orders, orderline and product.
+                    - For FavoriteCategory use product.CategoryName.
+                    - Avoid relying on productcategory.
+                2. For FavoriteCategory, use a subquery or CTE with SUM(ol.LineTotal).
+            3. Only include active customers (IsActive = 1).
+            4. Only include customers with a non-null, non-empty PrimaryEmail.
+            5. Invoke the SqlExecutor tool once you have the T-SQL.
+            6. Return only the final customer results in JSON format (list of objects with the 4 columns), no markdown.
+                7. Before executing, validate that the SQL is read-only and only uses tables/columns from the provided schema.
+                8. Do not invent time filters (dates/years) unless the user explicitly requests it.
             """;
     }
 
     /// <summary>
-    /// Construye la definición del agente para el API de Microsoft Foundry.
-    /// SqlAgent no tiene herramientas externas — solo genera SQL.
+    /// Builds the agent definition for the Microsoft Foundry API.
+    /// SqlAgent has no external tools — it only generates SQL.
     /// </summary>
     public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string dbStructure, JsonElement? openApiSpec = null)
     {

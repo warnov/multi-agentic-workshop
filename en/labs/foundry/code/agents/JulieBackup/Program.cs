@@ -10,28 +10,28 @@ using OpenAI.Responses;
 #pragma warning disable OPENAI001 // OpenAI preview API
 
 // =====================================================================
-//  JulieBackup — Agente orquestador de campañas (prompt, no workflow)
+//  JulieBackup — Campaign orchestrator agent (prompt, not workflow)
 //
-//  Versión backup de Julie que funciona como agente NORMAL
-//  (PromptAgentDefinition) con function tools. Evita el tipo workflow
-//  para mayor estabilidad en despliegue y operación.
+//  Backup version of Julie that works as a NORMAL agent
+//  (PromptAgentDefinition) with function tools. Avoids the workflow
+//  type for greater stability in deployment and operation.
 //
-//  SqlAgent y MarketingAgent se exponen como function tools.
-//  El Program.cs intercepta las llamadas a funciones y las redirige
-//  a los agentes reales en Foundry usando conversaciones independientes.
+//  SqlAgent and MarketingAgent are exposed as function tools.
+//  Program.cs intercepts function calls and redirects them
+//  to the real agents in Foundry using independent conversations.
 //
-//  Uso: dotnet run
+//  Usage: dotnet run
 // =====================================================================
 
-// --- Cargar configuración ---
+// --- Load configuration ---
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
 var foundryEndpoint = config["FoundryProjectEndpoint"]
-    ?? throw new InvalidOperationException("Falta FoundryProjectEndpoint en appsettings.json");
+    ?? throw new InvalidOperationException("Missing FoundryProjectEndpoint in appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
-    ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
+    ?? throw new InvalidOperationException("Missing ModelDeploymentName in appsettings.json");
 
 // --- Cliente del proyecto Foundry ---
 AIProjectClient projectClient = new(
@@ -45,28 +45,28 @@ Console.WriteLine("========================================================");
 Console.WriteLine();
 
 // =====================================================================
-//  FASE 1: Verificar que SqlAgent y MarketingAgent existen en Foundry
+//  PHASE 1: Verify that SqlAgent and MarketingAgent exist in Foundry
 // =====================================================================
 
 const string sqlAgentName = "SqlAgent";
 const string marketingAgentName = "MarketingAgent";
 const string julieBackupAgentName = "JulieBackup";
 
-Console.WriteLine("[Foundry] Verificando que los agentes dependientes existen...");
+Console.WriteLine("[Foundry] Verifying that dependent agents exist...");
 
 foreach (var dependentAgent in new[] { sqlAgentName, marketingAgentName })
 {
     try
     {
         projectClient.Agents.GetAgent(dependentAgent);
-        Console.WriteLine($"  ✓ '{dependentAgent}' encontrado");
+        Console.WriteLine($"  ✓ '{dependentAgent}' found");
     }
     catch (ClientResultException ex) when (ex.Status == 404)
     {
-        Console.WriteLine($"  ✗ '{dependentAgent}' NO encontrado en Foundry.");
-        Console.WriteLine($"    Cree el agente primero y vuelva a ejecutar JulieBackup.");
+        Console.WriteLine($"  ✗ '{dependentAgent}' NOT found in Foundry.");
+        Console.WriteLine($"    Create the agent first and then run JulieBackup again.");
         Console.WriteLine();
-        Console.WriteLine("[Abortado] No se puede crear JulieBackup sin sus agentes dependientes.");
+        Console.WriteLine("[Aborted] JulieBackup cannot be created without its dependent agents.");
         return;
     }
 }
@@ -74,92 +74,89 @@ foreach (var dependentAgent in new[] { sqlAgentName, marketingAgentName })
 Console.WriteLine();
 
 // =====================================================================
-//  FASE 2: Crear el agente JulieBackup (prompt + function tools)
+//  PHASE 2: Create the JulieBackup agent (prompt + function tools)
 // =====================================================================
 
 var julieInstructions = """
-    Eres JulieBackup, la agente planificadora y orquestadora de campañas de marketing
-    de Contoso Retail.
+    You are JulieBackup, the planning and orchestrator agent for Contoso Retail marketing campaigns.
 
-    Tu responsabilidad es coordinar la creación de campañas de marketing
-    personalizadas para segmentos específicos de clientes.
+    Your responsibility is to coordinate the creation of personalized marketing campaigns
+    for specific customer segments.
 
-    Dispones de dos herramientas:
-    - consultar_clientes: consulta la base de datos para obtener clientes
-      de un segmento específico (retorna FirstName, LastName, PrimaryEmail,
-      FavoriteCategory).
-    - generar_mensaje_marketing: genera un mensaje de marketing personalizado
-      para un cliente dado su nombre y categoría favorita.
+    You have two tools:
+    - query_customers: queries the database to retrieve customers from a specific segment
+      (returns FirstName, LastName, PrimaryEmail, FavoriteCategory).
+    - generate_marketing_message: generates a personalized marketing message
+      for a customer given their name and favorite category.
 
-    Cuando recibas una solicitud de campaña sigue estos pasos:
+    When you receive a campaign request, follow these steps:
 
-    1. EXTRACCIÓN: Analiza el prompt del usuario y extrae la descripción
-       del segmento de clientes.
+    1. EXTRACTION: Analyze the user prompt and extract the customer segment description.
 
-    2. CONSULTA DE CLIENTES: Invoca consultar_clientes con la descripción
-       del segmento. Recibirás los datos de clientes.
+    2. CUSTOMER QUERY: Invoke query_customers with the segment description.
+       You will receive customer data.
 
-    3. MARKETING PERSONALIZADO: Para CADA cliente retornado, invoca
-       generar_mensaje_marketing con su nombre completo y categoría favorita.
+    3. PERSONALIZED MARKETING: For EACH customer returned, invoke
+       generate_marketing_message with their full name and favorite category.
 
-    4. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
-       resultado como un JSON de campaña:
+    4. FINAL ORGANIZATION: With all generated messages, organize the
+       result as a campaign JSON:
 
     ```json
     {
-      "campaign": "Nombre descriptivo de la campaña",
+      "campaign": "Descriptive campaign name",
       "generatedAt": "YYYY-MM-DDTHH:mm:ss",
       "totalEmails": N,
       "emails": [
         {
-          "to": "email@ejemplo.com",
-          "customerName": "Nombre Apellido",
-          "favoriteCategory": "Categoría",
-          "subject": "Asunto del correo atractivo",
-          "body": "Mensaje de marketing personalizado"
+          "to": "email@example.com",
+          "customerName": "First Last",
+          "favoriteCategory": "Category",
+          "subject": "Attractive email subject",
+          "body": "Personalized marketing message"
         }
       ]
     }
     ```
 
-    REGLAS:
-    - Responde siempre en español.
-    - Si algún cliente no tiene email, omítelo del resultado.
-    - Genera un nombre descriptivo para la campaña basado en el segmento.
+    RULES:
+    - Always respond in English.
+    - If a customer has no email, omit them from the result.
+    - Generate a descriptive campaign name based on the segment.
     """;
 
 // Definir function tools que representan a SqlAgent y MarketingAgent
-var consultarClientesParams = BinaryData.FromObjectAsJson(new
+var queryCustomersParams = BinaryData.FromObjectAsJson(new
 {
     type = "object",
     properties = new
     {
-        descripcion_segmento = new
+        segment_description = new
         {
             type = "string",
-            description = "Descripción en lenguaje natural del segmento de clientes a consultar. Ejemplo: 'clientes que han comprado bicicletas en el último año'"
+            description = "Natural language description of the customer segment to query. Example: 'customers who purchased bicycles in the last year'"
         }
     },
-    required = new[] { "descripcion_segmento" }
+    required = new[] { "segment_description" }
 });
 
-var generarMensajeParams = BinaryData.FromObjectAsJson(new
+var generateMessageParams = BinaryData.FromObjectAsJson(new
 {
     type = "object",
     properties = new
     {
-        nombre_cliente = new
+        customer_name = new
         {
             type = "string",
-            description = "Nombre completo del cliente (FirstName LastName)"
+            description = "Customer's full name (FirstName LastName)"
         },
-        categoria_favorita = new
+        favorite_category = new
         {
             type = "string",
-            description = "Categoría de producto favorita del cliente (ej: Bikes, Clothing, Accessories, Components)"
+            description = "Customer's favorite product category (e.g.: Bikes, Clothing, Accessories, Components)"
         }
     },
-    required = new[] { "nombre_cliente", "categoria_favorita" }
+    required = new[] { "customer_name", "favorite_category" }
 });
 
 var julieDefinition = new PromptAgentDefinition(modelDeployment)
@@ -168,44 +165,43 @@ var julieDefinition = new PromptAgentDefinition(modelDeployment)
     Tools =
     {
         ResponseTool.CreateFunctionTool(
-            functionName: "consultar_clientes",
-            functionParameters: consultarClientesParams,
+            functionName: "query_customers",
+            functionParameters: queryCustomersParams,
             strictModeEnabled: false,
-            functionDescription: "Consulta la base de datos de Contoso Retail para obtener clientes que cumplen con un segmento dado. Retorna una lista con FirstName, LastName, PrimaryEmail y FavoriteCategory."
+            functionDescription: "Queries the Contoso Retail database for customers matching a given segment. Returns a list with FirstName, LastName, PrimaryEmail and FavoriteCategory."
         ).AsAgentTool(),
         ResponseTool.CreateFunctionTool(
-            functionName: "generar_mensaje_marketing",
-            functionParameters: generarMensajeParams,
+            functionName: "generate_marketing_message",
+            functionParameters: generateMessageParams,
             strictModeEnabled: false,
-            functionDescription: "Genera un mensaje de marketing personalizado para un cliente, buscando eventos relevantes en Bing según su categoría favorita."
+            functionDescription: "Generates a personalized marketing message for a customer, searching for relevant events on Bing based on their favorite category."
         ).AsAgentTool()
     }
 };
 
 // Verificar si JulieBackup ya existe
-Console.WriteLine($"[Foundry] Buscando agente '{julieBackupAgentName}'...");
+Console.WriteLine($"[Foundry] Searching for agent '{julieBackupAgentName}'...");
 AgentRecord? existingAgent = null;
 bool shouldCreate = true;
 
 try
 {
     existingAgent = projectClient.Agents.GetAgent(julieBackupAgentName);
-    Console.WriteLine($"[Foundry] Agente '{julieBackupAgentName}' encontrado");
-    Console.Write($"[Foundry] ¿Desea sobreescribir con una nueva versión? (s/N): ");
+    Console.WriteLine($"[Foundry] Agent '{julieBackupAgentName}' found");
+    Console.Write($"[Foundry] Do you want to overwrite it with a new version? (y/N): ");
     var answer = Console.ReadLine();
-    shouldCreate = answer?.Trim().Equals("s", StringComparison.OrdinalIgnoreCase) == true
-                || answer?.Trim().Equals("si", StringComparison.OrdinalIgnoreCase) == true
-                || answer?.Trim().Equals("sí", StringComparison.OrdinalIgnoreCase) == true;
+    shouldCreate = answer?.Trim().Equals("y", StringComparison.OrdinalIgnoreCase) == true
+                || answer?.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase) == true;
 
     if (!shouldCreate)
     {
-        Console.WriteLine($"[Foundry] Se conserva '{julieBackupAgentName}' existente.");
+        Console.WriteLine($"[Foundry] Keeping existing '{julieBackupAgentName}'.");
         return;
     }
 }
 catch (ClientResultException ex) when (ex.Status == 404)
 {
-    Console.WriteLine($"[Foundry] Agente '{julieBackupAgentName}' no encontrado. Se creará uno nuevo.");
+    Console.WriteLine($"[Foundry] Agent '{julieBackupAgentName}' not found. A new one will be created.");
 }
 
 // Crear/actualizar JulieBackup
@@ -219,37 +215,37 @@ try
 
     var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
     var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
-    Console.WriteLine($"[Foundry] Agente '{julieBackupAgentName}' creado exitosamente (v{version})");
+    Console.WriteLine($"[Foundry] Agent '{julieBackupAgentName}' created successfully (v{version})");
 }
 catch (ClientResultException ex) when (ex.Status == 400 && existingAgent is not null)
 {
-    Console.WriteLine($"[Foundry] No se pudo crear nueva versión: {ex.Message}");
-    Console.WriteLine($"[Foundry] Se reutilizará la versión existente.");
+    Console.WriteLine($"[Foundry] Could not create new version: {ex.Message}");
+    Console.WriteLine($"[Foundry] Reusing the existing version.");
 }
 
 Console.WriteLine();
-Console.WriteLine("[Foundry] Agente listo. Iniciando chat interactivo...");
+Console.WriteLine("[Foundry] Agent ready. Starting interactive chat...");
 
 // =====================================================================
-//  FASE 3: Chat interactivo con manejo de function calls
+//  PHASE 3: Interactive chat with function call handling
 //
-//  Cuando JulieBackup invoca consultar_clientes → redirigimos a SqlAgent
-//  Cuando JulieBackup invoca generar_mensaje_marketing → redirigimos a MarketingAgent
+//  When JulieBackup invokes query_customers → redirect to SqlAgent
+//  When JulieBackup invokes generate_marketing_message → redirect to MarketingAgent
 // =====================================================================
 
 ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
-Console.WriteLine($"[Foundry] Conversación creada: {conversation.Id}");
+Console.WriteLine($"[Foundry] Conversation created: {conversation.Id}");
 
 ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
     defaultAgent: julieBackupAgentName,
     defaultConversationId: conversation.Id);
 
 Console.WriteLine();
-Console.WriteLine("=== Chat con JulieBackup (escribe 'salir' para terminar) ===");
-Console.WriteLine("Ejemplo: 'Crea una campaña para clientes que hayan comprado bicicletas'");
+Console.WriteLine("=== Chat with JulieBackup (type 'exit' to quit) ===");
+Console.WriteLine("Example: 'Create a campaign for customers who have purchased bicycles'");
 Console.WriteLine();
 
-// --- Helper: enviar mensaje a un sub-agente y obtener respuesta ---
+// --- Helper: send a message to a sub-agent and get the response ---
 async Task<string> InvokeSubAgent(string agentName, string message)
 {
     Console.WriteLine($"  [→ {agentName}] {(message.Length > 100 ? message[..100] + "..." : message)}");
@@ -275,11 +271,11 @@ async Task<string> InvokeSubAgent(string agentName, string message)
 
 while (true)
 {
-    Console.Write("Tú: ");
+    Console.Write("You: ");
     var input = Console.ReadLine();
 
     if (string.IsNullOrWhiteSpace(input) ||
-        input.Equals("salir", StringComparison.OrdinalIgnoreCase))
+        input.Equals("exit", StringComparison.OrdinalIgnoreCase))
         break;
 
     try
@@ -294,9 +290,9 @@ while (true)
             var functionCalls = response.OutputItems.OfType<FunctionCallResponseItem>().ToList();
 
             if (functionCalls.Count == 0)
-                break; // No hay más function calls, salir del loop
+                break; // No more function calls, exit the loop
 
-            Console.WriteLine($"  [JulieBackup] Invocando {functionCalls.Count} herramienta(s)...");
+            Console.WriteLine($"  [JulieBackup] Invoking {functionCalls.Count} tool(s)...");
 
             var functionOutputs = new List<ResponseItem>();
 
@@ -308,26 +304,26 @@ while (true)
                 string result;
                 switch (funcCall.FunctionName)
                 {
-                    case "consultar_clientes":
-                        var segmento = argsJson.TryGetProperty("descripcion_segmento", out var seg)
+                    case "query_customers":
+                        var segmento = argsJson.TryGetProperty("segment_description", out var seg)
                             ? seg.GetString() ?? ""
                             : funcArgs;
                         result = await InvokeSubAgent(sqlAgentName, segmento);
                         break;
 
-                    case "generar_mensaje_marketing":
-                        var nombre = argsJson.TryGetProperty("nombre_cliente", out var n)
+                    case "generate_marketing_message":
+                        var nombre = argsJson.TryGetProperty("customer_name", out var n)
                             ? n.GetString() ?? ""
                             : "";
-                        var categoria = argsJson.TryGetProperty("categoria_favorita", out var c)
+                        var categoria = argsJson.TryGetProperty("favorite_category", out var c)
                             ? c.GetString() ?? ""
                             : "";
-                        var prompt = $"Genera un mensaje de marketing personalizado para el cliente {nombre} cuya categoría favorita es {categoria}.";
+                        var prompt = $"Generate a personalized marketing message for customer {nombre} whose favorite category is {categoria}.";
                         result = await InvokeSubAgent(marketingAgentName, prompt);
                         break;
 
                     default:
-                        result = $"Función desconocida: {funcCall.FunctionName}";
+                        result = $"Unknown function: {funcCall.FunctionName}";
                         break;
                 }
 
@@ -363,5 +359,5 @@ while (true)
     Console.WriteLine();
 }
 
-Console.WriteLine("[Foundry] Chat finalizado.");
-Console.WriteLine("[Foundry] El agente JulieBackup permanece disponible en Microsoft Foundry.");
+Console.WriteLine("[Foundry] Chat ended.");
+Console.WriteLine("[Foundry] Agent JulieBackup remains available in Microsoft Foundry.");

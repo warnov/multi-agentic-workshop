@@ -10,35 +10,35 @@ using JulieAgent;
 #pragma warning disable OPENAI001 // OpenAI preview API
 
 // =====================================================================
-//  Julie - Agente Orquestador de Campañas de Marketing
-//  (Microsoft Foundry - nueva experiencia)
+//  Julie - Marketing Campaign Orchestrator Agent
+//  (Microsoft Foundry - new experience)
 //
-//  Program.cs SOLO se encarga de:
-//  1. Crear/verificar los 3 agentes en Microsoft Foundry
+//  Program.cs is ONLY responsible for:
+//  1. Creating/verifying the 3 agents in Microsoft Foundry
 //     (SqlAgent, MarketingAgent, Julie)
-//  2. Abrir un chat interactivo con Julie
+//  2. Opening an interactive chat with Julie
 //
-//  Toda la orquestación la hace Julie internamente:
-//    SqlAgent (tool) → genera T-SQL
-//    SqlExecutor (OpenAPI tool) → ejecuta SQL contra la BD
-//    MarketingAgent (tool) → genera mensajes personalizados
-//    Julie → organiza el resultado como JSON de campaña
+//  All orchestration is done by Julie internally:
+//    SqlAgent (tool) → generates T-SQL
+//    SqlExecutor (OpenAPI tool) → executes SQL against the DB
+//    MarketingAgent (tool) → generates personalized messages
+//    Julie → organizes the result as campaign JSON
 // =====================================================================
 
-// --- Cargar configuración ---
+// --- Load configuration ---
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
 var foundryEndpoint = config["FoundryProjectEndpoint"]
-    ?? throw new InvalidOperationException("Falta FoundryProjectEndpoint en appsettings.json");
+    ?? throw new InvalidOperationException("Missing FoundryProjectEndpoint in appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
-    ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
+    ?? throw new InvalidOperationException("Missing ModelDeploymentName in appsettings.json");
 var bingConnectionId = config["BingConnectionId"]
-    ?? throw new InvalidOperationException("Falta BingConnectionId en appsettings.json");
+    ?? throw new InvalidOperationException("Missing BingConnectionId in appsettings.json");
 
-// URL base de la Function App con el ejecutor de consultas SQL.
-// Se configura en appsettings.json cuando la función esté desplegada.
+// Base URL of the Function App with the SQL query executor.
+// Configured in appsettings.json once the function is deployed.
 var functionAppBaseUrl = config["FunctionAppBaseUrl"];
 
 // --- Cargar estructura de la base de datos ---
@@ -48,18 +48,18 @@ if (!File.Exists(dbStructurePath))
 if (!File.Exists(dbStructurePath))
 {
     throw new FileNotFoundException(
-        "No se encontró el archivo db-structure.txt. " +
-        "Asegúrate de que existe en la carpeta raíz del proyecto JulieAgent.");
+        "File db-structure.txt not found. " +
+        "Make sure it exists in the root folder of the JulieAgent project.");
 }
 var dbStructure = File.ReadAllText(dbStructurePath);
-Console.WriteLine($"[Config] Estructura de BD cargada ({dbStructure.Length} caracteres)");
+Console.WriteLine($"[Config] DB structure loaded ({dbStructure.Length} chars)");
 
 // --- (Opcional) Descargar spec OpenAPI de la Function App ---
 JsonElement? openApiSpecJson = null;
 
 if (!string.IsNullOrEmpty(functionAppBaseUrl) && !functionAppBaseUrl.StartsWith("<"))
 {
-    Console.WriteLine("[OpenAPI] Descargando especificación desde la Function App...");
+    Console.WriteLine("[OpenAPI] Downloading specification from the Function App...");
     var openApiUrl = $"{functionAppBaseUrl}/openapi/v3.json";
     var maxAttempts = 3;
     for (var attempt = 1; attempt <= maxAttempts; attempt++)
@@ -73,27 +73,27 @@ if (!string.IsNullOrEmpty(functionAppBaseUrl) && !functionAppBaseUrl.StartsWith(
 
             var openApiSpec = await httpClient.GetStringAsync(openApiUrl);
             openApiSpecJson = JsonSerializer.Deserialize<JsonElement>(openApiSpec);
-            Console.WriteLine($"[OpenAPI] Especificación descargada ({openApiSpec.Length} bytes)");
+            Console.WriteLine($"[OpenAPI] Specification downloaded ({openApiSpec.Length} bytes)");
             break;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[OpenAPI] Intento {attempt}/{maxAttempts} falló: {ex.Message}");
+            Console.WriteLine($"[OpenAPI] Attempt {attempt}/{maxAttempts} failed: {ex.Message}");
             if (attempt < maxAttempts)
             {
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 continue;
             }
 
-            Console.WriteLine("[OpenAPI] Julie se creará sin herramienta OpenAPI.");
+            Console.WriteLine("[OpenAPI] Julie will be created without the OpenAPI tool.");
         }
     }
 }
 else
 {
-    Console.WriteLine("[Config] FunctionAppBaseUrl no configurada.");
-    Console.WriteLine("  → Julie se creará sin herramienta OpenAPI (ejecución SQL pendiente).");
-    Console.WriteLine("  → Configure FunctionAppBaseUrl en appsettings.json cuando la Function App esté desplegada.");
+    Console.WriteLine("[Config] FunctionAppBaseUrl not configured.");
+    Console.WriteLine("  → Julie will be created without the OpenAPI tool (SQL execution pending).");
+    Console.WriteLine("  → Configure FunctionAppBaseUrl in appsettings.json once the Function App is deployed.");
 }
 
 // --- Cliente del proyecto Foundry ---
@@ -102,42 +102,41 @@ AIProjectClient projectClient = new(
     tokenProvider: new DefaultAzureCredential());
 
 // =====================================================================
-//  FASE 1: Crear/verificar los 3 agentes en Microsoft Foundry
+//  PHASE 1: Create/verify the 3 agents in Microsoft Foundry
 // =====================================================================
 
 Console.WriteLine();
 Console.WriteLine("========================================");
-Console.WriteLine(" Julie - Orquestador de Campañas");
+Console.WriteLine(" Julie - Campaign Orchestrator");
 Console.WriteLine("========================================");
 Console.WriteLine();
 
-// --- Helper para crear o reutilizar un agente (definición tipada) ---
+// --- Helper to create or reuse an agent (typed definition) ---
 async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
 {
-    Console.WriteLine($"[Foundry] Buscando agente '{agentName}'...");
+    Console.WriteLine($"[Foundry] Searching for agent '{agentName}'...");
     AgentRecord? existingAgent = null;
     var shouldOverride = false;
     try
     {
         existingAgent = projectClient.Agents.GetAgent(agentName);
         AgentRecord existing = existingAgent;
-        Console.WriteLine($"[Foundry] Agente '{agentName}' encontrado (ID: {existing.Name})");
-        Console.Write($"[Foundry] ¿Desea sobreescribir '{agentName}' con una nueva versión? (s/N): ");
+        Console.WriteLine($"[Foundry] Agent '{agentName}' found (ID: {existing.Name})");
+        Console.Write($"[Foundry] Do you want to overwrite '{agentName}' with a new version? (y/N): ");
         var answer = Console.ReadLine();
-        shouldOverride = answer?.Trim().Equals("s", StringComparison.OrdinalIgnoreCase) == true
-                      || answer?.Trim().Equals("si", StringComparison.OrdinalIgnoreCase) == true
-                      || answer?.Trim().Equals("sí", StringComparison.OrdinalIgnoreCase) == true;
+        shouldOverride = answer?.Trim().Equals("y", StringComparison.OrdinalIgnoreCase) == true
+                      || answer?.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase) == true;
 
         if (!shouldOverride)
         {
-            Console.WriteLine($"[Foundry] Se conserva '{agentName}' existente.");
+            Console.WriteLine($"[Foundry] Keeping existing '{agentName}'.");
             return;
         }
 
     }
     catch (ClientResultException ex) when (ex.Status == 404)
     {
-        Console.WriteLine($"[Foundry] Agente '{agentName}' no encontrado. Se creará uno nuevo.");
+        Console.WriteLine($"[Foundry] Agent '{agentName}' not found. A new one will be created.");
     }
 
     try
@@ -148,12 +147,12 @@ async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
 
         var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
         var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
-        Console.WriteLine($"[Foundry] Agente '{agentName}' creado/actualizado (v{version})");
+        Console.WriteLine($"[Foundry] Agent '{agentName}' created/updated (v{version})");
     }
     catch (ClientResultException ex) when (ex.Status == 400 && existingAgent is not null)
     {
-        Console.WriteLine($"[Foundry] No se pudo crear nueva versión de '{agentName}': {ex.Message}");
-        Console.WriteLine($"[Foundry] Se reutilizará la versión existente de '{agentName}'.");
+        Console.WriteLine($"[Foundry] Could not create new version of '{agentName}': {ex.Message}");
+        Console.WriteLine($"[Foundry] Reusing the existing version of '{agentName}'.");
     }
 }
 
@@ -164,31 +163,31 @@ await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDe
 await EnsureAgent(JulieOrchestrator.Name, JulieOrchestrator.GetAgentDefinition(modelDeployment, openApiSpecJson));
 
 Console.WriteLine();
-Console.WriteLine("[Foundry] Todos los agentes están listos.");
+Console.WriteLine("[Foundry] All agents are ready.");
 
 // =====================================================================
-//  FASE 2: Chat interactivo con Julie
+//  PHASE 2: Interactive chat with Julie
 // =====================================================================
 
 ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
-Console.WriteLine($"[Foundry] Conversación creada: {conversation.Id}");
+Console.WriteLine($"[Foundry] Conversation created: {conversation.Id}");
 
 ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
     defaultAgent: JulieOrchestrator.Name,
     defaultConversationId: conversation.Id);
 
 Console.WriteLine();
-Console.WriteLine("=== Chat con Julie (escribe 'salir' para terminar) ===");
-Console.WriteLine("Ejemplo: 'Crea una campaña para clientes que hayan comprado bicicletas'");
+Console.WriteLine("=== Chat with Julie (type 'exit' to quit) ===");
+Console.WriteLine("Example: 'Create a campaign for customers who have purchased bicycles'");
 Console.WriteLine();
 
 while (true)
 {
-    Console.Write("Tú: ");
+    Console.Write("You: ");
     var input = Console.ReadLine();
 
     if (string.IsNullOrWhiteSpace(input) ||
-        input.Equals("salir", StringComparison.OrdinalIgnoreCase))
+        input.Equals("exit", StringComparison.OrdinalIgnoreCase))
         break;
 
     Console.Write("Julie: ");
@@ -206,12 +205,12 @@ while (true)
             var jsonOpts = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10 };
             var responseJson = JsonSerializer.Serialize(response, jsonOpts);
             Console.WriteLine($"  [DEBUG] Response JSON ({responseJson.Length} chars):");
-            Console.WriteLine(responseJson.Length > 3000 ? responseJson[..3000] + "\n  ... (truncado)" : responseJson);
+            Console.WriteLine(responseJson.Length > 3000 ? responseJson[..3000] + "\n  ... (truncated)" : responseJson);
         }
         catch (Exception serEx)
         {
-            Console.WriteLine($"  [DEBUG] No se pudo serializar response: {serEx.Message}");
-            // Fallback: dump propiedades via reflection
+            Console.WriteLine($"  [DEBUG] Could not serialize response: {serEx.Message}");
+            // Fallback: dump properties via reflection
             foreach (var prop in response.GetType().GetProperties())
             {
                 try
@@ -233,9 +232,9 @@ while (true)
         else
         {
             Console.WriteLine();
-            Console.WriteLine("[Sin texto de salida — revisando conversation items...]");
+            Console.WriteLine("[No output text — checking conversation items...]");
 
-            // Listar items de la conversación
+            // List conversation items
             try
             {
                 var convItems = projectClient.OpenAI.Conversations.GetProjectConversationItems(conversation.Id);
@@ -243,7 +242,7 @@ while (true)
                 foreach (var ci in convItems)
                 {
                     count++;
-                    // Serializar cada conversation item
+                    // Serialize each conversation item
                     try
                     {
                         var ciJson = JsonSerializer.Serialize(ci, new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10 });
@@ -258,7 +257,7 @@ while (true)
             }
             catch (Exception convEx)
             {
-                Console.WriteLine($"  [DEBUG] Error leyendo conversation: {convEx.Message}");
+                Console.WriteLine($"  [DEBUG] Error reading conversation: {convEx.Message}");
             }
         }
         // --- FIN DEBUG ---
@@ -273,5 +272,5 @@ while (true)
     Console.WriteLine();
 }
 
-Console.WriteLine("[Foundry] Chat finalizado.");
-Console.WriteLine("[Foundry] Los agentes permanecen disponibles en Microsoft Foundry.");
+Console.WriteLine("[Foundry] Chat ended.");
+Console.WriteLine("[Foundry] Agents remain available in Microsoft Foundry.");

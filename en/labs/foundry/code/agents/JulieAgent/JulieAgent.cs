@@ -1,21 +1,21 @@
 // =====================================================================
-//  JulieAgent — Agente orquestador de campañas de marketing
+//  JulieAgent — Campaign marketing orchestrator agent
 //
-//  Julie es un agente de tipo workflow que coordina:
-//  1. SqlAgent (type: agent) — genera T-SQL a partir de lenguaje natural
-//  2. Function App (type: openapi) — ejecuta el T-SQL contra la BD
-//  3. MarketingAgent (type: agent) — genera mensajes personalizados
+//  Julie is a workflow-type agent that coordinates:
+//  1. SqlAgent (type: agent) — generates T-SQL from natural language
+//  2. Function App (type: openapi) — executes the T-SQL against the DB
+//  3. MarketingAgent (type: agent) — generates personalized messages
 //
-//  El resultado final es un JSON de campaña con correos electrónicos.
+//  The final result is a campaign JSON with emails.
 //
-//  Herramientas:
-//    - SqlAgent        → agente que genera la consulta T-SQL
-//    - SqlExecutor     → OpenAPI tool que ejecuta el SQL contra la BD
-//    - MarketingAgent  → agente que genera mensajes de marketing
+//  Tools:
+//    - SqlAgent        → agent that generates the T-SQL query
+//    - SqlExecutor     → OpenAPI tool that executes the SQL against the DB
+//    - MarketingAgent  → agent that generates marketing messages
 //
-//  La URL de la Function App se configura en appsettings.json
-//  (FunctionAppBaseUrl). Si no está configurada, Julie se crea
-//  sin la herramienta OpenAPI (pendiente de despliegue).
+//  The Function App URL is configured in appsettings.json
+//  (FunctionAppBaseUrl). If not configured, Julie is created
+//  without the OpenAPI tool (pending deployment).
 // =====================================================================
 
 using System.Text.Json;
@@ -28,60 +28,60 @@ public static class JulieOrchestrator
     public const string Name = "Julie";
 
     public static string Instructions => """
-        Eres Julie, la agente planificadora y orquestadora de campañas de marketing
-        de Contoso Retail.
+        You are Julie, the planning and orchestration agent for Contoso Retail
+        marketing campaigns.
 
-        Tu responsabilidad es coordinar la creación de campañas de marketing
-        personalizadas para segmentos específicos de clientes.
+        Your responsibility is to coordinate the creation of personalized marketing
+        campaigns for specific customer segments.
 
-        Cuando recibas una solicitud de campaña sigues estos pasos:
+        When you receive a campaign request, follow these steps:
 
-        1. EXTRACCIÓN: Analiza el prompt del usuario y extrae la descripción
-           del segmento de clientes. Resume esa descripción en una frase clara.
+        1. EXTRACTION: Analyze the user's prompt and extract the description
+           of the customer segment. Summarize that description in a clear phrase.
 
-        2. GENERACIÓN SQL: Invoca a SqlAgent pasándole la descripción del segmento.
-           SqlAgent te retornará una consulta T-SQL.
+        2. SQL GENERATION: Invoke SqlAgent, passing it the segment description.
+           SqlAgent will return a T-SQL query.
 
-        3. EJECUCIÓN SQL: Envía el T-SQL a tu herramienta OpenAPI (SqlExecutor)
-           para ejecutarlo contra la base de datos. La herramienta retornará los
-           resultados como datos de clientes.
+        3. SQL EXECUTION: Send the T-SQL to your OpenAPI tool (SqlExecutor)
+           to execute it against the database. The tool will return the
+           results as customer data.
 
-        4. MARKETING PERSONALIZADO: Para CADA cliente retornado, invoca a
-           MarketingAgent pasándole el nombre del cliente y su categoría favorita.
-           MarketingAgent buscará eventos relevantes en Bing y generará un mensaje
-           personalizado.
+        4. PERSONALIZED MARKETING: For EACH returned customer, invoke
+           MarketingAgent, passing it the customer's name and their favorite category.
+           MarketingAgent will search for relevant events on Bing and generate a
+           personalized message.
 
-        5. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
-           resultado como un JSON de campaña con el siguiente formato:
+        5. FINAL ORGANIZATION: With all generated messages, organize the
+           result as a campaign JSON using the following format:
 
         ```json
         {
-          "campaign": "Nombre descriptivo de la campaña",
+          "campaign": "Descriptive campaign name",
           "generatedAt": "YYYY-MM-DDTHH:mm:ss",
           "totalEmails": N,
           "emails": [
             {
-              "to": "email@ejemplo.com",
-              "customerName": "Nombre Apellido",
-              "favoriteCategory": "Categoría",
-              "subject": "Asunto del correo generado automáticamente",
-              "body": "Mensaje de marketing personalizado"
+              "to": "email@example.com",
+              "customerName": "First Last",
+              "favoriteCategory": "Category",
+              "subject": "Automatically generated email subject",
+              "body": "Personalized marketing message"
             }
           ]
         }
         ```
 
-        REGLAS:
-        - El campo "subject" debe ser un asunto de correo atractivo y relevante.
-        - El campo "body" es el mensaje que generó MarketingAgent para ese cliente.
-        - Responde siempre en español.
-        - Si algún cliente no tiene email, omítelo del resultado.
-        - Genera un nombre descriptivo para la campaña basado en el segmento.
+        RULES:
+        - The "subject" field must be an attractive and relevant email subject line.
+        - The "body" field is the message generated by MarketingAgent for that customer.
+        - Always respond in English.
+        - If a customer does not have an email, omit them from the result.
+        - Generate a descriptive name for the campaign based on the segment.
         """;
 
     /// <summary>
-    /// Construye la definición del agente Julie como WorkflowAgentDefinition
-    /// usando CSDL YAML, compatible con la API actual.
+    /// Builds the Julie agent definition as a WorkflowAgentDefinition
+    /// using CSDL YAML, compatible with the current API.
     /// </summary>
     public static WorkflowAgentDefinition GetAgentDefinition(string modelDeployment, JsonElement? openApiSpec = null)
     {

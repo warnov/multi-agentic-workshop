@@ -1,12 +1,12 @@
-### Entorno local
+### Local environment
 #@baseUrl = http://localhost:7071/api
 
-### Entorno desplegado (reemplazar con valores del resumen de deploy.ps1)
+### Deployed environment (replace with values from deploy.ps1 summary)
 @baseUrl =  [BASE-URL]
 ###
 
-# GET - HolaMundo
-GET {{baseUrl}}/HolaMundo
+# GET - HelloWorld
+GET {{baseUrl}}/HelloWorld
 
 ###
 

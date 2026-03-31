@@ -1,41 +1,40 @@
 ## Table of contents
 
-- [Lab 3: Anders — Executor Agent](#lab-3-anders--executor-agent)
-  - [Table of contents](#table-of-contents)
-  - [Introduction](#introduction)
-    - [What are we going to do in this lab?](#what-are-we-going-to-do-in-this-lab)
-    - [Prerequisites](#prerequisites)
-      - [Tools on your machine](#tools-on-your-machine)
-      - [Azure infrastructure](#azure-infrastructure)
-      - [RBAC permissions](#rbac-permissions)
-  - [3.1 — Verify OpenAPI support (already preconfigured)](#31--verify-openapi-support-already-preconfigured)
-    - [Quick validation checklist](#quick-validation-checklist)
-    - [Step 1: Verify NuGet packages](#step-1-verify-nuget-packages)
-    - [Step 2: Verify exposed endpoints](#step-2-verify-exposed-endpoints)
-    - [Step 3: Verify build](#step-3-verify-build)
-    - [Generated OpenAPI endpoints](#generated-openapi-endpoints)
-  - [3.2 — Redeploy the Function App](#32--redeploy-the-function-app)
-    - [How to obtain `FabricWarehouseSqlEndpoint` and `FabricWarehouseDatabase`?](#how-to-obtain-fabricwarehousesqlendpoint-and-fabricwarehousedatabase)
-    - [Option 0: Re-run infrastructure setup (if you need to refresh settings)](#option-0-re-run-infrastructure-setup-if-you-need-to-refresh-settings)
-    - [Option A: Using Azure Functions Core Tools (recommended)](#option-a-using-azure-functions-core-tools-recommended)
-    - [Option B: Using Azure CLI](#option-b-using-azure-cli)
-  - [3.3 — Verify the OpenAPI specification](#33--verify-the-openapi-specification)
-    - [Get the JSON specification](#get-the-json-specification)
-    - [Explore the Swagger UI](#explore-the-swagger-ui)
-  - [3.4 — The Anders agent: Two SDK versions](#34--the-anders-agent-two-sdk-versions)
-    - [Why two versions?](#why-two-versions)
-    - [Which version should I use?](#which-version-should-i-use)
-    - [Understanding the code (version `ms-foundry/` — recommended)](#understanding-the-code-version-ms-foundry--recommended)
-      - [Phase 1 — Download the OpenAPI specification](#phase-1--download-the-openapi-specification)
-      - [Phase 2 — Verify existing agent or create a new one](#phase-2--verify-existing-agent-or-create-a-new-one)
-      - [Phase 3 — Interactive chat with the Responses API](#phase-3--interactive-chat-with-the-responses-api)
-    - [Step 1: Configure `appsettings.json`](#step-1-configure-appsettingsjson)
-    - [Step 2: Build and run](#step-2-build-and-run)
-    - [Step 3: Inspect the agent in Azure AI Foundry](#step-3-inspect-the-agent-in-azure-ai-foundry)
-    - [Step 4: Test the agent](#step-4-test-the-agent)
-  - [Troubleshooting](#troubleshooting)
-    - [Storage Account blocked by policy (error 503)](#storage-account-blocked-by-policy-error-503)
-  - [Next step](#next-step)
+- [Table of contents](#table-of-contents)
+- [Introduction](#introduction)
+  - [What are we going to do in this lab?](#what-are-we-going-to-do-in-this-lab)
+  - [Prerequisites](#prerequisites)
+    - [Tools on your machine](#tools-on-your-machine)
+    - [Azure infrastructure](#azure-infrastructure)
+    - [RBAC permissions](#rbac-permissions)
+- [3.1 — Verify OpenAPI support (already preconfigured)](#31--verify-openapi-support-already-preconfigured)
+  - [Quick validation checklist](#quick-validation-checklist)
+  - [Step 1: Verify NuGet packages](#step-1-verify-nuget-packages)
+  - [Step 2: Verify exposed endpoints](#step-2-verify-exposed-endpoints)
+  - [Step 3: Verify build](#step-3-verify-build)
+  - [Generated OpenAPI endpoints](#generated-openapi-endpoints)
+- [3.2 — Redeploy the Function App](#32--redeploy-the-function-app)
+  - [How to obtain `FabricWarehouseSqlEndpoint` and `FabricWarehouseDatabase`?](#how-to-obtain-fabricwarehousesqlendpoint-and-fabricwarehousedatabase)
+  - [Option 0: Re-run infrastructure setup (if you need to refresh settings)](#option-0-re-run-infrastructure-setup-if-you-need-to-refresh-settings)
+  - [Option A: Using Azure Functions Core Tools (recommended)](#option-a-using-azure-functions-core-tools-recommended)
+  - [Option B: Using Azure CLI](#option-b-using-azure-cli)
+- [3.3 — Verify the OpenAPI specification](#33--verify-the-openapi-specification)
+  - [Get the JSON specification](#get-the-json-specification)
+  - [Explore the Swagger UI](#explore-the-swagger-ui)
+- [3.4 — The Anders agent: Two SDK versions](#34--the-anders-agent-two-sdk-versions)
+  - [Why two versions?](#why-two-versions)
+  - [Which version should I use?](#which-version-should-i-use)
+  - [Understanding the code (version `ms-foundry/` — recommended)](#understanding-the-code-version-ms-foundry--recommended)
+    - [Phase 1 — Download the OpenAPI specification](#phase-1--download-the-openapi-specification)
+    - [Phase 2 — Verify existing agent or create a new one](#phase-2--verify-existing-agent-or-create-a-new-one)
+    - [Phase 3 — Interactive chat with the Responses API](#phase-3--interactive-chat-with-the-responses-api)
+  - [Step 1: Configure `appsettings.json`](#step-1-configure-appsettingsjson)
+  - [Step 2: Build and run](#step-2-build-and-run)
+  - [Step 3: Inspect the agent in Azure AI Foundry](#step-3-inspect-the-agent-in-azure-ai-foundry)
+  - [Step 4: Test the agent](#step-4-test-the-agent)
+- [Troubleshooting](#troubleshooting)
+  - [Storage Account blocked by policy (error 503)](#storage-account-blocked-by-policy-error-503)
+- [Next step](#next-step)
 
 ---
 
@@ -121,7 +120,7 @@ Open `FxContosoRetail.csproj` and confirm that these references exist:
 
 Open `FxContosoRetail.cs` and confirm that these endpoints exist:
 
-- `HolaMundo`
+- `HelloWorld`
 - `OrdersReporter`
 - `SqlExecutor`
 
@@ -384,17 +383,17 @@ The system prompt includes the exact JSON schema that Anders must build when inv
 
 ```json
 {
-  "customerName": "Nombre del Cliente",
+  "customerName": "Customer Name",
   "startDate": "YYYY-MM-DD",
   "endDate": "YYYY-MM-DD",
   "orders": [
     {
-      "orderNumber": "código de la orden",
+      "orderNumber": "order code",
       "orderDate": "YYYY-MM-DD",
       "orderLineNumber": 1,
-      "productName": "nombre del producto",
-      "brandName": "nombre de la marca",
-      "categoryName": "nombre de la categoría",
+      "productName": "product name",
+      "brandName": "brand name",
+      "categoryName": "category name",
       "quantity": 1.0,
       "unitPrice": 0.00,
       "lineTotal": 0.00
@@ -444,7 +443,7 @@ The interaction pattern in the `ms-foundry/` version is simpler than the Persist
 
 **Cleanup on exit:**
 
-When the user types `salir`, the chat loop ends. The agent **persists** in Foundry and is automatically reused on the next execution.
+When the user types `exit`, the chat loop ends. The agent **persists** in Foundry and is automatically reused on the next execution.
 
 ### Step 1: Configure `appsettings.json`
 
@@ -523,7 +522,7 @@ Now try a simpler case — a single order with two products:
 You: Generate a report for Marco Rivera (period: February 5–10, 2026). Order ORD-CID-112-001 (2026-02-07): Mountain Bike Socks M, Contoso Outdoor, Socks, 3x$9.50=$28.50 | Water Bottle 30oz, Contoso Outdoor, Bottles and Cages, 1x$6.99=$6.99.
 ```
 
-> **Note:** Typing `salir` only ends the conversation. The agent **persists** in Foundry and is automatically reused on the next execution.
+> **Note:** Typing `exit` only ends the conversation. The agent **persists** in Foundry and is automatically reused on the next execution.
 
 ---
 

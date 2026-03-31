@@ -295,47 +295,47 @@ az role assignment create `
 
 ```
 labs/foundry/
-├── README.md                              ← Este archivo
-├── lab04-anders-executor-agent.md          ← Lab 4: Agente Anders
-├── lab05-julie-planner-agent.md           ← Lab 5: Agente Julie
+├── README.md                              ← This file
+├── lab04-anders-executor-agent.md          ← Lab 4: Anders Agent
+├── lab05-julie-planner-agent.md           ← Lab 5: Julie Agent
 ├── setup/
-│   ├── op-flex/                           ← ⭐ Opción recomendada (Flex Consumption / Linux)
+│   ├── op-flex/                           ← ⭐ Recommended option (Flex Consumption / Linux)
 │   │   ├── main.bicep
 │   │   ├── storage-rbac.bicep
 │   │   └── deploy.ps1
-│   └── op-consumption/                    ← Opción clásica (Consumption Y1 / Windows)
+│   └── op-consumption/                    ← Classic option (Consumption Y1 / Windows)
 │       ├── main.bicep
 │       ├── storage-rbac.bicep
 │       └── deploy.ps1
 └── code/
     ├── api/
     │   └── FxContosoRetail/               ← Azure Function (API)
-    │       ├── FxContosoRetail.cs          ← Endpoints: HolaMundo, OrdersReporter, SqlExecutor
+    │       ├── FxContosoRetail.cs          ← Endpoints: HelloWorld, OrdersReporter, SqlExecutor
     │       ├── Program.cs
     │       ├── Models/
     │       └── ...
     ├── agents/
-    │   ├── AndersAgent/                   ← Console App: Agente Anders (kind: prompt + OpenAPI tool)
-    │   │   ├── ms-foundry/                ← Versión Responses API (recomendada)
+    │   ├── AndersAgent/                   ← Console App: Anders Agent (kind: prompt + OpenAPI tool)
+    │   │   ├── ms-foundry/                ← Responses API version (recommended)
     │   │   │   ├── Program.cs
     │   │   │   └── appsettings.json
-    │   │   └── ai-foundry/                ← Versión Persistent Agents API (alternativa)
+    │   │   └── ai-foundry/                ← Persistent Agents API version (alternative)
     │   │       └── ...
-    │   └── JulieAgent/                    ← Console App: Agente Julie (kind: workflow)
-    │       ├── Program.cs                 ← Crea los 3 agentes + chat con Julie
-    │       ├── JulieAgent.cs              ← Julie: workflow con 3 tools (SqlAgent, MarketingAgent, OpenAPI)
-    │       ├── SqlAgent.cs                ← Sub-agente: genera T-SQL a partir de lenguaje natural
-    │       ├── MarketingAgent.cs           ← Sub-agente: genera mensajes con Bing Search
-    │       ├── db-structure.txt            ← DDL de la BD inyectada en SqlAgent
+    │   └── JulieAgent/                    ← Console App: Julie Agent (kind: workflow)
+    │       ├── Program.cs                 ← Creates the 3 agents + chat with Julie
+    │       ├── JulieAgent.cs              ← Julie: workflow with 3 tools (SqlAgent, MarketingAgent, OpenAPI)
+    │       ├── SqlAgent.cs                ← Sub-agent: generates T-SQL from natural language
+    │       ├── MarketingAgent.cs           ← Sub-agent: generates messages with Bing Search
+    │       ├── db-structure.txt            ← DB DDL injected into SqlAgent
     │       └── appsettings.json
     └── tests/
-        ├── bruno/                         ← Colección Bruno (REST client)
+        ├── bruno/                         ← Bruno collection (REST client)
         │   ├── bruno.json
         │   ├── OrdersReporter.bru
         │   └── environments/
         │       └── local.bru
         └── http/
-            └── FxContosoRetail.http       ← Archivo .http (VS Code REST Client)
+            └── FxContosoRetail.http       ← .http file (VS Code REST Client)
 ```
 
 ---

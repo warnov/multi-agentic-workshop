@@ -45,7 +45,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     exit 1
 }
 
-# Forzar UTF-8 en la consola
+# Force UTF-8 in the console
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
@@ -224,7 +224,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $templateFile = Join-Path $scriptDir "main.bicep"
 $deploymentName = "main"
 
-# Lanzar despliegue en background (--no-wait)
+# Launch deployment in background (--no-wait)
 az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $templateFile `
@@ -238,7 +238,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Esperar a que el deployment aparezca en ARM (~5 segundos)
+# Wait for deployment to appear in ARM (~5 seconds)
 $retries = 0
 do {
     Start-Sleep -Seconds 3
@@ -255,7 +255,7 @@ if (-not $depState) {
     exit 1
 }
 
-# Seguimiento recurso a recurso
+# Resource-by-resource progress tracking
 $completedOps = @{}
 $spinChars = @('|', '/', '-', '\\')
 $spinIdx = 0
@@ -264,7 +264,7 @@ $deployFailed = $false
 while ($true) {
     Start-Sleep -Seconds 3
 
-    # Obtener operaciones del deployment
+    # Get deployment operations
     $opsJson = az deployment operation group list `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
@@ -282,7 +282,7 @@ while ($true) {
 
         $key = "$resType/$resName"
 
-        # Mostrar solo transiciones nuevas
+        # Show only new status transitions
         $prevStatus = $completedOps[$key]
         if ($prevStatus -ne $status) {
             $completedOps[$key] = $status
@@ -321,7 +321,7 @@ if ($depJson -ne 'Succeeded') {
     exit 1
 }
 
-# Obtener outputs del deployment exitoso
+# Get outputs from successful deployment
 $result = az deployment group show `
     --resource-group $ResourceGroupName `
     --name $deploymentName `
@@ -347,7 +347,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Crear zip para deployment
+# Create zip package for deployment
 $zipPath = Join-Path $env:TEMP "fxcontosoretail-publish.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
@@ -369,7 +369,7 @@ if (-not $dnsReady) {
     Write-Warning "  DNS for $scmHost did not resolve after 5 minutes. Attempting deploy anyway..."
 }
 
-# Deploy con reintentos (hasta 3 intentos con espera incremental)
+# Deploy with retries (up to 3 attempts with incremental wait)
 $maxRetries = 3
 $deploySuccess = $false
 for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
@@ -398,7 +398,7 @@ if (-not $deploySuccess) {
     exit 1
 }
 
-# Limpiar archivos temporales
+# Clean up temporary files
 Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
 Remove-Item $publishDir -Recurse -Force -ErrorAction SilentlyContinue
 
