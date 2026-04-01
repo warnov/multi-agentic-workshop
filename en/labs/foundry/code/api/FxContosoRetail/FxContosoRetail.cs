@@ -221,7 +221,7 @@ public class FxContosoRetail
 
         // --- Download the HTML template ---
         string templateUrl = _configuration["BillTemplate"]
-            ?? "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.html";
+            ?? "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.en.html";
 
         string html;
         try
@@ -231,7 +231,7 @@ public class FxContosoRetail
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "Error al descargar el template desde {Url}", templateUrl);
+            _logger.LogError(ex, "Error downloading template from {Url}", templateUrl);
             return new StatusCodeResult(502);
         }
 
@@ -268,18 +268,18 @@ public class FxContosoRetail
 
             ordersHtml.AppendLine("    <div class=\"order-block\">");
             ordersHtml.AppendLine($"        <div class=\"order-header\">");
-            ordersHtml.AppendLine($"            Orden: <span class=\"order-id\">{order.Key.OrderNumber}</span> &nbsp; | &nbsp;");
-            ordersHtml.AppendLine($"            Fecha: <span class=\"order-date\">{order.Key.OrderDate}</span>");
+            ordersHtml.AppendLine($"            Order: <span class=\"order-id\">{order.Key.OrderNumber}</span> &nbsp; | &nbsp;");
+            ordersHtml.AppendLine($"            Date: <span class=\"order-date\">{order.Key.OrderDate}</span>");
             ordersHtml.AppendLine($"        </div>");
             ordersHtml.AppendLine();
             ordersHtml.AppendLine("        <table>");
             ordersHtml.AppendLine("            <thead>");
             ordersHtml.AppendLine("                <tr>");
             ordersHtml.AppendLine("                    <th>Line #</th>");
-            ordersHtml.AppendLine("                    <th>Producto</th>");
+            ordersHtml.AppendLine("                    <th>Product</th>");
             ordersHtml.AppendLine("                    <th>Brand</th>");
             ordersHtml.AppendLine("                    <th>Category</th>");
-            ordersHtml.AppendLine("                    <th>Cantidad</th>");
+            ordersHtml.AppendLine("                    <th>Quantity</th>");
             ordersHtml.AppendLine("                    <th>Unit Price</th>");
             ordersHtml.AppendLine("                    <th>Line Total</th>");
             ordersHtml.AppendLine("                </tr>");
@@ -322,12 +322,12 @@ public class FxContosoRetail
                 html.AsSpan(containerEnd));
         }
 
-        // --- Inyectar gran total ---
+        // --- Inject grand total ---
         html = html.Replace(
             "<strong id=\"report-grand-total\"></strong>",
             $"<strong id=\"report-grand-total\">{FormatCurrency(grandTotal)}</strong>");
 
-        // --- Subir HTML como blob al container "reports" ---
+        // --- Upload HTML as blob to "reports" container ---
         string storageAccountName = _configuration["StorageAccountName"]
             ?? throw new InvalidOperationException("StorageAccountName is not configured.");
 
@@ -347,7 +347,7 @@ public class FxContosoRetail
             ContentType = "text/html; charset=utf-8"
         });
 
-        _logger.LogInformation("Reporte subido como blob: {BlobName}", blobName);
+        _logger.LogInformation("Report uploaded as blob: {BlobName}", blobName);
 
         // --- Generate read-only SAS valid for 1 hour (User Delegation) ---
         var userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync(
