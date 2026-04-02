@@ -73,7 +73,7 @@ For Anders to interact with the Contoso Retail API, we will define an **OpenAPI 
 
 #### Azure infrastructure
 
-- Have completed the **infrastructure setup** described in [Foundry Setup](README.md)
+- Have completed the **infrastructure setup** described in [Foundry Setup](codespaces-setup.md)
 - Have noted **all values generated during the infrastructure deployment** (resource names, URLs, suffix, AI Foundry endpoint, etc.)
 - Have identified these 2 Fabric Warehouse values (used in the updated setup):
     - `FabricWarehouseSqlEndpoint`

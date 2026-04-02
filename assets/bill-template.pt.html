@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>Orders Report - Contoso Retail</title>
+<title>Relatório de Pedidos - Contoso Retail</title>
 
 <style>
     body {
@@ -98,45 +98,45 @@
 <header>
     <img class="logo" src="https://raw.githubusercontent.com/warnov/taller-multi-agentic/main/assets/ContosoRetailLogo.png" alt="Contoso Retail Logo">
     <div class="report-metadata">
-        <strong>Customer:</strong> <span id="customer-name"></span><br>
-        <strong>Issue Date:</strong> <span id="report-date"></span><br>
-        <strong>Date Range:</strong> <span id="report-date-range"></span>
+        <strong>Cliente:</strong> <span id="customer-name"></span><br>
+        <strong>Data de Emissão:</strong> <span id="report-date"></span><br>
+        <strong>Período:</strong> <span id="report-date-range"></span>
     </div>
 </header>
 
 <div class="container">
-    <h1>Customer Orders Report</h1>
+    <h1>Relatório de Pedidos do Cliente</h1>
 
     <!-- 
-        Orders container: dynamically insert .order-block elements here.
-        Each block must follow the order template structure below.
+        Contêiner de pedidos: insira dinamicamente elementos .order-block aqui.
+        Cada bloco deve seguir a estrutura do template de pedido abaixo.
     -->
     <div id="orders-container">
 
         <!-- ============================================================
-             ORDER TEMPLATE (repeat for each order)
+             TEMPLATE DE PEDIDO (repetir para cada pedido)
              ============================================================ -->
         <!--
         <div class="order-block">
             <div class="order-header">
-                Order: <span class="order-id"></span> &nbsp; | &nbsp; 
-                Date: <span class="order-date"></span>
+                Pedido: <span class="order-id"></span> &nbsp; | &nbsp; 
+                Data: <span class="order-date"></span>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th>Line #</th>
-                        <th>Product</th>
-                        <th>Brand</th>
-                        <th>Category</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Line Total</th>
+                        <th>N. Linha</th>
+                        <th>Produto</th>
+                        <th>Marca</th>
+                        <th>Categoria</th>
+                        <th>Quantidade</th>
+                        <th>Preço Unit.</th>
+                        <th>Total Linha</th>
                     </tr>
                 </thead>
                 <tbody class="order-lines">
-                    <!-- Insert <tr> rows with this structure:
+                    <!-- Inserir linhas <tr> com esta estrutura:
                     <tr>
                         <td class="line-number"></td>
                         <td class="line-product"></td>
@@ -151,18 +151,18 @@
             </table>
 
             <div class="order-total">
-                Order Total: <strong class="order-total-amount"></strong>
+                Total Pedido: <strong class="order-total-amount"></strong>
             </div>
         </div>
         -->
         <!-- ============================================================
-             ORDER TEMPLATE END
+             FIM TEMPLATE DE PEDIDO
              ============================================================ -->
 
     </div>
 
     <div class="global-total">
-        Report Total: <strong id="report-grand-total"></strong>
+        Total Relatório: <strong id="report-grand-total"></strong>
     </div>
 
 </div>

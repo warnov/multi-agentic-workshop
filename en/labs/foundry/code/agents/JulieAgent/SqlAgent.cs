@@ -17,8 +17,8 @@ public static class SqlAgent
     public const string Name = "SqlAgent";
 
     /// <summary>
-    /// Genera las instrucciones del agente SQL, inyectando la estructura
-    /// de la base de datos desde el archivo db-structure.txt.
+    /// Builds the SQL agent instructions, injecting the database
+    /// structure from the db-structure.txt file.
     /// </summary>
     public static string GetInstructions(string dbStructure)
     {

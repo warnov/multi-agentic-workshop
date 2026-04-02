@@ -51,10 +51,10 @@ public static class MarketingAgent
     /// Construye la definición del agente para el API de Microsoft Foundry.
     /// MarketingAgent usa Bing Search (grounding) como herramienta.
     /// </summary>
-    public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string bingConnectionId)
+    public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string bingConnectionName)
     {
         var bingGroundingAgentTool = new BingGroundingAgentTool(new BingGroundingSearchToolOptions(
-            searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionId)]));
+            searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionName)]));
 
         return new PromptAgentDefinition(modelDeployment)
         {

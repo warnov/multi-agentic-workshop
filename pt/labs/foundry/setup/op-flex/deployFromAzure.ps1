@@ -1,16 +1,25 @@
 # ============================================================================
-# Contoso Retail - Script de Implantação (Flex Consumption FC1 / Linux)
-# Workshop Multi-Agêntico
+# Contoso Retail - Script de Implantação para Azure Cloud Shell
+# Workshop Multi-Agente  |  Plano: Flex Consumption (FC1 / Linux)
 # ============================================================================
+#
+# PRÉ-REQUISITOS no Cloud Shell:
+#   1. Clone o repositório (somente na primeira vez):
+#        git clone https://github.com/<org>/taller-multi-agentic.git
+#   2. Execute este script:
+#        cd taller-multi-agentic/pt/labs/foundry/setup/op-flex
+#        pwsh ./deployFromAzure.ps1
+#
 # Uso:
-#   .\deploy.ps1 -TenantName "meu-tenant-temporario"
-#   .\deploy.ps1 -TenantName "meu-tenant-temporario" -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" -FabricWarehouseDatabase "<database>"
-#   .\deploy.ps1 -TenantName "meu-tenant-temporario" -Location "eastus" -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" -FabricWarehouseDatabase "<database>"
+#   ./deployFromAzure.ps1
+#   ./deployFromAzure.ps1 -FabricWarehouseSqlEndpoint "<endpoint>" -FabricWarehouseDatabase "<db>"
+#   ./deployFromAzure.ps1 -Location "eastus" -FabricWarehouseSqlEndpoint "<endpoint>" -FabricWarehouseDatabase "<db>"
+# TenantName é opcional: exibido apenas na tela, não afeta os recursos criados.
 # ============================================================================
 
 param(
-    [Parameter(Mandatory = $true, HelpMessage = "Nome do tenant temporário atribuído ao participante.")]
-    [string]$TenantName,
+    [Parameter(Mandatory = $false, HelpMessage = "Rótulo descritivo opcional (ex: número de tenant do participante). Exibido apenas na tela.")]
+    [string]$TenantName = "",
 
     [Parameter(Mandatory = $false, HelpMessage = "Região do Azure (padrão: eastus).")]
     [string]$Location = "eastus",
@@ -26,45 +35,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-# --- Verificar PowerShell 7+ ---
-if ($PSVersionTable.PSVersion.Major -lt 7) {
-    Write-Host ""
-    Write-Host "ERRO: Este script requer PowerShell 7 ou superior." -ForegroundColor Red
-    Write-Host "  Versão detectada: PowerShell $($PSVersionTable.PSVersion)" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "  Baixe o PowerShell 7:" -ForegroundColor Yellow
-    Write-Host "    Windows : https://aka.ms/powershell-release?tag=stable  (MSI installer)" -ForegroundColor Cyan
-    Write-Host "             ou execute:  winget install Microsoft.PowerShell" -ForegroundColor Gray
-    Write-Host "    Linux   : https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux" -ForegroundColor Cyan
-    Write-Host "    macOS   : https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-macos" -ForegroundColor Cyan
-    Write-Host "             ou execute:  brew install powershell/tap/powershell" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  Após instalar, abra um terminal 'pwsh' (não 'powershell') e execute o script novamente." -ForegroundColor Yellow
-    Write-Host ""
-    exit 1
-}
-
-# Forzar UTF-8 en la consola
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$OutputEncoding = [System.Text.Encoding]::UTF8
-
-# --- Verificar ExecutionPolicy ---
-$execPolicy = Get-ExecutionPolicy -Scope CurrentUser
-if ($execPolicy -eq 'Restricted' -or $execPolicy -eq 'Undefined') {
-    $systemPolicy = Get-ExecutionPolicy -Scope LocalMachine
-    if ($systemPolicy -eq 'Restricted' -or $systemPolicy -eq 'Undefined') {
-        Write-Host ""
-        Write-Host "ERRO: A ExecutionPolicy não permite executar scripts." -ForegroundColor Red
-        Write-Host "  Policy atual (CurrentUser): $execPolicy" -ForegroundColor Red
-        Write-Host "  Policy atual (LocalMachine): $systemPolicy" -ForegroundColor Red
-        Write-Host ""
-        Write-Host "  Execute este comando no pwsh e tente novamente:" -ForegroundColor Yellow
-        Write-Host "    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser" -ForegroundColor Cyan
-        Write-Host ""
-        exit 1
-    }
-}
 
 Write-Host "Pressione Enter para o padrão." -ForegroundColor DarkGray
 
@@ -83,8 +53,8 @@ if (-not $PSBoundParameters.ContainsKey('ResourceGroupName')) {
 }
 
 if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint) -and [string]::IsNullOrWhiteSpace($FabricWarehouseDatabase)) {
-    $configureFabricNow = Read-Host "Deseja configurar agora a conexão SQL do Fabric para o Lab04? (s/N)"
-    if ($configureFabricNow -match '^(s|si|sim|y|yes)$') {
+    $configureFabricNow = Read-Host "Deseja configurar a conexão SQL do Fabric para o Lab04 agora? (s/N)"
+    if ($configureFabricNow -match '^(s|sim|y|yes)$') {
         $FabricWarehouseSqlEndpoint = (Read-Host "FabricWarehouseSqlEndpoint (sem protocolo, sem porta)").Trim()
         $FabricWarehouseDatabase = (Read-Host "FabricWarehouseDatabase").Trim()
     }
@@ -100,8 +70,9 @@ if ([string]::IsNullOrWhiteSpace($FabricWarehouseSqlEndpoint) -and -not [string]
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Workshop Multi-Agêntico - Implantação" -ForegroundColor Cyan
+Write-Host " Workshop Multi-Agente - Implantação" -ForegroundColor Cyan
 Write-Host " Plano: Flex Consumption (FC1 / Linux)" -ForegroundColor Cyan
+Write-Host " Modo: Azure Cloud Shell" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Tenant:         $TenantName" -ForegroundColor Yellow
@@ -127,20 +98,9 @@ if (-not $hasCompleteFabricConfig) {
     Write-Warning "A conexão SQL para o Lab04 não será configurada nesta implantação. Você precisará ajustá-la manualmente depois."
 }
 
-# --- 1. Verificar Azure CLI ---
-Write-Host "[1/5] Verificando Azure CLI..." -ForegroundColor Green
-try {
-    $azVersion = az version --output json | ConvertFrom-Json
-    Write-Host "  Azure CLI v$($azVersion.'azure-cli') detectado." -ForegroundColor Gray
-    Write-Host "  Registrando provider Microsoft.Bing (se aplicável)..." -ForegroundColor Gray
-    az provider register --namespace Microsoft.Bing --output none 2>$null
-} catch {
-    Write-Error "O Azure CLI não está instalado. Instale em https://aka.ms/installazurecli"
-    exit 1
-}
-
-# --- 2. Verificar sessão ativa ---
-Write-Host "[2/5] Verificando sessão do Azure..." -ForegroundColor Green
+# --- 1. Verificar sessão ativa ---
+# No Cloud Shell a sessão costuma estar ativa, mas verificamos por precaução.
+Write-Host "[1/5] Verificando sessão do Azure..." -ForegroundColor Green
 $account = az account show --output json 2>$null | ConvertFrom-Json
 if (-not $account) {
     Write-Host "  Nenhuma sessão ativa. Iniciando login..." -ForegroundColor Yellow
@@ -148,35 +108,16 @@ if (-not $account) {
     $account = az account show --output json | ConvertFrom-Json
 }
 Write-Host "  Assinatura: $($account.name) ($($account.id))" -ForegroundColor Gray
+Write-Host "  Registrando provider Microsoft.Bing (se aplicável)..." -ForegroundColor Gray
+az provider register --namespace Microsoft.Bing --output none 2>$null
 
-# --- 3. Criar Resource Group ---
-Write-Host "[3/5] Criando Resource Group '$ResourceGroupName'..." -ForegroundColor Green
+# --- 2. Criar Resource Group ---
+Write-Host "[2/5] Criando Resource Group '$ResourceGroupName'..." -ForegroundColor Green
 az group create --name $ResourceGroupName --location $Location --output none
 Write-Host "  Resource Group pronto." -ForegroundColor Gray
 
-# Tentar preservar configuração existente (requer que o RG já exista)
-$suffixForNames = $null
-if (-not [string]::IsNullOrWhiteSpace($TenantName)) {
-    $suffixTemplateForPreserve = @'
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": { "t": { "type": "string" } },
-  "resources": [],
-  "outputs": { "s": { "type": "string", "value": "[substring(uniqueString(parameters('t')),0,5)]" } }
-}
-'@
-    $suffixTempFileForPreserve = Join-Path $env:TEMP "suffix-calc-preserve.json"
-    [System.IO.File]::WriteAllText($suffixTempFileForPreserve, $suffixTemplateForPreserve, [System.Text.UTF8Encoding]::new($false))
-    $suffixForNames = az deployment group create `
-        --resource-group $ResourceGroupName `
-        --template-file $suffixTempFileForPreserve `
-        --parameters t=$TenantName `
-        --name "suffix-calc-preserve" `
-        --query 'properties.outputs.s.value' `
-        --output tsv 2>$null
-    Remove-Item $suffixTempFileForPreserve -Force -ErrorAction SilentlyContinue
-}
+# Sufixo único derivado do ID da assinatura (coincide com o que main.bicep calcula)
+$suffixForNames = $account.id.Replace('-', '').Substring(0, 5).ToLower()
 
 if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffixForNames)) {
     $existingFunctionAppName = "func-contosoretail-$suffixForNames"
@@ -188,47 +129,35 @@ if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffix
 
     if (-not [string]::IsNullOrWhiteSpace($existingConnection) -and $existingConnection -ne "null") {
         $FabricWarehouseConnectionString = $existingConnection
-        Write-Host "  FabricWarehouseConnectionString existente será preservada na Function App." -ForegroundColor Yellow
+        Write-Host "  FabricWarehouseConnectionString existente na Function App será preservada." -ForegroundColor Yellow
     }
 }
 
-# --- 4. Implantar Bicep ---
-Write-Host "[4/5] Implantando infraestrutura..." -ForegroundColor Green
+# --- 3. Implantar Bicep ---
+Write-Host "[3/5] Implantando infraestrutura..." -ForegroundColor Green
 
-# Calcular e exibir o sufixo antes de implantar
-$suffixTemplate = @'
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": { "t": { "type": "string" } },
-  "resources": [],
-  "outputs": { "s": { "type": "string", "value": "[substring(uniqueString(parameters('t')),0,5)]" } }
-}
-'@
-$suffixTempFile = Join-Path $env:TEMP "suffix-calc.json"
-[System.IO.File]::WriteAllText($suffixTempFile, $suffixTemplate, [System.Text.UTF8Encoding]::new($false))
-$suffixResult = az deployment group create `
-    --resource-group $ResourceGroupName `
-    --template-file $suffixTempFile `
-    --parameters t=$TenantName `
-    --name "suffix-calc" `
-    --query 'properties.outputs.s.value' `
-    --output tsv 2>$null
-Remove-Item $suffixTempFile -Force -ErrorAction SilentlyContinue
-Write-Host "  Sufijo:         $suffixResult" -ForegroundColor Yellow
+# O sufixo é calculado da mesma forma que em main.bicep: primeiros 5 hex chars do subscription ID (sem hífens)
+$suffixResult = $account.id.Replace('-', '').Substring(0, 5).ToLower()
+Write-Host "  Sufixo:         $suffixResult" -ForegroundColor Yellow
 
 Write-Host "" -ForegroundColor Gray
 Write-Host "  Isso pode levar ~5 minutos." -ForegroundColor Yellow
 Write-Host ""
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+$scriptDir = $PSScriptRoot
 $templateFile = Join-Path $scriptDir "main.bicep"
 $deploymentName = "main"
+
+if (-not (Test-Path $templateFile)) {
+    Write-Error "main.bicep não encontrado em '$scriptDir'. Certifique-se de executar o script a partir da pasta op-flex do repositório clonado."
+    exit 1
+}
 
 # Iniciar implantação em background (--no-wait)
 az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $templateFile `
-    --parameters tenantName=$TenantName location=$Location fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
+    --parameters location=$Location fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
     --name $deploymentName `
     --no-wait `
     --output none
@@ -238,7 +167,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Aguardar o deployment aparecer no ARM (~5 segundos)
+# Aguardar o deployment aparecer no ARM
 $retries = 0
 do {
     Start-Sleep -Seconds 3
@@ -257,14 +186,11 @@ if (-not $depState) {
 
 # Acompanhamento recurso a recurso
 $completedOps = @{}
-$spinChars = @('|', '/', '-', '\\')
-$spinIdx = 0
 $deployFailed = $false
 
 while ($true) {
     Start-Sleep -Seconds 3
 
-    # Obter operações do deployment
     $opsJson = az deployment operation group list `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
@@ -281,8 +207,6 @@ while ($true) {
         if (-not $resType -or -not $resName) { continue }
 
         $key = "$resType/$resName"
-
-        # Exibir apenas transições novas
         $prevStatus = $completedOps[$key]
         if ($prevStatus -ne $status) {
             $completedOps[$key] = $status
@@ -295,7 +219,6 @@ while ($true) {
         }
     }
 
-    # Verificar se o deployment terminou
     $depJson = az deployment group show `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
@@ -305,23 +228,20 @@ while ($true) {
     if ($depJson -eq 'Succeeded' -or $depJson -eq 'Failed' -or $depJson -eq 'Canceled') {
         break
     }
-
-    $spinIdx = ($spinIdx + 1) % $spinChars.Count
 }
 
 if ($depJson -ne 'Succeeded') {
     Write-Host ""
-    # Exibir erro detalhado
     az deployment group show `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
         --query 'properties.error' `
         --output json
-    Write-Error "A implantação falhou. Verifique os erros acima."
+    Write-Error "A implantação falhou. Revise os erros acima."
     exit 1
 }
 
-# Obter outputs do deployment bem-sucedido
+# Obter outputs da implantação bem-sucedida
 $result = az deployment group show `
     --resource-group $ResourceGroupName `
     --name $deploymentName `
@@ -330,31 +250,37 @@ $result = az deployment group show `
 $outputs = $result.properties.outputs
 $functionAppName = $outputs.functionAppName.value
 
-# --- 5. Publicar código da Function App ---
-Write-Host "[5/5] Publicando código do FxContosoRetail..." -ForegroundColor Green
-$projectDir = Join-Path (Join-Path (Join-Path (Join-Path $scriptDir "..") "..") "code") "api"
-$projectDir = Join-Path $projectDir "FxContosoRetail"
-$publishDir = Join-Path (Join-Path $projectDir "bin") "publish"
+# --- 4. Compilar e publicar código da Function App ---
+Write-Host "[4/5] Compilando FxContosoRetail..." -ForegroundColor Green
 
-Write-Host "  Compilando projeto..." -ForegroundColor Gray
+$projectDir = Join-Path $scriptDir "../../code/api/FxContosoRetail"
+$projectDir = (Resolve-Path $projectDir).Path
+$publishDir = Join-Path $projectDir "bin/publish"
+
 $publishOutput = dotnet publish $projectDir --configuration Release --output $publishDir 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "" 
+    Write-Host ""
     Write-Host "===== Detalhe do erro de compilação =====" -ForegroundColor Red
     $publishOutput | ForEach-Object { Write-Host $_ }
-    Write-Host "==========================================" -ForegroundColor Red
+    Write-Host "=========================================" -ForegroundColor Red
     Write-Error "Erro ao compilar o projeto. Verifique o código."
     exit 1
 }
 
 # Criar zip para implantação
-$zipPath = Join-Path $env:TEMP "fxcontosoretail-publish.zip"
+# FIX: Compress-Archive no PowerShell 7 no Linux exclui diretórios ocultos (dotfiles)
+# como .azurefunctions, que o Flex Consumption valida como obrigatório.
+# Usa-se o comando zip do sistema, que com '.' inclui todos os arquivos sem exceção.
+$zipPath = "/tmp/fxcontosoretail-publish.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
+Push-Location $publishDir
+& zip -r $zipPath . | Out-Null
+Pop-Location
 
-# Aguardar o endpoint SCM estar resolvível por DNS (Flex Consumption demora)
+# Aguardar o endpoint SCM estar disponível
+# Nota: no Cloud Shell (Linux) usa-se [System.Net.Dns] pois Resolve-DnsName não está disponível.
 $scmHost = "$functionAppName.scm.azurewebsites.net"
-Write-Host "  Aguardando endpoint SCM ficar disponível..." -ForegroundColor Gray
+Write-Host "[5/5] Aguardando o endpoint SCM ficar disponível..." -ForegroundColor Green
 $dnsReady = $false
 for ($i = 0; $i -lt 30; $i++) {
     try {
@@ -369,7 +295,7 @@ if (-not $dnsReady) {
     Write-Warning "  O DNS de $scmHost não resolveu após 5 minutos. Tentando deploy mesmo assim..."
 }
 
-# Deploy com novas tentativas (até 3 tentativas com espera incremental)
+# Deploy com tentativas
 $maxRetries = 3
 $deploySuccess = $false
 for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
@@ -394,7 +320,7 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
 }
 
 if (-not $deploySuccess) {
-    Write-Error "Erro ao publicar o código após $maxRetries tentativas. Você pode tentar manualmente com: az functionapp deployment source config-zip --resource-group $ResourceGroupName --name $functionAppName --src `"$zipPath`""
+    Write-Error "Erro ao publicar o código após $maxRetries tentativas. Você pode tentar manualmente com: az functionapp deployment source config-zip --resource-group $ResourceGroupName --name $functionAppName --src '$zipPath'"
     exit 1
 }
 
@@ -406,7 +332,6 @@ Write-Host "  ✅ Código publicado com sucesso." -ForegroundColor Green
 
 # --- Resumo final ---
 $functionAppUrl = $outputs.functionAppUrl.value
-
 $apiUrl = "$functionAppUrl/api/OrdersReporter"
 
 Write-Host ""
@@ -414,15 +339,15 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host " Implantação concluída!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Sufijo único:        $($outputs.suffix.value)" -ForegroundColor White
-Write-Host "  Storage Account:     $($outputs.storageAccountName.value)" -ForegroundColor White
-Write-Host "  Function App:        $functionAppName" -ForegroundColor White
-Write-Host "  Function App Base URL:      $functionAppUrl/api" -ForegroundColor White
+Write-Host "  Sufixo único:                $($outputs.suffix.value)" -ForegroundColor White
+Write-Host "  Storage Account:             $($outputs.storageAccountName.value)" -ForegroundColor White
+Write-Host "  Function App:                $functionAppName" -ForegroundColor White
+Write-Host "  Function App Base URL:       $functionAppUrl/api" -ForegroundColor White
 Write-Host "  API OrdersReporter:          $apiUrl" -ForegroundColor White
 Write-Host "  Foundry Project Endpoint:    $($outputs.foundryProjectEndpoint.value)" -ForegroundColor White
 Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" -ForegroundColor White
 Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
-Write-Host "  Bing Connection ID (Julie):  $($outputs.bingConnectionId.value)" -ForegroundColor White
+Write-Host "  Bing Connection Name (Julie): $($outputs.bingConnectionName.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
     Write-Host "  Fabric SQL Connection:       atualizada a partir dos parâmetros" -ForegroundColor White
 }

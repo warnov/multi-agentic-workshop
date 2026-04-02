@@ -3,77 +3,77 @@ using Azure.AI.Agents.Persistent;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 
-#pragma warning disable CA2252 // API en preview
+#pragma warning disable CA2252 // API em pré-visualização
 
-// --- Cargar configuración ---
+// --- Carregar configuração ---
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
 var foundryEndpoint = config["FoundryProjectEndpoint"]
-    ?? throw new InvalidOperationException("Falta FoundryProjectEndpoint en appsettings.json");
+    ?? throw new InvalidOperationException("FoundryProjectEndpoint ausente no appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
-    ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
+    ?? throw new InvalidOperationException("ModelDeploymentName ausente no appsettings.json");
 var functionAppBaseUrl = config["FunctionAppBaseUrl"]
-    ?? throw new InvalidOperationException("Falta FunctionAppBaseUrl en appsettings.json");
+    ?? throw new InvalidOperationException("FunctionAppBaseUrl ausente no appsettings.json");
 
 // =====================================================================
-//  FASE 1: Obtener la especificación OpenAPI de la Function App
+//  FASE 1: Obter a especificação OpenAPI da Function App
 // =====================================================================
 
-Console.WriteLine("[OpenAPI] Descargando especificación desde la Function App...");
+Console.WriteLine("[OpenAPI] Baixando especificação da Function App...");
 
 var httpClient = new HttpClient();
 var openApiSpecUrl = $"{functionAppBaseUrl}/openapi/v3.json";
 var openApiSpec = await httpClient.GetStringAsync(openApiSpecUrl);
 
-Console.WriteLine($"[OpenAPI] Especificación descargada ({openApiSpec.Length} bytes)");
+Console.WriteLine($"[OpenAPI] Especificação baixada ({openApiSpec.Length} bytes)");
 
 // =====================================================================
-//  FASE 2: Crear agente con herramienta OpenAPI en Foundry
+//  FASE 2: Criar agente com ferramenta OpenAPI no Foundry
 // =====================================================================
 
-// Cliente del proyecto Foundry
+// Cliente do projeto Foundry
 var projectClient = new AIProjectClient(
     new Uri(foundryEndpoint),
     new DefaultAzureCredential());
 
-// Obtener el cliente de agentes persistentes
+// Obter o cliente de agentes persistentes
 var agentsClient = projectClient.GetPersistentAgentsClient();
 
-// Definir la herramienta OpenAPI a partir de la especificación descargada
+// Definir a ferramenta OpenAPI a partir da especificação baixada
 var openApiTool = new OpenApiToolDefinition(
     new OpenApiFunctionDefinition(
         name: "ContosoRetailAPI",
         spec: BinaryData.FromString(openApiSpec),
         openApiAuthentication: new OpenApiAnonymousAuthDetails())
     {
-        Description = "API de Contoso Retail para generar reportes de órdenes de compra"
+        Description = "API da Contoso Retail para gerar relatórios de pedidos de compra"
     });
 
-// Instrucciones del agente Anders
+// Instruções do agente Anders
 var andersInstructions = """
-    Eres Anders, el agente ejecutor de Contoso Retail.
+    Você é Anders, o agente executor da Contoso Retail.
 
-    Tu responsabilidad es ejecutar acciones operativas concretas cuando se te soliciten.
-    Tu principal capacidad es generar reportes de órdenes de compra de clientes
-    usando la API de Contoso Retail disponible como herramienta OpenAPI.
+    Sua responsabilidade é executar ações operacionais concretas quando solicitado.
+    Sua principal capacidade é gerar relatórios de pedidos de compra de clientes
+    usando a API da Contoso Retail disponível como ferramenta OpenAPI.
 
-    Cuando recibas datos de órdenes, debes construir el JSON del request body
-    con EXACTAMENTE este schema para invocar el endpoint ordersReporter:
+    Quando receber dados de pedidos, você deve construir o JSON do request body
+    com EXATAMENTE este schema para invocar o endpoint ordersReporter:
 
     {
-      "customerName": "Nombre del Cliente",
+      "customerName": "Nome do Cliente",
       "startDate": "YYYY-MM-DD",
       "endDate": "YYYY-MM-DD",
       "orders": [
         {
-          "orderNumber": "código de la orden",
+          "orderNumber": "código do pedido",
           "orderDate": "YYYY-MM-DD",
           "orderLineNumber": 1,
-          "productName": "nombre del producto",
-          "brandName": "nombre de la marca",
-          "categoryName": "nombre de la categoría",
+          "productName": "nome do produto",
+          "brandName": "nome da marca",
+          "categoryName": "nome da categoria",
           "quantity": 1.0,
           "unitPrice": 0.00,
           "lineTotal": 0.00
@@ -81,27 +81,27 @@ var andersInstructions = """
       ]
     }
 
-    Reglas:
-    - TODOS los campos son obligatorios para cada línea de orden.
-    - Si una orden tiene múltiples productos, cada producto es un elemento
-      separado en el array "orders" con el mismo "orderNumber" y "orderDate"
-      pero diferente "orderLineNumber" (secuencial: 1, 2, 3...).
-    - Las fechas deben estar en formato ISO: YYYY-MM-DD.
-    - "quantity", "unitPrice" y "lineTotal" son numéricos (double).
+    Regras:
+    - TODOS os campos são obrigatórios para cada linha de pedido.
+    - Se um pedido tiver múltiplos produtos, cada produto é um elemento
+      separado no array "orders" com o mesmo "orderNumber" e "orderDate"
+      mas diferente "orderLineNumber" (sequencial: 1, 2, 3...).
+    - As datas devem estar no formato ISO: YYYY-MM-DD.
+    - "quantity", "unitPrice" e "lineTotal" são numéricos (double).
 
-    Siempre confirma la acción realizada al usuario, incluyendo la URL del reporte.
-    Si los datos son insuficientes o inválidos, explica qué falta.
-    Responde en español.
+    Sempre confirme a ação realizada ao usuário, incluindo a URL do relatório.
+    Se os dados forem insuficientes ou inválidos, explique o que falta.
+    Responda em português.
     """;
 
-Console.WriteLine("[Foundry] Buscando agente Anders existente...");
+Console.WriteLine("[Foundry] Procurando agente Anders existente...");
 
 PersistentAgent? agent = null;
 
-// Buscar si ya existe un agente con el mismo nombre
+// Verificar se já existe um agente com o mesmo nome
 await foreach (var existingAgent in agentsClient.Administration.GetAgentsAsync())
 {
-    if (existingAgent.Name == "Anders - Agente Ejecutor")
+    if (existingAgent.Name == "Anders - Agente Executor")
     {
         agent = existingAgent;
         Console.WriteLine($"[Foundry] Agente existente encontrado: {agent.Name} (ID: {agent.Id})");
@@ -111,47 +111,47 @@ await foreach (var existingAgent in agentsClient.Administration.GetAgentsAsync()
 
 if (agent is null)
 {
-    Console.WriteLine("[Foundry] Creando agente Anders con herramienta OpenAPI...");
+    Console.WriteLine("[Foundry] Criando agente Anders com ferramenta OpenAPI...");
 
     agent = (await agentsClient.Administration.CreateAgentAsync(
         model: modelDeployment,
-        name: "Anders - Agente Ejecutor",
-        description: "Agente ejecutor de Contoso Retail con herramienta OpenAPI",
+        name: "Anders - Agente Executor",
+        description: "Agente executor da Contoso Retail com ferramenta OpenAPI",
         instructions: andersInstructions,
         tools: new List<ToolDefinition> { openApiTool })).Value;
 
-    Console.WriteLine($"[Foundry] Agente creado: {agent.Name} (ID: {agent.Id})");
+    Console.WriteLine($"[Foundry] Agente criado: {agent.Name} (ID: {agent.Id})");
 }
 
 // =====================================================================
-//  FASE 3: Interactuar con el agente (threads & runs)
+//  FASE 3: Interagir com o agente (threads & runs)
 // =====================================================================
 
 PersistentAgentThread thread = (await agentsClient.Threads.CreateThreadAsync()).Value;
 Console.WriteLine($"[Foundry] Thread creado: {thread.Id}");
 Console.WriteLine();
-Console.WriteLine("=== Chat con Anders (escribe 'salir' para terminar) ===");
+Console.WriteLine("=== Chat com Anders (digite 'sair' para terminar) ===");
 Console.WriteLine();
 
 while (true)
 {
-    Console.Write("Tú: ");
+    Console.Write("Você: ");
     var input = Console.ReadLine();
 
     if (string.IsNullOrWhiteSpace(input) ||
-        input.Equals("salir", StringComparison.OrdinalIgnoreCase))
+        input.Equals("sair", StringComparison.OrdinalIgnoreCase))
         break;
 
-    // Enviar mensaje del usuario al thread
+    // Enviar mensagem do usuário ao thread
     await agentsClient.Messages.CreateMessageAsync(
         threadId: thread.Id,
         role: MessageRole.User,
         content: input);
 
-    // Ejecutar el agente sobre el thread
+    // Executar o agente no thread
     ThreadRun run = (await agentsClient.Runs.CreateRunAsync(thread, agent)).Value;
 
-    // Esperar a que el run termine (polling)
+    // Aguardar o run terminar (polling)
     Console.Write("Anders: ");
     while (run.Status == RunStatus.Queued || run.Status == RunStatus.InProgress)
     {
@@ -159,15 +159,15 @@ while (true)
         run = (await agentsClient.Runs.GetRunAsync(thread.Id, run.Id)).Value;
     }
 
-    // Procesar resultado
+    // Processar resultado
     if (run.Status == RunStatus.Completed)
     {
-        // Obtener mensajes del thread (los más recientes primero)
+        // Obter mensagens do thread (as mais recentes primeiro)
         var messages = agentsClient.Messages.GetMessagesAsync(threadId: thread.Id);
 
         await foreach (PersistentThreadMessage message in messages)
         {
-            // Solo mostrar la primera respuesta del agente (la más reciente)
+            // Mostrar apenas a primeira resposta do agente (a mais recente)
             if (message.Role == MessageRole.Agent)
             {
                 foreach (MessageContent contentItem in message.ContentItems)
@@ -183,17 +183,17 @@ while (true)
     }
     else
     {
-        Console.WriteLine($"\n[Error] Run terminó con estado: {run.Status}");
+        Console.WriteLine($"\n[Erro] Run terminou com estado: {run.Status}");
         if (run.LastError != null)
-            Console.WriteLine($"[Error] {run.LastError.Code}: {run.LastError.Message}");
+            Console.WriteLine($"[Erro] {run.LastError.Code}: {run.LastError.Message}");
     }
     Console.WriteLine();
 }
 
 // =====================================================================
-//  Limpieza del thread (el agente persiste para reutilizarse)
+//  Limpeza do thread (o agente persiste para reutilização)
 // =====================================================================
 
-Console.WriteLine("[Foundry] Limpiando thread...");
+Console.WriteLine("[Foundry] Limpando thread...");
 await agentsClient.Threads.DeleteThreadAsync(thread.Id);
-Console.WriteLine($"[Foundry] Thread eliminado. El agente '{agent.Name}' (ID: {agent.Id}) permanece disponible.");
+Console.WriteLine($"[Foundry] Thread excluído. O agente '{agent.Name}' (ID: {agent.Id}) permanece disponível.");

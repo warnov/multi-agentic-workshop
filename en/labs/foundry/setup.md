@@ -128,7 +128,7 @@ After this, you will start seeing the deployment progress and be informed about 
 
 > 👁️ **Review the output.** When the script finishes, it displays the names and URLs of all created resources. Take note of these values — you will need them in the labs!
 
-> **Note:** If you do not provide the Fabric parameters, the deployment **does not fail**. It skips the SQL connection configuration and shows a warning to configure it manually later. The SQL connection is only needed for Lab 5 (Julie) and the `SqlExecutor` Function App.
+> **Note:** If you do not provide the Fabric parameters, the deployment **does not fail**. It skips the SQL connection configuration and shows a warning to configure it manually later. The SQL connection is only needed for Lab 4 (Julie) and the `SqlExecutor` Function App.
 
 ---
 
@@ -185,17 +185,14 @@ az role assignment create `
 ```
 labs/foundry/
 ├── README.md                              ← This file
-├── lab04-anders-executor-agent.md          ← Lab 4: Anders Agent
-├── lab05-julie-planner-agent.md           ← Lab 5: Julie Agent
+├── lab03-anders-executor-agent.en.md      ← Lab 3: Anders Agent
+├── lab04-julie-planner-agent.en.md       ← Lab 4: Julie Agent
 ├── setup/
 │   ├── op-flex/                           ← ⭐ Recommended option (Flex Consumption / Linux)
 │   │   ├── main.bicep
 │   │   ├── storage-rbac.bicep
 │   │   └── deploy.ps1
-│   └── op-consumption/                    ← Classic option (Consumption Y1 / Windows)
-│       ├── main.bicep
-│       ├── storage-rbac.bicep
-│       └── deploy.ps1
+│   └── op-consumption/                    ← Classic option (Consumption Y1 / Windows; see es/ folder)
 └── code/
     ├── api/
     │   └── FxContosoRetail/               ← Azure Function (API)
@@ -231,10 +228,10 @@ labs/foundry/
 
 ## Labs
 
-| Lab   | File                                                      | Description                                                  |
-| ----- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Lab 4 | [Anders — Executor Agent](lab04-anders-executor-agent.md) | Create the executor agent that generates reports and interacts with Contoso Retail services. |
-| Lab 5 | [Julie — Planner Agent](lab05-julie-planner-agent.md)     | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
+| Lab   | File                                                          | Description                                                  |
+| ----- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| Lab 3 | [Anders — Executor Agent](lab03-anders-executor-agent.en.md) | Create the executor agent that generates reports and interacts with Contoso Retail services. |
+| Lab 4 | [Julie — Planner Agent](lab04-julie-planner-agent.en.md)     | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
 
 ---
 
@@ -242,4 +239,4 @@ labs/foundry/
 
 ## Next step
 
-Once the setup is complete, continue with [Lab 3 — Anders (Executor Agent)](lab03-anders-executor-agent.md).
+Once the setup is complete, continue with [Lab 3 — Anders (Executor Agent)](lab03-anders-executor-agent.en.md).

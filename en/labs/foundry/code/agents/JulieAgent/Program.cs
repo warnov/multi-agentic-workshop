@@ -41,7 +41,7 @@ var bingConnectionId = config["BingConnectionId"]
 // Configured in appsettings.json once the function is deployed.
 var functionAppBaseUrl = config["FunctionAppBaseUrl"];
 
-// --- Cargar estructura de la base de datos ---
+// --- Load database structure ---
 var dbStructurePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-structure.txt");
 if (!File.Exists(dbStructurePath))
     dbStructurePath = Path.Combine(Directory.GetCurrentDirectory(), "db-structure.txt");
@@ -54,7 +54,7 @@ if (!File.Exists(dbStructurePath))
 var dbStructure = File.ReadAllText(dbStructurePath);
 Console.WriteLine($"[Config] DB structure loaded ({dbStructure.Length} chars)");
 
-// --- (Opcional) Descargar spec OpenAPI de la Function App ---
+// --- (Optional) Download OpenAPI spec from the Function App ---
 JsonElement? openApiSpecJson = null;
 
 if (!string.IsNullOrEmpty(functionAppBaseUrl) && !functionAppBaseUrl.StartsWith("<"))
@@ -96,7 +96,7 @@ else
     Console.WriteLine("  → Configure FunctionAppBaseUrl in appsettings.json once the Function App is deployed.");
 }
 
-// --- Cliente del proyecto Foundry ---
+// --- Foundry project client ---
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
@@ -157,7 +157,7 @@ async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
 }
 
 
-// Crear los 3 agentes
+// Create the 3 agents
 await EnsureAgent(SqlAgent.Name, SqlAgent.GetAgentDefinition(modelDeployment, dbStructure, openApiSpecJson));
 await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDeployment, bingConnectionId));
 await EnsureAgent(JulieOrchestrator.Name, JulieOrchestrator.GetAgentDefinition(modelDeployment, openApiSpecJson));
@@ -199,7 +199,7 @@ while (true)
         Console.WriteLine();
         Console.WriteLine($"  [DEBUG] Status: {response.Status}");
 
-        // Serializar response completo a JSON para ver la estructura
+        // Serialize full response to JSON to inspect structure
         try
         {
             var jsonOpts = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10 };

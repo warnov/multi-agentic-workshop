@@ -33,14 +33,14 @@ var foundryEndpoint = config["FoundryProjectEndpoint"]
 var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Missing ModelDeploymentName in appsettings.json");
 
-// --- Cliente del proyecto Foundry ---
+// --- Foundry project client ---
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
 
 Console.WriteLine();
 Console.WriteLine("========================================================");
-Console.WriteLine(" JulieBackup - Agente orquestador (prompt + functions)");
+Console.WriteLine(" JulieBackup - Orchestrator agent (prompt + functions)");
 Console.WriteLine("========================================================");
 Console.WriteLine();
 
@@ -125,7 +125,7 @@ var julieInstructions = """
     - Generate a descriptive campaign name based on the segment.
     """;
 
-// Definir function tools que representan a SqlAgent y MarketingAgent
+// Define function tools representing SqlAgent and MarketingAgent
 var queryCustomersParams = BinaryData.FromObjectAsJson(new
 {
     type = "object",
@@ -179,7 +179,7 @@ var julieDefinition = new PromptAgentDefinition(modelDeployment)
     }
 };
 
-// Verificar si JulieBackup ya existe
+// Check if JulieBackup already exists
 Console.WriteLine($"[Foundry] Searching for agent '{julieBackupAgentName}'...");
 AgentRecord? existingAgent = null;
 bool shouldCreate = true;
@@ -204,10 +204,10 @@ catch (ClientResultException ex) when (ex.Status == 404)
     Console.WriteLine($"[Foundry] Agent '{julieBackupAgentName}' not found. A new one will be created.");
 }
 
-// Crear/actualizar JulieBackup
+// Create/update JulieBackup
 try
 {
-    Console.WriteLine($"[Foundry] Creando/actualizando agente '{julieBackupAgentName}'...");
+    Console.WriteLine($"[Foundry] Creating/updating agent '{julieBackupAgentName}'...");
 
     var result = await projectClient.Agents.CreateAgentVersionAsync(
         julieBackupAgentName,
@@ -263,7 +263,7 @@ async Task<string> InvokeSubAgent(string agentName, string message)
     }
     catch (Exception ex)
     {
-        var error = $"Error al invocar {agentName}: {ex.Message}";
+        var error = $"Error invoking {agentName}: {ex.Message}";
         Console.WriteLine($"  [✗ {agentName}] {error}");
         return error;
     }
@@ -280,13 +280,13 @@ while (true)
 
     try
     {
-        // Enviar mensaje a JulieBackup
+        // Send message to JulieBackup
         ResponseResult response = responseClient.CreateResponse(input);
 
-        // Loop de function calls: JulieBackup puede pedir N function calls
+        // Function call loop: JulieBackup may request N function calls
         while (true)
         {
-            // Recoger todas las function calls pendientes
+            // Collect all pending function calls
             var functionCalls = response.OutputItems.OfType<FunctionCallResponseItem>().ToList();
 
             if (functionCalls.Count == 0)
@@ -305,20 +305,20 @@ while (true)
                 switch (funcCall.FunctionName)
                 {
                     case "query_customers":
-                        var segmento = argsJson.TryGetProperty("segment_description", out var seg)
+                        var segment = argsJson.TryGetProperty("segment_description", out var seg)
                             ? seg.GetString() ?? ""
                             : funcArgs;
-                        result = await InvokeSubAgent(sqlAgentName, segmento);
+                        result = await InvokeSubAgent(sqlAgentName, segment);
                         break;
 
                     case "generate_marketing_message":
-                        var nombre = argsJson.TryGetProperty("customer_name", out var n)
+                        var customerName = argsJson.TryGetProperty("customer_name", out var n)
                             ? n.GetString() ?? ""
                             : "";
-                        var categoria = argsJson.TryGetProperty("favorite_category", out var c)
+                        var category = argsJson.TryGetProperty("favorite_category", out var c)
                             ? c.GetString() ?? ""
                             : "";
-                        var prompt = $"Generate a personalized marketing message for customer {nombre} whose favorite category is {categoria}.";
+                        var prompt = $"Generate a personalized marketing message for customer {customerName} whose favorite category is {category}.";
                         result = await InvokeSubAgent(marketingAgentName, prompt);
                         break;
 
@@ -331,12 +331,12 @@ while (true)
                     ResponseItem.CreateFunctionCallOutputItem(funcCall.CallId, result));
             }
 
-            // Enviar resultados de funciones de vuelta a JulieBackup
-            // No pasar previousResponseId porque ProjectResponsesClient ya inyecta conversationId
+            // Send function results back to JulieBackup
+            // No previousResponseId needed — ProjectResponsesClient already injects conversationId
             response = responseClient.CreateResponse(functionOutputs, previousResponseId: null);
         }
 
-        // Mostrar respuesta final de JulieBackup
+        // Show JulieBackup's final response
         var outputText = response.GetOutputText();
         if (!string.IsNullOrEmpty(outputText))
         {
@@ -346,7 +346,7 @@ while (true)
         else
         {
             Console.WriteLine();
-            Console.WriteLine("[JulieBackup] Sin texto de salida.");
+            Console.WriteLine("[JulieBackup] No output text.");
         }
     }
     catch (Exception ex)

@@ -1,9 +1,9 @@
 // ============================================================================
-// Contoso Retail - Infraestructura Azure (Flex Consumption)
-// Taller Multi-Agéntico
+// Contoso Retail - Infraestrutura Azure (Flex Consumption)
+// Workshop Multi-Agêntico
 // ============================================================================
-// Cada attendee despliega en su propia suscripción.
-// El sufijo único (5 chars) se genera a partir del nombre del tenant temporal.
+// Cada participante implanta em sua própria assinatura.
+// O sufixo único (5 chars) é gerado a partir do nome do tenant temporário.
 //
 // Plan: Flex Consumption (FC1 / Linux)
 // - Identity-based storage completo (sin connection strings para runtime)
@@ -15,35 +15,35 @@
 targetScope = 'resourceGroup'
 
 // ============================================================================
-// Parámetros
+// Parâmetros
 // ============================================================================
 
-@description('Nombre del tenant temporal asignado al attendee (ej: "contoso-abc123tenant").')
+@description('Nome do tenant temporário atribuído ao participante (ex: "contoso-abc123tenant").')
 param tenantName string
 
-@description('Ubicación de los recursos. Por defecto: eastus.')
+@description('Localização dos recursos. Padrão: eastus.')
 param location string = 'eastus'
 
-@description('Nombre del modelo GPT a desplegar en AI Services.')
+@description('Nome do modelo GPT a implantar no AI Services.')
 param gptModelName string = 'gpt-4.1'
 
-@description('Versión del modelo GPT.')
+@description('Versão do modelo GPT.')
 param gptModelVersion string = '2025-04-14'
 
-@description('Capacidad del deployment (tokens por minuto en miles).')
+@description('Capacidade do deployment (tokens por minuto em milhares).')
 param gptDeploymentCapacity int = 30
 
-@description('Endpoint SQL del Warehouse de Fabric (sin protocolo), por ejemplo: xyz.datawarehouse.fabric.microsoft.com')
+@description('Endpoint SQL do Warehouse do Fabric (sem protocolo), por exemplo: xyz.datawarehouse.fabric.microsoft.com')
 param fabricWarehouseSqlEndpoint string = ''
 
-@description('Nombre de la base de datos del Warehouse de Fabric.')
+@description('Nome do banco de dados do Warehouse do Fabric.')
 param fabricWarehouseDatabase string = ''
 
-@description('Connection string SQL completa de Fabric. Se usa para preservar un valor existente cuando no se envían endpoint/database.')
+@description('Connection string SQL completa do Fabric. Usada para preservar um valor existente quando endpoint/database não são enviados.')
 param fabricWarehouseConnectionString string = ''
 
 // ============================================================================
-// Variables - Sufijo y nombres
+// Variáveis - Sufixo e nomes
 // ============================================================================
 
 var suffix = substring(uniqueString(tenantName), 0, 5)
@@ -56,7 +56,7 @@ var aiProjectName = 'aip-contosoretail-${suffix}'
 var bingGroundingName = 'bingsearch-${suffix}'
 var bingConnectionName = '${aiFoundryName}-bingsearchconnection'
 
-// Container para el paquete de deployment de la Function App
+// Container para o pacote de deployment da Function App
 var deploymentContainerName = 'app-package-${toLower(functionAppName)}'
 var hasFabricWarehouseConfig = !empty(fabricWarehouseSqlEndpoint) && !empty(fabricWarehouseDatabase)
 var computedFabricWarehouseConnectionString = 'Server=tcp:${fabricWarehouseSqlEndpoint},1433;Database=${fabricWarehouseDatabase};Encrypt=True;TrustServerCertificate=False;Authentication=Active Directory Default;Connection Timeout=30;'
@@ -189,11 +189,11 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
 // ============================================================================
 // 3b. Role Assignments - Function App → Storage Account
 // ============================================================================
-// La Function App usa Managed Identity para TODO: runtime + código.
-// Se requieren 3 roles:
+// A Function App usa Managed Identity para TUDO: runtime + código.
+// São necessários 3 roles:
 //   - Storage Blob Data Owner       → triggers, bindings, blob storage, deployment
 //   - Storage Queue Data Contributor → queue triggers
-//   - Storage Account Contributor   → gestión general
+//   - Storage Account Contributor   → gestão geral
 
 module functionStorageRbac 'storage-rbac.bicep' = {
   name: 'functionStorageRbacDeployment'
@@ -206,8 +206,8 @@ module functionStorageRbac 'storage-rbac.bicep' = {
 // ============================================================================
 // 7. AI Foundry Resource (CognitiveServices/accounts con allowProjectManagement)
 // ============================================================================
-// Este recurso unifica AI Services + Foundry Hub en un solo recurso.
-// Reemplaza el antiguo patrón Hub (MachineLearningServices/workspaces kind:Hub).
+// Este recurso unifica AI Services + Foundry Hub em um único recurso.
+// Substitui o antigo padrão Hub (MachineLearningServices/workspaces kind:Hub).
 // Ref: https://learn.microsoft.com/azure/ai-foundry/how-to/create-resource-template
 
 resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
@@ -230,7 +230,7 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
 }
 
 // ============================================================================
-// 8. AI Foundry Project (hijo directo del Foundry Resource)
+// 8. AI Foundry Project (filho direto do Foundry Resource)
 // ============================================================================
 
 resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
@@ -245,7 +245,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = 
 }
 
 // ============================================================================
-// 9. Model Deployment (GPT sobre el Foundry Resource)
+// 9. Model Deployment (GPT sobre o Foundry Resource)
 // ============================================================================
 
 resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {

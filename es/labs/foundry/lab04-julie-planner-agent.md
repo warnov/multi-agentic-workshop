@@ -1,5 +1,49 @@
 # Lab 4: Julie Planner Agent
 
+## Tabla de contenido
+
+- [Lab 4: Julie Planner Agent](#lab-4-julie-planner-agent)
+	- [Tabla de contenido](#tabla-de-contenido)
+	- [Introducción](#introducción)
+	- [Continuidad del setup](#continuidad-del-setup)
+	- [Checklist rápido](#checklist-rápido)
+		- [1) Verificar valores de conexión SQL](#1-verificar-valores-de-conexión-sql)
+		- [2) Alternativa si no sigues toda la secuencia de labs](#2-alternativa-si-no-sigues-toda-la-secuencia-de-labs)
+		- [3) Comportamiento cuando no se pasan valores de Fabric](#3-comportamiento-cuando-no-se-pasan-valores-de-fabric)
+	- [Configuración manual de permisos en Fabric (obligatorio para Lab 4)](#configuración-manual-de-permisos-en-fabric-obligatorio-para-lab-4)
+		- [Parte A — Acceso al Workspace](#parte-a--acceso-al-workspace)
+		- [Parte B — Usuario SQL y permisos en la base](#parte-b--usuario-sql-y-permisos-en-la-base)
+		- [Validación recomendada](#validación-recomendada)
+	- [Arquitectura del proyecto Julie (detalle)](#arquitectura-del-proyecto-julie-detalle)
+	- [¿Qué tipo de orquestación se escogió?](#qué-tipo-de-orquestación-se-escogió)
+	- [¿Cómo se implementó el workflow en este laboratorio?](#cómo-se-implementó-el-workflow-en-este-laboratorio)
+	- [Definición de agentes especializados](#definición-de-agentes-especializados)
+		- [SqlAgent](#sqlagent)
+		- [MarketingAgent](#marketingagent)
+		- [JulieOrchestrator](#julieorchestrator)
+	- [Pasos del laboratorio](#pasos-del-laboratorio)
+		- [Paso 1: Configurar appsettings.json](#paso-1-configurar-appsettingsjson)
+		- [Paso 2: Asegurarte de que los permisos de Fabric están configurados](#paso-2-asegurarte-de-que-los-permisos-de-fabric-están-configurados)
+		- [Paso 3: Ejecutar Julie](#paso-3-ejecutar-julie)
+		- [Paso 4: Probar el flujo end-to-end](#paso-4-probar-el-flujo-end-to-end)
+		- [Validación del laboratorio](#validación-del-laboratorio)
+	- [Challenges](#challenges)
+		- [Challenge 1: Mejorar el prompt de MarketingAgent para campañas actuales](#challenge-1-mejorar-el-prompt-de-marketingagent-para-campañas-actuales)
+			- [Contexto](#contexto)
+			- [Objetivo](#objetivo)
+			- [Parte A — Iterar el prompt en el Playground](#parte-a--iterar-el-prompt-en-el-playground)
+			- [Parte B — Llevar el prompt mejorado al código](#parte-b--llevar-el-prompt-mejorado-al-código)
+			- [Criterio de éxito](#criterio-de-éxito)
+		- [Challenge 2: Crear un agente no-code con Code Interpreter](#challenge-2-crear-un-agente-no-code-con-code-interpreter)
+			- [Contexto](#contexto-1)
+			- [Objetivo](#objetivo-1)
+			- [Pasos](#pasos)
+			- [Pruebas](#pruebas)
+			- [Criterio de éxito](#criterio-de-éxito-1)
+			- [Reflexión](#reflexión)
+
+---
+
 ## Introducción
 
 En este laboratorio construirás y validarás a Julie como agente planner de campañas de marketing en Foundry. Julie se implementa como agente de tipo `workflow` y orquesta el flujo con dos sub-agentes: `SqlAgent` y `MarketingAgent`. `SqlAgent` puede usar la tool OpenAPI `SqlExecutor` (Function App `FxContosoRetail`) para ejecutar SQL contra la base y devolver los clientes segmentados. En este laboratorio, progresivamente, configurarás el entorno, verificarás permisos y conexión SQL, y ejecutarás el flujo end-to-end para obtener la salida final de campaña en formato JSON.
@@ -252,7 +296,7 @@ Racional de diseño:
 
 ```csharp
 var bingGroundingAgentTool = new BingGroundingAgentTool(new BingGroundingSearchToolOptions(
-	searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionId)]));
+	searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionName)]));
 
 return new PromptAgentDefinition(modelDeployment)
 {
@@ -328,8 +372,9 @@ Racional de diseño:
 1. Cargar `appsettings.json`.
 2. Leer `db-structure.txt`.
 3. Descargar spec OpenAPI de la Function App (si está disponible).
-4. Crear o reutilizar agentes en Foundry.
-5. Abrir chat interactivo con Julie.
+4. Resolver el ID completo de la conexión Bing (el API requiere el ARM resource ID, no solo el nombre).
+5. Crear o reutilizar agentes en Foundry.
+6. Abrir chat interactivo con Julie.
 
 El helper `EnsureAgent(...)` implementa el patrón **buscar → decidir override → crear versión** con tipos del SDK:
 
@@ -362,22 +407,219 @@ ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponses
 
 Con esto, el código local se limita a orquestar infraestructura de agente; la ejecución del workflow ocurre dentro de Foundry en cada `CreateResponse(...)`.
 
+> **Nota sobre la conexión Bing:** `Program.cs` resuelve el nombre de la conexión Bing (ej: `ais-contosoretail-geoxs-bingsearchconnection`) a su ARM resource ID completo usando `projectClient.Connections.GetConnectionAsync()`. Esto es necesario porque `BingGroundingSearchConfiguration(projectConnectionId:)` espera el ID completo, no solo el nombre.
+
 > Nota: el `Program.cs` descarga OpenAPI con reintentos para tolerar fallas DNS intermitentes; esa spec se pasa a `SqlAgent` para habilitar la tool `SqlExecutor` y ejecutar SQL desde el sub-agente.
 
-## Patrón recomendado aplicado en este lab
+---
 
-Para mantener consistencia y mantenibilidad, este laboratorio aplica el siguiente patrón:
+## Pasos del laboratorio
 
-1. **Definiciones tipadas en código**
-	- `SqlAgent` y `MarketingAgent` retornan `PromptAgentDefinition`.
-	- `JulieOrchestrator` retorna `WorkflowAgentDefinition`.
+### Paso 1: Configurar appsettings.json
 
-2. **Creación tipada de versiones**
-	- Se usa `CreateAgentVersionAsync(..., new AgentVersionCreationOptions(agentDefinition))`.
+Abre `labs/foundry/code/agents/JulieAgent/appsettings.json` y reemplaza todos los valores `<suffix>` y `<subscription-id>` con los outputs del despliegue (Paso 8 del setup):
 
-3. **Separación clara de responsabilidades**
-	- `Program.cs` crea/versiona agentes y abre conversación.
-	- Cada clase de agente encapsula sus instrucciones y tools.
+```json
+{
+  "FoundryProjectEndpoint": "https://ais-contosoretail-<suffix>.services.ai.azure.com/api/projects/aip-contosoretail-<suffix>",
+  "ModelDeploymentName": "gpt-4.1",
+  "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api",
+  "BingConnectionName": "ais-contosoretail-<suffix>-bingsearchconnection"
+}
+```
 
-4. **Contrato de salida estable**
-	- Julie mantiene salida JSON final homogénea para facilitar consumo por otros sistemas o validaciones automáticas.
+Todos estos valores los obtienes de la salida del script de despliegue (o del portal → recurso AI Foundry → **Project settings** → **Overview**).
+
+> Para obtener el `BingConnectionName` directamente, ejecuta:
+> ```bash
+> az cognitiveservices account connection list \
+>     --name ais-contosoretail-<suffix> \
+>     --resource-group rg-contoso-retail \
+>     --query "[?contains(name,'bing')].name" -o tsv
+> ```
+> Reemplaza `<suffix>` con tu sufijo. El comando retorna el nombre de la conexión listo para pegar.
+
+### Paso 2: Asegurarte de que los permisos de Fabric están configurados
+
+Antes de ejecutar, confirma que ya completaste la sección **Configuración manual de permisos en Fabric** de este mismo documento (Partes A y B). Si no lo hiciste, la Function App no podrá ejecutar SQL contra el Warehouse y `SqlAgent` fallará.
+
+### Paso 3: Ejecutar Julie
+
+Desde la terminal, en la raíz del repositorio:
+
+```bash
+cd /workspaces/taller-multi-agentic/labs/foundry/code/agents/JulieAgent
+dotnet run
+```
+
+Al arrancar, el programa:
+1. Descarga la spec OpenAPI de la Function App (puede tardar unos segundos).
+2. Crea o actualiza los tres agentes en Foundry: `SqlAgent`, `MarketingAgent` y `Julie`.
+3. Abre un chat interactivo en la terminal.
+
+Verás mensajes como:
+
+```
+Agente SqlAgent creado/actualizado.
+Agente MarketingAgent creado/actualizado.
+Agente Julie creado/actualizado.
+Chat iniciado. Escribe tu solicitud de campaña (o 'exit' para salir):
+>
+```
+
+### Paso 4: Probar el flujo end-to-end
+
+Escribe un prompt describiendo el segmento de clientes para la campaña. Por ejemplo:
+
+```
+Crea una campaña para clientes cuya categoría favorita sea Bikes
+```
+
+```
+Genera una campaña para los 5 clientes más recientes que hayan comprado en la categoría Clothing
+```
+
+Julie invocará a `SqlAgent` (que generará y ejecutará el SQL contra Fabric), luego a `MarketingAgent` (que buscará eventos en Bing y redactará el mensaje personalizado para cada cliente), y finalmente consolidará todo en un JSON de campaña:
+
+```json
+{
+  "campaign": "Campaña Bikes - Primavera 2026",
+  "generatedAt": "2026-03-13T10:30:00",
+  "totalEmails": 3,
+  "emails": [
+    {
+      "to": "cliente@ejemplo.com",
+      "customerName": "Ana García",
+      "favoriteCategory": "Bikes",
+      "subject": "¡Ana, prepárate para la temporada ciclista!",
+      "body": "Hola Ana, ..."
+    }
+  ]
+}
+```
+
+> La primera ejecución puede tardar **30–60 segundos** porque el workflow pasa por SQL execution + Bing search + generación de texto para cada cliente del segmento.
+
+### Validación del laboratorio
+
+El laboratorio se considera completado cuando:
+
+- [ ] Los tres agentes aparecen creados en el portal de Foundry (AI Foundry → tu proyecto → **Agents**).
+- [ ] Un prompt de campaña retorna un JSON con al menos un email generado.
+- [ ] El `body` de cada email incluye una referencia a un evento o tendencia actual buscada en Bing.
+
+---
+
+## Challenges
+
+### Challenge 1: Mejorar el prompt de MarketingAgent para campañas actuales
+
+#### Contexto
+
+Al probar el flujo de Julie, es posible que MarketingAgent genere mensajes basados en noticias o eventos desactualizados (por ejemplo, eventos de 2024). Esto ocurre porque el prompt actual no restringe a Bing Search para que filtre por fecha, ni le indica al agente que descarte resultados antiguos.
+
+#### Objetivo
+
+Lograr que MarketingAgent **siempre** genere mensajes de marketing basados en eventos actuales o futuros, nunca en eventos ya pasados.
+
+#### Parte A — Iterar el prompt en el Playground
+
+1. Abre el portal de **Azure AI Foundry** en [https://ai.azure.com](https://ai.azure.com).
+2. Navega a tu proyecto y abre la sección **Agents**.
+3. Localiza el agente **MarketingAgent** y ábrelo.
+4. En el panel de **Instructions**, modifica el prompt para resolver el problema de eventos desactualizados.
+5. Usa el panel de **Chat** del playground para probar iterativamente. Envía mensajes como:
+   - `"Genera un mensaje de marketing para Juan Pérez, cuya categoría favorita es Bikes"`
+   - `"Genera un mensaje para María López, categoría Clothing"`
+6. Itera el prompt hasta que **todas** las respuestas hagan referencia a eventos vigentes o futuros.
+
+> 💡 **Tip:** El playground permite modificar y probar el prompt inmediatamente, sin recompilar ni re-desplegar. Úsalo para experimentar rápidamente.
+
+#### Parte B — Llevar el prompt mejorado al código
+
+Una vez que tengas un prompt que funcione correctamente en el playground:
+
+1. Copia las instrucciones finales del playground.
+2. Abre el archivo `MarketingAgent.cs` en el proyecto `JulieAgent`.
+3. Reemplaza el contenido de la propiedad `Instructions` con el prompt mejorado.
+4. Ejecuta `dotnet run` y sobreescribe MarketingAgent cuando se te pregunte.
+5. Verifica que el comportamiento es idéntico al que validaste en el playground.
+
+#### Criterio de éxito
+
+- En el playground, MarketingAgent genera mensajes que solo referencian eventos actuales o futuros.
+- El mismo prompt, trasladado al código, produce el mismo resultado al ejecutar Julie end-to-end.
+
+---
+
+### Challenge 2: Crear un agente no-code con Code Interpreter
+
+#### Contexto
+
+Azure AI Foundry ofrece una experiencia visual **no-code/low-code** para crear agentes directamente desde el portal. Además de Bing Grounding (que ya usamos), Foundry ofrece otras herramientas integradas. En este challenge usarás **Code Interpreter** — una herramienta que permite al agente escribir y ejecutar código Python para analizar datos, hacer cálculos y generar gráficas.
+
+#### Objetivo
+
+Crear un agente llamado **"SalesAnalyst"** desde la interfaz visual de Azure AI Foundry que analice datos de ventas de Contoso Retail y genere visualizaciones.
+
+#### Pasos
+
+1. Abre el portal de **Azure AI Foundry** en [https://ai.azure.com](https://ai.azure.com).
+2. Navega a tu proyecto (`aip-contosoretail-<sufijo>`).
+3. En el menú lateral, ve a **Agents**.
+4. Haz clic en **+ New Agent**.
+5. Configura el agente:
+   - **Nombre:** `SalesAnalyst`
+   - **Model:** Selecciona `gpt-4.1`
+   - **Instructions:** Copia y pega las siguientes instrucciones:
+
+```
+Eres SalesAnalyst, un analista de datos de ventas de Contoso Retail.
+
+Tu rol es recibir datos de ventas (en texto, CSV o como descripción),
+analizarlos y generar insights útiles para el equipo comercial.
+
+Capacidades:
+1. Cuando recibas datos de ventas, usa Code Interpreter para:
+   - Calcular totales, promedios y tendencias.
+   - Generar gráficas de barras, líneas o pastel según corresponda.
+   - Identificar los productos o categorías más vendidos.
+2. Presenta los resultados de forma clara y ejecutiva.
+3. Si el usuario sube un archivo CSV, analízalo automáticamente.
+
+Reglas:
+- Responde siempre en español.
+- Genera gráficas cuando los datos lo permitan.
+- Incluye siempre un resumen ejecutivo en texto además de la gráfica.
+- Usa colores profesionales en las visualizaciones.
+```
+
+6. En la sección **Tools**, haz clic en **+ Add tool**.
+7. Selecciona **Code Interpreter**.
+8. Haz clic en **Save** (o **Create**).
+
+#### Pruebas
+
+Usa el panel de **Chat** para probar con estas conversaciones:
+
+a. `"Tengo estas ventas por categoría: Bikes $45,000, Clothing $12,000, Accessories $8,500, Components $23,000. Genera una gráfica de pastel y dime cuál es la categoría más fuerte."`
+
+b. `"Compara las ventas del Q1 vs Q2: Q1 — Bikes: 120 unidades, Clothing: 340, Accessories: 210. Q2 — Bikes: 155, Clothing: 290, Accessories: 380. Genera una gráfica comparativa y analiza la tendencia."`
+
+c. `"Calcula el crecimiento porcentual de cada categoría entre Q1 y Q2 y ordénalas de mayor a menor crecimiento."`
+
+#### Criterio de éxito
+
+- El agente genera **código Python** que se ejecuta dentro de la conversación.
+- Las respuestas incluyen **gráficas** visibles directamente en el chat.
+- El agente proporciona un **resumen ejecutivo** en español junto con cada visualización.
+- La herramienta **Code Interpreter** aparece como habilitada en la configuración del agente.
+
+#### Reflexión
+
+- ¿En qué se diferencia Code Interpreter de las otras herramientas (Bing Grounding, OpenAPI)?
+- ¿Qué tipo de tareas del negocio podrías automatizar con un agente que ejecuta código?
+- Compara la experiencia de crear este agente visualmente vs. la creación programática de los agentes anteriores:
+  - ¿Qué ventajas tiene cada enfoque?
+  - ¿Qué limitaciones tiene el enfoque no-code que el SDK no tiene?
+

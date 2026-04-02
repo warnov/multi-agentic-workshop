@@ -33,8 +33,8 @@ Anders and Julie agents use GPT-4.1 models deployed in Azure AI Services to reas
 
 | Lab | File | Description |
 |-----|---------|-------------|
-| Lab 4 | [Anders — Executor Agent](lab04-anders-executor-agent.en.md) | Create the executor agent that generates reports and interacts with Contoso Retail services. |
-| Lab 5 | [Julie — Planner Agent](lab05-julie-planner-agent.en.md) | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
+| Lab 3 | [Anders — Executor Agent](lab03-anders-executor-agent.en.md) | Create the executor agent that generates reports and interacts with Contoso Retail services. |
+| Lab 4 | [Julie — Planner Agent](lab04-julie-planner-agent.en.md) | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
 
 ---
 
@@ -86,12 +86,12 @@ Example:
 - `FabricWarehouseSqlEndpoint`: `kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com`
 - `FabricWarehouseDatabase`: `retail_sqldatabase_danrdol6ases3c-6d18d61e-43a5-4281-a754-b255fc9a6c9b`
 
-If you are not following the full lab sequence, only a SQL database is used here for Lab 5 (Julie) queries. You can point directly to a standalone SQL database (for example Azure SQL Database) using:
+If you are not following the full lab sequence, only a SQL database is used here for Lab 4 (Julie) queries. You can point directly to a standalone SQL database (for example Azure SQL Database) using:
 
 - `FabricWarehouseSqlEndpoint` = SQL host of your standalone database
 - `FabricWarehouseDatabase` = name of your database
 
-If you do not provide these values, the deployment does not fail: it skips the DB configuration for Lab 5 and shows a warning to configure it manually later.
+If you do not provide these values, the deployment does not fail: it skips the DB configuration for Lab 4 and shows a warning to configure it manually later.
 
 ### Sign in to Azure
 
@@ -164,7 +164,7 @@ The script will prompt you interactively for the optional parameters. Press **En
 Press Enter for default.
 Location [eastus]:                           ← Enter to accept eastus
 ResourceGroupName [rg-contoso-retail]:       ← Enter to accept rg-contoso-retail
-Do you want to configure the Fabric SQL connection for Lab05 now? (y/N):  ← N to skip
+Do you want to configure the Fabric SQL connection for Lab04 now? (y/N):  ← N to skip
 ```
 
 If you answer **y** to the Fabric question, it will prompt you for:
@@ -189,7 +189,7 @@ If you pass all parameters via the command line, the script will not prompt for 
   -FabricWarehouseDatabase "retail_sqldatabase_xxx"
 ```
 
-> **Note:** If you do not provide the Fabric parameters, the deployment **does not fail**. It skips configuring the SQL connection and shows a warning to configure it manually later. The SQL connection is only needed for Lab 5 (Julie) and the `SqlExecutor` Function App.
+> **Note:** If you do not provide the Fabric parameters, the deployment **does not fail**. It skips configuring the SQL connection and shows a warning to configure it manually later. The SQL connection is only needed for Lab 4 (Julie) and the `SqlExecutor` Function App.
 
 ---
 
@@ -296,17 +296,14 @@ az role assignment create `
 ```
 labs/foundry/
 ├── README.md                              ← This file
-├── lab04-anders-executor-agent.md          ← Lab 4: Anders Agent
-├── lab05-julie-planner-agent.md           ← Lab 5: Julie Agent
+├── lab03-anders-executor-agent.en.md      ← Lab 3: Anders Agent
+├── lab04-julie-planner-agent.en.md       ← Lab 4: Julie Agent
 ├── setup/
 │   ├── op-flex/                           ← ⭐ Recommended option (Flex Consumption / Linux)
 │   │   ├── main.bicep
 │   │   ├── storage-rbac.bicep
 │   │   └── deploy.ps1
-│   └── op-consumption/                    ← Classic option (Consumption Y1 / Windows)
-│       ├── main.bicep
-│       ├── storage-rbac.bicep
-│       └── deploy.ps1
+│   └── op-consumption/                    ← Classic option (Consumption Y1 / Windows; see es/ folder)
 └── code/
     ├── api/
     │   └── FxContosoRetail/               ← Azure Function (API)
@@ -342,5 +339,5 @@ labs/foundry/
 
 ## Next step
 
-Once the setup is complete, continue with [Lab 4 — Anders (Executor Agent)](lab04-anders-executor-agent.en.md).
+Once the setup is complete, continue with [Lab 3 — Anders (Executor Agent)](lab03-anders-executor-agent.en.md).
 ``

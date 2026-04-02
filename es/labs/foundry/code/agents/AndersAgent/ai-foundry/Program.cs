@@ -16,6 +16,7 @@ var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
 var functionAppBaseUrl = config["FunctionAppBaseUrl"]
     ?? throw new InvalidOperationException("Falta FunctionAppBaseUrl en appsettings.json");
+var tenantId = config["TenantId"];
 
 // =====================================================================
 //  FASE 1: Obtener la especificación OpenAPI de la Function App
@@ -34,9 +35,15 @@ Console.WriteLine($"[OpenAPI] Especificación descargada ({openApiSpec.Length} b
 // =====================================================================
 
 // Cliente del proyecto Foundry
+// Si TenantId está configurado, se usa explícitamente para evitar conflictos
+// en máquinas con múltiples tenants de Azure (error 400 "Token tenant does not match").
+var credentialOptions = new DefaultAzureCredentialOptions();
+if (!string.IsNullOrWhiteSpace(tenantId))
+    credentialOptions.TenantId = tenantId;
+
 var projectClient = new AIProjectClient(
     new Uri(foundryEndpoint),
-    new DefaultAzureCredential());
+    new DefaultAzureCredential(credentialOptions));
 
 // Obtener el cliente de agentes persistentes
 var agentsClient = projectClient.GetPersistentAgentsClient();

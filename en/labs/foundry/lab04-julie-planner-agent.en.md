@@ -8,7 +8,7 @@ In this lab you will build and validate Julie as a marketing campaign planner ag
 
 This lab assumes you have already completed:
 
-- The base Foundry infrastructure deployment (`labs/foundry/README.en.md`)
+- The base Foundry infrastructure deployment (`labs/foundry/codespaces-setup.md`)
 - The Fabric data flow from **Lab 1** (`../fabric/lab01-data-setup.en.md`)
 
 ## Quick checklist

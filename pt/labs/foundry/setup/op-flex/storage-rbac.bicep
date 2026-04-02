@@ -1,17 +1,17 @@
 // ============================================================================
 // Módulo: Role Assignments sobre Storage Account
 // ============================================================================
-// Asigna roles RBAC a un principal (Managed Identity) sobre un Storage Account.
-// Requerido para identity-based connections de Azure Functions.
+// Atribui roles RBAC a um principal (Managed Identity) sobre um Storage Account.
+// Necessário para identity-based connections do Azure Functions.
 // ============================================================================
 
-@description('Nombre del Storage Account existente.')
+@description('Nome do Storage Account existente.')
 param storageAccountName string
 
-@description('Principal ID de la Managed Identity (ej: Function App).')
+@description('Principal ID da Managed Identity (ex: Function App).')
 param principalId string
 
-// --- Referencia al Storage Account existente ---
+// --- Referência ao Storage Account existente ---
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
 }
@@ -41,7 +41,7 @@ resource queueDataContributorRole 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-// Storage Account Contributor → gestión general
+// Storage Account Contributor → gestão geral
 resource storageAccountContributorRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(storageAccount.id, principalId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')
   scope: storageAccount

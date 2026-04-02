@@ -101,7 +101,7 @@ public class FxContosoRetail
             return new BadRequestObjectResult("You must provide the 'tsql' property with a valid query.");
 
         if (!IsReadOnlySql(request.TSql))
-            return new BadRequestObjectResult("Solo se permiten consultas de solo lectura (SELECT/CTE).");
+            return new BadRequestObjectResult("Only read-only queries are allowed (SELECT/CTE).");
 
         var rawConnectionString = _configuration["FabricWarehouseConnectionString"];
         if (string.IsNullOrWhiteSpace(rawConnectionString))
@@ -221,7 +221,7 @@ public class FxContosoRetail
 
         // --- Download the HTML template ---
         string templateUrl = _configuration["BillTemplate"]
-            ?? "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.en.html";
+            ?? "https://raw.githubusercontent.com/warnov/multi-agentic-workshop/refs/heads/main/assets/bill-template.en.html";
 
         string html;
         try
@@ -311,7 +311,7 @@ public class FxContosoRetail
 
         // --- Inject orders into the container ---
         int containerStart = html.IndexOf("<div id=\"orders-container\">");
-        int containerEnd = html.IndexOf("</div>", html.IndexOf("FIN TEMPLATE DE ORDEN"));
+        int containerEnd = html.IndexOf("</div>", html.IndexOf("ORDER TEMPLATE END"));
         if (containerStart >= 0 && containerEnd >= 0)
         {
             int innerStart = html.IndexOf('>', containerStart) + 1;

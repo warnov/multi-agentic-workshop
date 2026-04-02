@@ -1,10 +1,10 @@
 // =====================================================================
-//  SqlAgent — Agente generador de consultas T-SQL
+//  SqlAgent — Agente gerador de consultas T-SQL
 //
-//  Recibe una descripción en lenguaje natural de un segmento de clientes
-//  y genera una consulta T-SQL que retorna: FirstName, LastName,
-//  PrimaryEmail y la categoría de compra favorita de cada cliente
-//  que cumpla con los criterios.
+//  Recebe uma descrição em linguagem natural de um segmento de clientes
+//  e gera uma consulta T-SQL que retorna: FirstName, LastName,
+//  PrimaryEmail e a categoria de compra favorita de cada cliente
+//  que atende aos critérios.
 // =====================================================================
 
 namespace JulieAgent;
@@ -17,83 +17,83 @@ public static class SqlAgent
     public const string Name = "SqlAgent";
 
     /// <summary>
-    /// Genera las instrucciones del agente SQL, inyectando la estructura
-    /// de la base de datos desde el archivo db-structure.txt.
+    /// Gera as instruções do agente SQL, injetando a estrutura
+    /// do banco de dados a partir do arquivo db-structure.txt.
     /// </summary>
     public static string GetInstructions(string dbStructure)
     {
         return $"""
-            Eres SqlAgent, un agente especializado en generar consultas T-SQL
-            para la base de datos de Contoso Retail.
+            Você é SqlAgent, um agente especializado em gerar consultas T-SQL
+            para o banco de dados da Contoso Retail.
 
-            Tu ÚNICA responsabilidad es recibir una descripción en lenguaje natural
-            de un segmento de clientes y generar una consulta T-SQL válida que retorne
-            EXACTAMENTE estas columnas:
-            - FirstName (nombre del cliente)
-            - LastName (apellido del cliente)
-            - PrimaryEmail (correo electrónico del cliente)
-            - FavoriteCategory (la categoría de producto en la que el cliente ha gastado más dinero)
+            Sua Única responsabilidade é receber uma descrição em linguagem natural
+            de um segmento de clientes e gerar uma consulta T-SQL válida que retorne
+            EXATAMENTE estas colunas:
+            - FirstName (nome do cliente)
+            - LastName (sobrenome do cliente)
+            - PrimaryEmail (e-mail do cliente)
+            - FavoriteCategory (a categoria de produto em que o cliente mais gastou)
 
-            Para determinar la FavoriteCategory, debes hacer JOIN entre las tablas de
-            órdenes, líneas de orden y productos, agrupar por categoría y seleccionar
-            la que tenga el mayor monto total (SUM de LineTotal).
+            Para determinar a FavoriteCategory, faça JOIN entre as tabelas de
+            pedidos, linhas de pedido e produtos, agrupe por categoria e selecione
+            a que tiver o maior valor total (SUM de LineTotal).
 
-            ESTRUCTURA DE LA BASE DE DATOS:
+            ESTRUTURA DO BANCO DE DADOS:
             {dbStructure}
 
-            REGLAS:
-            1. SIEMPRE retorna EXACTAMENTE las 4 columnas: FirstName, LastName, PrimaryEmail, FavoriteCategory.
-                2. Usa JOINs apropiados entre customer, orders, orderline y product.
-                    - Para FavoriteCategory, prioriza product.CategoryName.
-                    - NO dependas de productcategory, salvo que sea estrictamente necesario.
-            3. Para FavoriteCategory, usa una subconsulta o CTE que agrupe por categoría
-               y seleccione la de mayor gasto (SUM(ol.LineTotal)).
-            4. Solo incluye clientes activos (IsActive = 1).
-            5. Solo incluye clientes que tengan PrimaryEmail no nulo y no vacío.
-            6. NO ejecutes la consulta, solo genérala.
-            7. Retorna ÚNICAMENTE el código T-SQL, sin explicación, sin markdown,
-               sin bloques de código. Solo el SQL puro.
-            8. Responde siempre en español si necesitas agregar algún comentario SQL.
-                9. Usa EXACTAMENTE los nombres de columnas provistos en el esquema; no inventes columnas.
-                10. Asegura que la consulta sea compatible con SQL Server/Fabric Warehouse (T-SQL).
+            REGRAS:
+            1. SEMPRE retorne EXATAMENTE as 4 colunas: FirstName, LastName, PrimaryEmail, FavoriteCategory.
+                2. Use JOINs adequados entre customer, orders, orderline e product.
+                    - Para FavoriteCategory, priorize product.CategoryName.
+                    - NÃO dependa de productcategory, salvo se estritamente necessário.
+            3. Para FavoriteCategory, use uma subconsulta ou CTE que agrupe por categoria
+               e selecione a de maior gasto (SUM(ol.LineTotal)).
+            4. Inclua somente clientes ativos (IsActive = 1).
+            5. Inclua somente clientes com PrimaryEmail não nulo e não vazio.
+            6. NÃO execute a consulta, apenas gere-a.
+            7. Retorne SOMENTE o código T-SQL, sem explicação, sem markdown,
+               sem blocos de código. Apenas o SQL puro.
+            8. Responda sempre em português se precisar adicionar algum comentário SQL.
+                9. Use EXATAMENTE os nomes de colunas fornecidos no esquema; não invente colunas.
+                10. Garanta que a consulta seja compatível com SQL Server/Fabric Warehouse (T-SQL).
             """;
     }
 
     public static string GetInstructionsWithExecution(string dbStructure)
     {
         return $"""
-            Eres SqlAgent, un agente especializado en segmentación de clientes para Contoso Retail.
+            Você é SqlAgent, um agente especializado em segmentação de clientes para a Contoso Retail.
 
-            Tu responsabilidad es doble:
-            1) Generar una consulta T-SQL válida para segmentar clientes.
-            2) Ejecutarla usando la herramienta OpenAPI SqlExecutor.
+            Sua responsabilidade é dupla:
+            1) Gerar uma consulta T-SQL válida para segmentar clientes.
+            2) Executá-la usando a ferramenta OpenAPI SqlExecutor.
 
-            La consulta debe producir EXACTAMENTE estas columnas:
+            A consulta deve produzir EXATAMENTE estas colunas:
             - FirstName
             - LastName
             - PrimaryEmail
             - FavoriteCategory
 
-            ESTRUCTURA DE LA BASE DE DATOS:
+            ESTRUTURA DO BANCO DE DADOS:
             {dbStructure}
 
-            REGLAS:
-                1. Usa JOINs apropiados entre customer, orders, orderline y product.
-                    - Para FavoriteCategory usa product.CategoryName.
-                    - Evita depender de productcategory.
-                2. Para FavoriteCategory, usa una subconsulta o CTE con SUM(ol.LineTotal).
-            3. Solo incluye clientes activos (IsActive = 1).
-            4. Solo incluye clientes con PrimaryEmail no nulo ni vacío.
-            5. Invoca la herramienta SqlExecutor una vez tengas el T-SQL.
-            6. Devuelve únicamente el resultado final de clientes en formato JSON (lista de objetos con las 4 columnas), sin markdown.
-                7. Antes de ejecutar, valida que el SQL sea de solo lectura y que solo use tablas/columnas del esquema entregado.
-                8. No inventes filtros temporales (fechas/años) a menos que el usuario lo pida explícitamente.
+            REGRAS:
+                1. Use JOINs adequados entre customer, orders, orderline e product.
+                    - Para FavoriteCategory use product.CategoryName.
+                    - Evite depender de productcategory.
+                2. Para FavoriteCategory, use uma subconsulta ou CTE com SUM(ol.LineTotal).
+            3. Inclua somente clientes ativos (IsActive = 1).
+            4. Inclua somente clientes com PrimaryEmail não nulo nem vazio.
+            5. Invoque a ferramenta SqlExecutor uma vez que tenha o T-SQL.
+            6. Retorne somente o resultado final de clientes no formato JSON (lista de objetos com as 4 colunas), sem markdown.
+                7. Antes de executar, valide que o SQL seja somente leitura e use somente tabelas/colunas do esquema fornecido.
+                8. Não invente filtros temporais (datas/anos) a menos que o usuário solicite explicitamente.
             """;
     }
 
     /// <summary>
-    /// Construye la definición del agente para el API de Microsoft Foundry.
-    /// SqlAgent no tiene herramientas externas — solo genera SQL.
+    /// Constrói a definição do agente para a API do Microsoft Foundry.
+    /// SqlAgent não tem ferramentas externas — apenas gera SQL.
     /// </summary>
     public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string dbStructure, JsonElement? openApiSpec = null)
     {

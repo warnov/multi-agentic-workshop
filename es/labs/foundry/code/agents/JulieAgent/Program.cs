@@ -34,8 +34,8 @@ var foundryEndpoint = config["FoundryProjectEndpoint"]
     ?? throw new InvalidOperationException("Falta FoundryProjectEndpoint en appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
-var bingConnectionId = config["BingConnectionId"]
-    ?? throw new InvalidOperationException("Falta BingConnectionId en appsettings.json");
+var bingConnectionName = config["BingConnectionName"]
+    ?? throw new InvalidOperationException("Falta BingConnectionName en appsettings.json");
 
 // URL base de la Function App con el ejecutor de consultas SQL.
 // Se configura en appsettings.json cuando la función esté desplegada.
@@ -101,6 +101,22 @@ AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
 
+// --- Resolver el ID completo de la conexión Bing ---
+Console.WriteLine($"[Config] Resolviendo conexión Bing '{bingConnectionName}'...");
+string bingConnectionId;
+try
+{
+    var bingConnection = await projectClient.Connections.GetConnectionAsync(bingConnectionName);
+    bingConnectionId = bingConnection.Value.Id;
+    Console.WriteLine($"[Config] Conexión Bing resuelta: {bingConnectionId}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[Config] No se pudo resolver la conexión Bing: {ex.Message}");
+    Console.WriteLine($"[Config] Se usará el nombre tal cual: {bingConnectionName}");
+    bingConnectionId = bingConnectionName;
+}
+
 // =====================================================================
 //  FASE 1: Crear/verificar los 3 agentes en Microsoft Foundry
 // =====================================================================
@@ -142,11 +158,33 @@ async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
 
     try
     {
+        var creationOpts = new AgentVersionCreationOptions(agentDefinition);
+
+        // --- DEBUG: Mostrar JSON del request ---
+        try
+        {
+            var debugJson = System.Text.Json.JsonSerializer.Serialize(agentDefinition,
+                new JsonSerializerOptions { WriteIndented = true });
+            Console.WriteLine($"[DEBUG] AgentDefinition JSON para '{agentName}':");
+            Console.WriteLine(debugJson);
+        }
+        catch (Exception dex)
+        {
+            Console.WriteLine($"[DEBUG] No se pudo serializar AgentDefinition: {dex.Message}");
+        }
+        // --- FIN DEBUG ---
+
         var result = await projectClient.Agents.CreateAgentVersionAsync(
             agentName,
-            new AgentVersionCreationOptions(agentDefinition));
+            creationOpts);
 
-        var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
+        // --- DEBUG: Mostrar raw response ---
+        var rawResponse = result.GetRawResponse().Content.ToString();
+        Console.WriteLine($"[DEBUG] Raw API Response para '{agentName}':");
+        Console.WriteLine(rawResponse.Length > 2000 ? rawResponse[..2000] + "\n... (truncado)" : rawResponse);
+        // --- FIN DEBUG ---
+
+        var responseJson = JsonDocument.Parse(rawResponse);
         var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
         Console.WriteLine($"[Foundry] Agente '{agentName}' creado/actualizado (v{version})");
     }

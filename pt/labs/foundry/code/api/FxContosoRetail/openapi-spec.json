@@ -16,8 +16,8 @@
         "tags": [
           "Data"
         ],
-        "summary": "Ejecuta una consulta T-SQL para segmentos de clientes",
-        "description": "Recibe T-SQL en el body, ejecuta la consulta contra Fabric Warehouse y retorna una lista con FirstName, LastName, PrimaryEmail y FavoriteCategory.",
+        "summary": "Executa uma consulta T-SQL para segmentos de clientes",
+        "description": "Recebe T-SQL no body, executa a consulta contra o Fabric Warehouse e retorna uma lista com FirstName, LastName, PrimaryEmail e FavoriteCategory.",
         "operationId": "sqlExecutor",
         "consumes": [
           "application/json"
@@ -30,7 +30,7 @@
           {
             "in": "body",
             "name": "body",
-            "description": "Objeto JSON con la propiedad 'tsql' que contiene la consulta a ejecutar",
+            "description": "Objeto JSON com a propriedade 'tsql' que contém a consulta a executar",
             "required": true,
             "schema": {
               "$ref": "#/definitions/sqlExecutorRequest"
@@ -39,7 +39,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Resultados tipados del segmento de clientes",
+            "description": "Resultados tipados do segmento de clientes",
             "schema": {
               "type": "array",
               "items": {
@@ -48,13 +48,13 @@
             }
           },
           "400": {
-            "description": "Mensaje de error por body inválido o columnas distintas al contrato esperado",
+            "description": "Mensagem de erro por body inválido ou colunas diferentes do contrato esperado",
             "schema": {
               "type": "string"
             }
           },
           "500": {
-            "description": "Error al ejecutar la consulta SQL",
+            "description": "Erro ao executar a consulta SQL",
             "schema": {
               "type": "string"
             }
@@ -65,10 +65,10 @@
     "/OrdersReporter": {
       "post": {
         "tags": [
-          "Reportes"
+          "Relatórios"
         ],
-        "summary": "Genera un reporte HTML de órdenes",
-        "description": "Recibe líneas de órdenes de un cliente, genera un reporte HTML con el detalle, lo sube a Blob Storage y retorna la URL con SAS para visualizarlo/descargarlo.",
+        "summary": "Gera um relatório HTML de pedidos",
+        "description": "Recebe linhas de pedidos de um cliente, gera um relatório HTML com o detalhe, faz upload para o Blob Storage e retorna a URL SAS para visualizar/baixar.",
         "operationId": "ordersReporter",
         "consumes": [
           "application/json"
@@ -81,7 +81,7 @@
           {
             "in": "body",
             "name": "body",
-            "description": "Datos del cliente y líneas de órdenes a incluir en el reporte",
+            "description": "Dados do cliente e linhas de pedidos a incluir no relatório",
             "required": true,
             "schema": {
               "$ref": "#/definitions/ordersReportRequest"
@@ -90,13 +90,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Objeto JSON con la propiedad 'reportUrl' que contiene la URL SAS del reporte generado",
+            "description": "Objeto JSON com a propriedade 'reportUrl' que contém a URL SAS do relatório gerado",
             "schema": {
               "type": "object"
             }
           },
           "400": {
-            "description": "Mensaje de error cuando el JSON es inválido o no contiene órdenes",
+            "description": "Mensagem de erro quando o JSON é inválido ou não contém pedidos",
             "schema": {
               "type": "string"
             }

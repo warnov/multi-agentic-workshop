@@ -1,350 +1,350 @@
 # Lab 4: Julie Planner Agent
 
-## Introducción
+## Introdução
 
-En este laboratorio construirás y validarás a Julie como agente planner de campañas de marketing en Foundry. Julie se implementa como agente de tipo `workflow` y orquesta el flujo con dos sub-agentes: `SqlAgent` y `MarketingAgent`. `SqlAgent` puede usar la tool OpenAPI `SqlExecutor` (Function App `FxContosoRetail`) para ejecutar SQL contra la base y devolver los clientes segmentados. En este laboratorio, progresivamente, configurarás el entorno, verificarás permisos y conexión SQL, y ejecutarás el flujo end-to-end para obtener la salida final de campaña en formato JSON.
+Neste laboratório você vai construir e validar a Julie como agente planejador de campanhas de marketing no Foundry. Julie é implementada como agente do tipo `workflow` e orquestra o fluxo com dois sub-agentes: `SqlAgent` e `MarketingAgent`. O `SqlAgent` pode usar a tool OpenAPI `SqlExecutor` (Function App `FxContosoRetail`) para executar SQL contra o banco e retornar os clientes segmentados. Neste laboratório, progressivamente, você configurará o ambiente, verificará permissões e a conexão SQL, e executará o fluxo end-to-end para obter a saída final de campanha em formato JSON.
 
-## Continuidad del setup
+## Continuidade do setup
 
-Este laboratorio asume que ya completaste:
+Este laboratório pressupõe que você já concluiu:
 
-- El despliegue base de infraestructura de Foundry (`labs/foundry/README.md`)
-- El flujo de datos en Fabric del **Lab 1** (`../fabric/lab01-data-setup.md`)
+- A implantação base de infraestrutura do Foundry (`labs/foundry/README.md`)
+- O fluxo de dados no Fabric do **Lab 1** (`../fabric/lab01-data-setup.md`)
 
 ## Checklist rápido
 
-### 1) Verificar valores de conexión SQL
+### 1) Verificar valores de conexão SQL
 
-Para el setup actualizado se usan estos valores:
+Para o setup atualizado são usados estes valores:
 
 - `FabricWarehouseSqlEndpoint`
 - `FabricWarehouseDatabase`
 
-Se obtienen del connection string SQL del Warehouse de Fabric:
+São obtidos da connection string SQL do Warehouse do Fabric:
 
-- `FabricWarehouseSqlEndpoint` = `Data Source` sin `,1433`
+- `FabricWarehouseSqlEndpoint` = `Data Source` sem `,1433`
 - `FabricWarehouseDatabase` = `Initial Catalog`
 
-### 2) Alternativa si no sigues toda la secuencia de labs
+### 2) Alternativa se você não seguir toda a sequência de labs
 
-Si no estás siguiendo toda la secuencia de laboratorios, para Lab 4 también puedes usar una base SQL standalone (por ejemplo Azure SQL Database), ajustando esos dos valores al host y nombre de base correspondientes.
+Se você não estiver seguindo toda a sequência de laboratórios, para o Lab 4 você também pode usar um banco SQL standalone (por exemplo Azure SQL Database), ajustando esses dois valores para o host e nome do banco correspondentes.
 
-### 3) Comportamiento cuando no se pasan valores de Fabric
+### 3) Comportamento quando os valores do Fabric não são fornecidos
 
-Si no proporcionas estos valores durante el setup, el despliegue de infraestructura no falla, pero la conexión SQL para Lab 4 no se configura automáticamente y debe ajustarse manualmente en la Function App.
+Se você não fornecer esses valores durante o setup, a implantação de infraestrutura não falha, mas a conexão SQL para o Lab 4 não é configurada automaticamente e deve ser ajustada manualmente na Function App.
 
-## Configuración manual de permisos en Fabric (obligatorio para Lab 4)
+## Configuração manual de permissões no Fabric (obrigatório para o Lab 4)
 
-Después del despliegue, asegúrate de que la Managed Identity de la Function App tenga acceso al workspace y a la base SQL de `retail`.
+Após a implantação, certifique-se de que a Managed Identity da Function App tenha acesso ao workspace e ao banco SQL do `retail`.
 
-### Parte A — Acceso al Workspace
+### Parte A — Acesso ao Workspace
 
-1. Abre el workspace donde se desplegó la base de datos de `retail`.
-2. Ve a **Manage access**.
-3. Haz click en **Add people or groups**.
-4. Busca y agrega la identidad de la Function App.
-	- Nombre esperado: `func-contosoretail-[sufijo]`
-	- Ejemplo: `func-contosoretail-siwhb`
-5. En el rol, selecciona **Contributor** (si tu Fabric está en inglés) o **Colaborador** (si está en español).
-6. Haz click en **Add**.
+1. Abra o workspace onde o banco de dados `retail` foi implantado.
+2. Vá em **Manage access**.
+3. Clique em **Add people or groups**.
+4. Pesquise e adicione a identidade da Function App.
+- Nome esperado: `func-contosoretail-[sufixo]`
+- Exemplo: `func-contosoretail-siwhb`
+5. No role, selecione **Contributor** (se seu Fabric estiver em inglês) ou **Colaborador** (se estiver em português).
+6. Clique em **Add**.
 
-### Parte B — Usuario SQL y permisos en la base
+### Parte B — Usuário SQL e permissões no banco
 
-1. Dentro del mismo workspace, abre la base de datos `retail`.
-2. Haz click en **New Query**.
-3. Ejecuta el siguiente código T-SQL para crear el usuario externo:
+1. Dentro do mesmo workspace, abra o banco de dados `retail`.
+2. Clique em **New Query**.
+3. Execute o seguinte código T-SQL para criar o usuário externo:
 
 ```sql
-CREATE USER [func-contosoretail-[sufijo]] FROM EXTERNAL PROVIDER;
+CREATE USER [func-contosoretail-[sufixo]] FROM EXTERNAL PROVIDER;
 ```
 
-Ejemplo real:
+Exemplo real:
 
 ```sql
 CREATE USER [func-contosoretail-siwhb] FROM EXTERNAL PROVIDER;
 ```
 
-4. Luego asigna permisos de lectura:
+4. Em seguida, atribua permissões de leitura:
 
 ```sql
-ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-[sufijo]];
+ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-[sufixo]];
 ```
 
-Ejemplo real:
+Exemplo real:
 
 ```sql
 ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-siwhb];
 ```
 
-### Validación recomendada
+### Validação recomendada
 
-- Espera 1–3 minutos para propagación de permisos.
+- Aguarde 1–3 minutos para a propagação das permissões.
 
-## Arquitectura del proyecto Julie (detalle)
+## Arquitetura do projeto Julie (detalhes)
 
-Esta solución está organizada en 4 clases principales dentro de `labs/foundry/code/agents/JulieAgent/`:
+Esta solução está organizada em 4 classes principais dentro de `labs/foundry/code/agents/JulieAgent/`:
 
-- `SqlAgent.cs`: define el agente que transforma lenguaje natural en T-SQL.
-- `MarketingAgent.cs`: define el agente que redacta mensajes personalizados apoyado en Bing.
-- `JulieAgent.cs`: define a Julie como orquestadora `workflow` en formato CSDL YAML e invoca sub-agentes.
-- `Program.cs`: carga configuración, crea/verifica agentes en Foundry y ejecuta el chat.
+- `SqlAgent.cs`: define o agente que transforma linguagem natural em T-SQL.
+- `MarketingAgent.cs`: define o agente que redige mensagens personalizadas com suporte do Bing.
+- `JulieAgent.cs`: define a Julie como orquestradora `workflow` em formato CSDL YAML e invoca sub-agentes.
+- `Program.cs`: carrega configuração, cria/verifica agentes no Foundry e executa o chat.
 
-## ¿Qué tipo de orquestación se escogió?
+## Qual tipo de orquestação foi escolhido?
 
-Se escogió una orquestación de tipo **workflow** para Julie.
+Foi escolhida uma orquestação do tipo **workflow** para a Julie.
 
-- En un agente `prompt`, el modelo responde directamente con su instrucción y tools simples.
-- En un agente `workflow`, el modelo coordina pasos y herramientas especializadas para cumplir una tarea compuesta.
+- Em um agente `prompt`, o modelo responde diretamente com sua instrução e tools simples.
+- Em um agente `workflow`, o modelo coordena etapas e ferramentas especializadas para cumprir uma tarefa composta.
 
-Aquí Julie usa `workflow` porque el caso requiere una secuencia multi-etapa:
+Aqui a Julie usa `workflow` porque o caso exige uma sequência com múltiplas etapas:
 
-1. interpretar segmento de negocio,
-2. generar SQL,
-3. generar mensajes por cliente,
-4. consolidar todo en JSON final.
+1. interpretar segmento de negócio,
+2. gerar SQL,
+3. gerar mensagens por cliente,
+4. consolidar tudo em JSON final.
 
-## ¿Cómo se implementó el workflow en este laboratorio?
+## Como o workflow foi implementado neste laboratório?
 
-En la versión actual del laboratorio, Julie se construye con el enfoque **tipado del SDK** usando `WorkflowAgentDefinition`.
+Na versão atual do laboratório, a Julie é construída com a abordagem **tipada do SDK** usando `WorkflowAgentDefinition`.
 
-En `JulieAgent.cs`, `GetAgentDefinition(...)` retorna explícitamente `WorkflowAgentDefinition`:
+Em `JulieAgent.cs`, `GetAgentDefinition(...)` retorna explicitamente `WorkflowAgentDefinition`:
 
 ```csharp
 public static WorkflowAgentDefinition GetAgentDefinition(string modelDeployment, JsonElement? openApiSpec = null)
 ```
 
-La definición se construye con `WorkflowAgentDefinition` y un `workflowYaml` CSDL, luego se materializa con la factoría del SDK:
+A definição é construída com `WorkflowAgentDefinition` e um `workflowYaml` CSDL, e em seguida materializada com a fábrica do SDK:
 
 ```csharp
 var workflowYaml = $$"""
 kind: Workflow
 trigger:
-	kind: OnActivity
+kind: OnActivity
 workflow:
-	actions:
-		- kind: InvokeAzureAgent
-			id: sql_step
-			agent:
-				name: {{SqlAgent.Name}}
-			conversationId: =System.ConversationId
-			input:
-				messages: =System.LastMessage
-			output:
-				messages: Local.SqlMessages
+actions:
+- kind: InvokeAzureAgent
+id: sql_step
+agent:
+name: {{SqlAgent.Name}}
+conversationId: =System.ConversationId
+input:
+messages: =System.LastMessage
+output:
+messages: Local.SqlMessages
 
-		- kind: InvokeAzureAgent
-			id: marketing_step
-			agent:
-				name: {{MarketingAgent.Name}}
-			conversationId: =System.ConversationId
-			input:
-				messages: =Local.SqlMessages
-			output:
-				autoSend: true
+- kind: InvokeAzureAgent
+id: marketing_step
+agent:
+name: {{MarketingAgent.Name}}
+conversationId: =System.ConversationId
+input:
+messages: =Local.SqlMessages
+output:
+autoSend: true
 """;
 
 return ProjectsOpenAIModelFactory.WorkflowAgentDefinition(workflowYaml: workflowYaml);
 ```
 
-> Nota técnica: Julie queda **workflow-only** y orquesta sub-agentes mediante acciones `InvokeAzureAgent` del YAML CSDL; la ejecución SQL por OpenAPI se encapsula en `SqlAgent` cuando la spec está disponible.
+> Nota técnica: a Julie fica **exclusivamente workflow** e orquestra sub-agentes por meio de ações `InvokeAzureAgent` do YAML CSDL; a execução SQL por OpenAPI é encapsulada no `SqlAgent` quando a spec está disponível.
 
-La orquestación actual usa 2 sub-agentes:
+A orquestação atual usa 2 sub-agentes:
 
-- `SqlAgent` (tool tipo `agent`)
-- `MarketingAgent` (tool tipo `agent`)
+- `SqlAgent` (tool do tipo `agent`)
+- `MarketingAgent` (tool do tipo `agent`)
 
 
-## Definición de agentes especializados
+## Definição dos agentes especializados
 
 ### SqlAgent
 
-`SqlAgent.cs` define un agente de tipo `prompt` con instrucciones estrictas para retornar exactamente 4 columnas (`FirstName`, `LastName`, `PrimaryEmail`, `FavoriteCategory`) y usa `db-structure.txt` como contexto.
+`SqlAgent.cs` define um agente do tipo `prompt` com instruções estritas para retornar exatamente 4 colunas (`FirstName`, `LastName`, `PrimaryEmail`, `FavoriteCategory`) e usa `db-structure.txt` como contexto.
 
-Instrucciones completas:
+Instruções completas:
 
 ```text
-Eres SqlAgent, un agente especializado en generar consultas T-SQL
-para la base de datos de Contoso Retail.
+Você é SqlAgent, um agente especializado em gerar consultas T-SQL
+para o banco de dados da Contoso Retail.
 
-Tu ÚNICA responsabilidad es recibir una descripción en lenguaje natural
-de un segmento de clientes y generar una consulta T-SQL válida que retorne
-EXACTAMENTE estas columnas:
-- FirstName (nombre del cliente)
-- LastName (apellido del cliente)
-- PrimaryEmail (correo electrónico del cliente)
-- FavoriteCategory (la categoría de producto en la que el cliente ha gastado más dinero)
+Sua ÚNICA responsabilidade é receber uma descrição em linguagem natural
+de um segmento de clientes e gerar uma consulta T-SQL válida que retorne
+EXATAMENTE estas colunas:
+- FirstName (nome do cliente)
+- LastName (sobrenome do cliente)
+- PrimaryEmail (e-mail do cliente)
+- FavoriteCategory (a categoria de produto na qual o cliente mais gastou dinheiro)
 
-Para determinar la FavoriteCategory, debes hacer JOIN entre las tablas de
-órdenes, líneas de orden y productos, agrupar por categoría y seleccionar
-la que tenga el mayor monto total (SUM de LineTotal).
+Para determinar a FavoriteCategory, você deve fazer JOIN entre as tabelas de
+pedidos, linhas de pedido e produtos, agrupar por categoria e selecionar
+a que tiver o maior valor total (SUM de LineTotal).
 
-ESTRUCTURA DE LA BASE DE DATOS:
+ESTRUTURA DO BANCO DE DADOS:
 {dbStructure}
 
-REGLAS:
-1. SIEMPRE retorna EXACTAMENTE las 4 columnas: FirstName, LastName, PrimaryEmail, FavoriteCategory.
-2. Usa JOINs apropiados entre customer, orders, orderline, product y productcategory.
-3. Para FavoriteCategory, usa una subconsulta o CTE que agrupe por categoría
-	y seleccione la de mayor gasto (SUM(ol.LineTotal)).
-4. Solo incluye clientes activos (IsActive = 1).
-5. Solo incluye clientes que tengan PrimaryEmail no nulo y no vacío.
-6. NO ejecutes la consulta, solo genérala.
-7. Retorna ÚNICAMENTE el código T-SQL, sin explicación, sin markdown,
-	sin bloques de código. Solo el SQL puro.
-8. Responde siempre en español si necesitas agregar algún comentario SQL.
+REGRAS:
+1. SEMPRE retorne EXATAMENTE as 4 colunas: FirstName, LastName, PrimaryEmail, FavoriteCategory.
+2. Use JOINs apropriados entre customer, orders, orderline, product e productcategory.
+3. Para FavoriteCategory, use uma subconsulta ou CTE que agrupe por categoria
+e selecione a de maior gasto (SUM(ol.LineTotal)).
+4. Inclua apenas clientes ativos (IsActive = 1).
+5. Inclua apenas clientes que tenham PrimaryEmail não nulo e não vazio.
+6. NÃO execute a consulta, apenas a gere.
+7. Retorne SOMENTE o código T-SQL, sem explicação, sem markdown,
+sem blocos de código. Apenas o SQL puro.
+8. Responda sempre em português se precisar adicionar algum comentário SQL.
 ```
 
-Racional de diseño:
+Racional de design:
 
-- Restringir explícitamente las columnas reduce ambigüedad en la salida.
-- Obligar SQL puro (sin markdown) evita ambigüedad al encadenar la salida con Julie.
-- Inyectar `db-structure.txt` mejora precisión de joins y nombres de tablas.
+- Restringir explicitamente as colunas reduz ambiguidade na saída.
+- Exigir SQL puro (sem markdown) evita ambiguidade ao encadear a saída com a Julie.
+- Injetar `db-structure.txt` melhora a precisão de joins e nomes de tabelas.
 
 ```csharp
 return new PromptAgentDefinition(modelDeployment)
 {
-	Instructions = GetInstructions(dbStructure)
+Instructions = GetInstructions(dbStructure)
 };
 ```
 
 ### MarketingAgent
 
-`MarketingAgent.cs` también es `prompt`, pero incorpora tool de Bing grounding por `connection.id`:
+`MarketingAgent.cs` também é `prompt`, mas incorpora tool de Bing grounding por `connection.id`:
 
-Instrucciones completas:
+Instruções completas:
 
 ```text
-Eres MarketingAgent, un agente especializado en crear mensajes de marketing
-personalizados para clientes de Contoso Retail.
+Você é MarketingAgent, um agente especializado em criar mensagens de marketing
+personalizadas para clientes da Contoso Retail.
 
-Tu flujo de trabajo es el siguiente:
+Seu fluxo de trabalho é o seguinte:
 
-1. Recibes el nombre completo de un cliente y su categoría de compra favorita.
-2. Usas la herramienta de Bing Search para buscar eventos recientes o próximos
-	relacionados con esa categoría. Por ejemplo:
-	- Si la categoría es "Bikes", busca eventos de ciclismo.
-	- Si la categoría es "Clothing", busca eventos de moda.
-	- Si la categoría es "Accessories", busca eventos de tecnología o lifestyle.
-	- Si la categoría es "Components", busca eventos de ingeniería o manufactura.
-3. De los resultados de búsqueda, selecciona el evento más relevante y actual.
-4. Genera un mensaje de marketing breve y motivacional (máximo 3 párrafos) que:
-	- Salude al cliente por su nombre.
-	- Mencione el evento encontrado y por qué es relevante para el cliente.
-	- Invite al cliente a visitar el catálogo online de Contoso Retail
-	  para encontrar los mejores productos de la categoría y estar preparado
-	  para el evento.
-	- Tenga un tono cálido, entusiasta y profesional.
-	- Esté en español.
+1. Você recebe o nome completo de um cliente e sua categoria de compra favorita.
+2. Você usa a ferramenta de Bing Search para pesquisar eventos recentes ou próximos
+relacionados com essa categoria. Por exemplo:
+- Se a categoria for "Bikes", pesquise eventos de ciclismo.
+- Se a categoria for "Clothing", pesquise eventos de moda.
+- Se a categoria for "Accessories", pesquise eventos de tecnologia ou lifestyle.
+- Se a categoria for "Components", pesquise eventos de engenharia ou manufatura.
+3. Dos resultados da pesquisa, selecione o evento mais relevante e atual.
+4. Gere uma mensagem de marketing breve e motivadora (máximo 3 parágrafos) que:
+- Cumprimente o cliente pelo nome.
+- Mencione o evento encontrado e por que é relevante para o cliente.
+- Convide o cliente a visitar o catálogo online da Contoso Retail
+  para encontrar os melhores produtos da categoria e estar preparado
+  para o evento.
+- Tenha um tom caloroso, entusiasmado e profissional.
+- Esteja em português.
 
-5. Retorna ÚNICAMENTE el texto del mensaje de marketing. Sin JSON, sin metadata,
-	sin explicaciones adicionales. Solo el mensaje listo para enviar por correo.
+5. Retorne SOMENTE o texto da mensagem de marketing. Sem JSON, sem metadata,
+sem explicações adicionais. Apenas a mensagem pronta para envio por e-mail.
 
-IMPORTANTE: Si no encuentras eventos relevantes, genera un mensaje general sobre
-tendencias actuales en esa categoría e invita al cliente a explorar las novedades
-de Contoso Retail.
+IMPORTANTE: Se não encontrar eventos relevantes, gere uma mensagem geral sobre
+tendências atuais nessa categoria e convide o cliente a explorar as novidades
+da Contoso Retail.
 ```
 
-Racional de diseño:
+Racional de design:
 
-- Separar marketing en un agente propio desacopla creatividad de la lógica SQL.
-- Bing grounding aporta contexto actual sin “contaminar” a Julie con búsquedas web.
-- Limitar formato/salida facilita consolidación posterior en JSON de campaña.
+- Separar marketing em um agente próprio desacopla criatividade da lógica SQL.
+- O Bing grounding traz contexto atual sem "contaminar" a Julie com pesquisas web.
+- Limitar formato/saída facilita a consolidação posterior em JSON de campanha.
 
 ```csharp
 var bingGroundingAgentTool = new BingGroundingAgentTool(new BingGroundingSearchToolOptions(
-	searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionId)]));
+searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionId)]));
 
 return new PromptAgentDefinition(modelDeployment)
 {
-	Instructions = Instructions,
-	Tools = { bingGroundingAgentTool }
+Instructions = Instructions,
+Tools = { bingGroundingAgentTool }
 };
 ```
 
 ### JulieOrchestrator
 
-`JulieAgent.cs` define el agente principal `workflow` que coordina los otros dos agentes con CSDL YAML.
+`JulieAgent.cs` define o agente principal `workflow` que coordena os outros dois agentes com CSDL YAML.
 
-Instrucciones completas:
+Instruções completas:
 
 ```text
-Eres Julie, la agente planificadora y orquestadora de campañas de marketing
-de Contoso Retail.
+Você é Julie, a agente planejadora e orquestradora de campanhas de marketing
+da Contoso Retail.
 
-Tu responsabilidad es coordinar la creación de campañas de marketing
+Sua responsabilidade é coordenar a criação de campanhas de marketing
 personalizadas para segmentos específicos de clientes.
 
-Cuando recibas una solicitud de campaña sigues estos pasos:
+Quando receber uma solicitação de campanha, você segue estas etapas:
 
-1. EXTRACCIÓN: Analiza el prompt del usuario y extrae la descripción
-	del segmento de clientes. Resume esa descripción en una frase clara.
+1. EXTRAÇÃO: Analise o prompt do usuário e extraia a descrição
+do segmento de clientes. Resuma essa descrição em uma frase clara.
 
-2. GENERACIÓN SQL: Invoca a SqlAgent pasándole la descripción del segmento.
-	SqlAgent te retornará una consulta T-SQL.
+2. GERAÇÃO SQL: Invoque o SqlAgent passando a descrição do segmento.
+O SqlAgent retornará uma consulta T-SQL.
 
-3. MARKETING PERSONALIZADO: Invoca a
-	MarketingAgent pasándole el nombre del cliente y su categoría favorita.
-	MarketingAgent buscará eventos relevantes en Bing y generará un mensaje
-	personalizado.
+3. MARKETING PERSONALIZADO: Invoque o
+MarketingAgent passando o nome do cliente e sua categoria favorita.
+O MarketingAgent pesquisará eventos relevantes no Bing e gerará uma mensagem
+personalizada.
 
-4. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
-	resultado como un JSON de campaña con el siguiente formato:
+4. ORGANIZAÇÃO FINAL: Com todas as mensagens geradas, organize o
+resultado como um JSON de campanha com o seguinte formato:
 
 ```json
 {
-  "campaign": "Nombre descriptivo de la campaña",
+  "campaign": "Nome descritivo da campanha",
   "generatedAt": "YYYY-MM-DDTHH:mm:ss",
   "totalEmails": N,
   "emails": [
-	 {
-		"to": "email@ejemplo.com",
-		"customerName": "Nombre Apellido",
-		"favoriteCategory": "Categoría",
-		"subject": "Asunto del correo generado automáticamente",
-		"body": "Mensaje de marketing personalizado"
-	 }
+ {
+"to": "email@exemplo.com",
+"customerName": "Nome Sobrenome",
+"favoriteCategory": "Categoria",
+"subject": "Assunto do e-mail gerado automaticamente",
+"body": "Mensagem de marketing personalizada"
+ }
   ]
 }
 ```
 
-REGLAS:
-- El campo "subject" debe ser un asunto de correo atractivo y relevante.
-- El campo "body" es el mensaje que generó MarketingAgent para ese cliente.
-- Responde siempre en español.
-- Si algún cliente no tiene email, omítelo del resultado.
-- Genera un nombre descriptivo para la campaña basado en el segmento.
+REGRAS:
+- O campo "subject" deve ser um assunto de e-mail atrativo e relevante.
+- O campo "body" é a mensagem que o MarketingAgent gerou para esse cliente.
+- Responda sempre em português.
+- Se algum cliente não tiver e-mail, omita-o do resultado.
+- Gere um nome descritivo para a campanha com base no segmento.
 ```
 
-Racional de diseño:
+Racional de design:
 
-- `workflow` se eligió porque hay una secuencia dependiente de pasos (SQL → marketing).
-- Julie no “adivina” resultados: delega la generación de SQL y de contenido a sub-agentes especializados.
-- Centralizar la salida final en Julie asegura un único formato JSON consistente para consumo externo.
+- `workflow` foi escolhido porque existe uma sequência dependente de etapas (SQL → marketing).
+- A Julie não "adivinha" resultados: delega a geração de SQL e de conteúdo a sub-agentes especializados.
+- Centralizar a saída final na Julie garante um único formato JSON consistente para consumo externo.
 
-## ¿Qué hace Program.cs exactamente?
+## O que o Program.cs faz exatamente?
 
-`Program.cs` no contiene la lógica de negocio de campaña; su rol es operativo:
+O `Program.cs` não contém a lógica de negócio da campanha; seu papel é operacional:
 
-1. Cargar `appsettings.json`.
-2. Leer `db-structure.txt`.
-3. Descargar spec OpenAPI de la Function App (si está disponible).
-4. Crear o reutilizar agentes en Foundry.
-5. Abrir chat interactivo con Julie.
+1. Carregar `appsettings.json`.
+2. Ler `db-structure.txt`.
+3. Baixar spec OpenAPI da Function App (se disponível).
+4. Criar ou reutilizar agentes no Foundry.
+5. Abrir chat interativo com a Julie.
 
-El helper `EnsureAgent(...)` implementa el patrón **buscar → decidir override → crear versión** con tipos del SDK:
+O helper `EnsureAgent(...)` implementa o padrão **buscar → decidir override → criar versão** com tipos do SDK:
 
 ```csharp
 async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
 {
-	...
-	var result = await projectClient.Agents.CreateAgentVersionAsync(
-		agentName,
-		new AgentVersionCreationOptions(agentDefinition));
-	...
+...
+var result = await projectClient.Agents.CreateAgentVersionAsync(
+agentName,
+new AgentVersionCreationOptions(agentDefinition));
+...
 }
 ```
 
-Luego registra los 3 agentes en orden. En la implementación actual, `SqlAgent` recibe también la spec OpenAPI cuando está disponible:
+Em seguida, registra os 3 agentes em ordem. Na implementação atual, o `SqlAgent` também recebe a spec OpenAPI quando está disponível:
 
 ```csharp
 await EnsureAgent(SqlAgent.Name, SqlAgent.GetAgentDefinition(modelDeployment, dbStructure, openApiSpecJson));
@@ -352,32 +352,32 @@ await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDe
 await EnsureAgent(JulieOrchestrator.Name, JulieOrchestrator.GetAgentDefinition(modelDeployment, openApiSpecJson));
 ```
 
-Finalmente, el chat usa `ProjectResponsesClient` con Julie como agente por defecto:
+Por fim, o chat usa `ProjectResponsesClient` com a Julie como agente padrão:
 
 ```csharp
 ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
-	defaultAgent: JulieOrchestrator.Name,
-	defaultConversationId: conversation.Id);
+defaultAgent: JulieOrchestrator.Name,
+defaultConversationId: conversation.Id);
 ```
 
-Con esto, el código local se limita a orquestar infraestructura de agente; la ejecución del workflow ocurre dentro de Foundry en cada `CreateResponse(...)`.
+Com isso, o código local se limita a orquestrar infraestrutura de agentes; a execução do workflow ocorre dentro do Foundry a cada `CreateResponse(...)`.
 
-> Nota: el `Program.cs` descarga OpenAPI con reintentos para tolerar fallas DNS intermitentes; esa spec se pasa a `SqlAgent` para habilitar la tool `SqlExecutor` y ejecutar SQL desde el sub-agente.
+> Nota: o `Program.cs` baixa o OpenAPI com novas tentativas para tolerar falhas de DNS intermitentes; essa spec é passada ao `SqlAgent` para habilitar a tool `SqlExecutor` e executar SQL a partir do sub-agente.
 
-## Patrón recomendado aplicado en este lab
+## Padrão recomendado aplicado neste lab
 
-Para mantener consistencia y mantenibilidad, este laboratorio aplica el siguiente patrón:
+Para manter consistência e facilidade de manutenção, este laboratório aplica o seguinte padrão:
 
-1. **Definiciones tipadas en código**
-	- `SqlAgent` y `MarketingAgent` retornan `PromptAgentDefinition`.
-	- `JulieOrchestrator` retorna `WorkflowAgentDefinition`.
+1. **Definições tipadas em código**
+- `SqlAgent` e `MarketingAgent` retornam `PromptAgentDefinition`.
+- `JulieOrchestrator` retorna `WorkflowAgentDefinition`.
 
-2. **Creación tipada de versiones**
-	- Se usa `CreateAgentVersionAsync(..., new AgentVersionCreationOptions(agentDefinition))`.
+2. **Criação tipada de versões**
+- É usado `CreateAgentVersionAsync(..., new AgentVersionCreationOptions(agentDefinition))`.
 
-3. **Separación clara de responsabilidades**
-	- `Program.cs` crea/versiona agentes y abre conversación.
-	- Cada clase de agente encapsula sus instrucciones y tools.
+3. **Separação clara de responsabilidades**
+- `Program.cs` cria/versiona agentes e abre a conversação.
+- Cada classe de agente encapsula suas instruções e tools.
 
-4. **Contrato de salida estable**
-	- Julie mantiene salida JSON final homogénea para facilitar consumo por otros sistemas o validaciones automáticas.
+4. **Contrato de saída estável**
+- A Julie mantém saída JSON final homogênea para facilitar o consumo por outros sistemas ou validações automáticas.

@@ -91,12 +91,12 @@ var andersInstructions = """
     Respond in English.
     """;
 
-// Cliente del proyecto Foundry (nueva experiencia)
+// Foundry project client (new experience)
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
 
-// Verificar si el agente ya existe
+// Check if the agent already exists
 bool shouldCreateAgent = true;
 AgentRecord? existingAgent = null;
 
@@ -160,7 +160,7 @@ if (shouldCreateAgent)
         BinaryContent.Create(BinaryData.FromString(jsonContent)),
         new RequestOptions());
 
-    // Parsear respuesta para obtener info del agente
+    // Parse response to get agent info
     var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
     var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
     Console.WriteLine($"[Foundry] Agent created/updated: {agentName} (v{version})");

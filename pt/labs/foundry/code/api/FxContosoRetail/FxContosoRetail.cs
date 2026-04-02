@@ -51,39 +51,39 @@ public class FxContosoRetail
     public IActionResult HolaMundo(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        _logger.LogInformation("Función HolaMundo ejecutada.");
-        return new OkObjectResult("¡Hola Mundo!");
+        _logger.LogInformation("Função HolaMundo executada.");
+        return new OkObjectResult("Olá Mundo!");
     }
 
 
 [OpenApiOperation(operationId: "sqlExecutor", tags: new[] { "Data" },
-    Summary = "Ejecuta una consulta T-SQL para segmentos de clientes",
-    Description = "Recibe T-SQL en el body, ejecuta la consulta contra Fabric Warehouse y retorna una lista con FirstName, LastName, PrimaryEmail y FavoriteCategory.")]
+    Summary = "Executa uma consulta T-SQL para segmentos de clientes",
+    Description = "Recebe T-SQL no body, executa a consulta contra o Fabric Warehouse e retorna uma lista com FirstName, LastName, PrimaryEmail e FavoriteCategory.")]
 [OpenApiRequestBody(
     contentType: "application/json",
     bodyType: typeof(SqlExecutorRequest),
     Required = true,
-    Description = "Objeto JSON con la propiedad 'tsql' que contiene la consulta a ejecutar")]
+    Description = "Objeto JSON com a propriedade 'tsql' que contém a consulta a executar")]
 [OpenApiResponseWithBody(
     statusCode: HttpStatusCode.OK,
     contentType: "application/json",
     bodyType: typeof(List<SqlExecutorCustomerRecord>),
-    Description = "Resultados tipados del segmento de clientes")]
+    Description = "Resultados tipados do segmento de clientes")]
 [OpenApiResponseWithBody(
     statusCode: HttpStatusCode.BadRequest,
     contentType: "text/plain",
     bodyType: typeof(string),
-    Description = "Mensaje de error por body inválido o columnas distintas al contrato esperado")]
+    Description = "Mensagem de erro por body inválido ou colunas diferentes do contrato esperado")]
 [OpenApiResponseWithBody(
     statusCode: HttpStatusCode.InternalServerError,
     contentType: "text/plain",
     bodyType: typeof(string),
-    Description = "Error al ejecutar la consulta SQL")]
+    Description = "Erro ao executar a consulta SQL")]
     [Function("SqlExecutor")]
     public async Task<IActionResult> SqlExecutor(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
-        _logger.LogInformation("SqlExecutor: procesando solicitud.");
+        _logger.LogInformation("SqlExecutor: processando solicitação.");
 
         SqlExecutorRequest? request;
         try
@@ -94,19 +94,19 @@ public class FxContosoRetail
         catch (JsonException ex)
         {
             _logger.LogError(ex, "SqlExecutor: body inválido.");
-            return new BadRequestObjectResult("El cuerpo de la solicitud no es un JSON válido.");
+            return new BadRequestObjectResult("O corpo da solicitação não é um JSON válido.");
         }
 
         if (request is null || string.IsNullOrWhiteSpace(request.TSql))
-            return new BadRequestObjectResult("Debe enviar la propiedad 'tsql' con una consulta válida.");
+            return new BadRequestObjectResult("É necessário enviar a propriedade 'tsql' com uma consulta válida.");
 
         if (!IsReadOnlySql(request.TSql))
-            return new BadRequestObjectResult("Solo se permiten consultas de solo lectura (SELECT/CTE).");
+            return new BadRequestObjectResult("Apenas consultas somente leitura são permitidas (SELECT/CTE).");
 
         var rawConnectionString = _configuration["FabricWarehouseConnectionString"];
         if (string.IsNullOrWhiteSpace(rawConnectionString))
         {
-            return new BadRequestObjectResult("No existe configuración 'FabricWarehouseConnectionString'.");
+            return new BadRequestObjectResult("Configuração 'FabricWarehouseConnectionString' não encontrada.");
         }
 
         var connectionString = EnsureAdDefaultAuthentication(rawConnectionString);
@@ -132,7 +132,7 @@ public class FxContosoRetail
             if (!HasExpectedSqlExecutorColumns(returnedColumns))
             {
                 return new BadRequestObjectResult(
-                    "La consulta debe retornar EXACTAMENTE estas columnas: FirstName, LastName, PrimaryEmail, FavoriteCategory.");
+                    "A consulta deve retornar EXATAMENTE estas colunas: FirstName, LastName, PrimaryEmail, FavoriteCategory.");
             }
 
             int firstNameOrdinal = reader.GetOrdinal("FirstName");
@@ -157,16 +157,16 @@ public class FxContosoRetail
         }
         catch (SqlException ex)
         {
-            _logger.LogError(ex, "SqlExecutor: error SQL al ejecutar consulta.");
-            return new ObjectResult($"Error al ejecutar la consulta SQL: {ex.Message}")
+            _logger.LogError(ex, "SqlExecutor: erro SQL ao executar consulta.");
+            return new ObjectResult($"Erro ao executar a consulta SQL: {ex.Message}")
             {
                 StatusCode = StatusCodes.Status500InternalServerError
             };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "SqlExecutor: error inesperado.");
-            return new ObjectResult("Error interno al ejecutar SqlExecutor.")
+            _logger.LogError(ex, "SqlExecutor: erro inesperado.");
+            return new ObjectResult("Erro interno ao executar SqlExecutor.")
             {
                 StatusCode = StatusCodes.Status500InternalServerError
             };
@@ -174,31 +174,31 @@ public class FxContosoRetail
     }
 
 
-[OpenApiOperation(operationId: "ordersReporter", tags: new[] { "Reportes" },
-    Summary = "Genera un reporte HTML de órdenes",
-    Description = "Recibe líneas de órdenes de un cliente, genera un reporte HTML con el detalle, lo sube a Blob Storage y retorna la URL con SAS para visualizarlo/descargarlo.")]
+[OpenApiOperation(operationId: "ordersReporter", tags: new[] { "Relatórios" },
+    Summary = "Gera um relatório HTML de pedidos",
+    Description = "Recebe linhas de pedidos de um cliente, gera um relatório HTML com o detalhe, faz upload para o Blob Storage e retorna a URL SAS para visualizar/baixar.")]
 [OpenApiRequestBody(
     contentType: "application/json",
     bodyType: typeof(OrdersReportRequest),
     Required = true,
-    Description = "Datos del cliente y líneas de órdenes a incluir en el reporte")]
+    Description = "Dados do cliente e linhas de pedidos a incluir no relatório")]
 [OpenApiResponseWithBody(
     statusCode: HttpStatusCode.OK,
     contentType: "application/json",
     bodyType: typeof(object),
-    Description = "Objeto JSON con la propiedad 'reportUrl' que contiene la URL SAS del reporte generado")]
+    Description = "Objeto JSON com a propriedade 'reportUrl' que contém a URL SAS do relatório gerado")]
 [OpenApiResponseWithBody(
     statusCode: HttpStatusCode.BadRequest,
     contentType: "text/plain",
     bodyType: typeof(string),
-    Description = "Mensaje de error cuando el JSON es inválido o no contiene órdenes")]
+    Description = "Mensagem de erro quando o JSON é inválido ou não contém pedidos")]
     [Function("OrdersReporter")]
     public async Task<IActionResult> OrdersReporter(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
-        _logger.LogInformation("OrdersReporter: procesando solicitud.");
+        _logger.LogInformation("OrdersReporter: processando solicitação.");
 
-        // --- Deserializar el body ---
+        // --- Desserializar o body ---
         OrdersReportRequest? request;
         try
         {
@@ -207,21 +207,21 @@ public class FxContosoRetail
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Error al deserializar el JSON de entrada.");
-            return new BadRequestObjectResult("El cuerpo de la solicitud no es un JSON válido.");
+            _logger.LogError(ex, "Erro ao desserializar o JSON de entrada.");
+            return new BadRequestObjectResult("O corpo da solicitação não é um JSON válido.");
         }
 
         if (request is null || request.Orders.Count == 0)
-            return new BadRequestObjectResult("No se recibieron líneas de orden.");
+            return new BadRequestObjectResult("Nenhuma linha de pedido recebida.");
 
         string customerName = request.CustomerName;
         string dateRangeStart = request.StartDate;
         string dateRangeEnd = request.EndDate;
         var lines = request.Orders;
 
-        // --- Descargar el template HTML ---
+        // --- Baixar o template HTML ---
         string templateUrl = _configuration["BillTemplate"]
-            ?? "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.html";
+            ?? "https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.pt.html";
 
         string html;
         try
@@ -231,11 +231,11 @@ public class FxContosoRetail
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "Error al descargar el template desde {Url}", templateUrl);
+            _logger.LogError(ex, "Erro ao baixar o template de {Url}", templateUrl);
             return new StatusCodeResult(502);
         }
 
-        // --- Inyectar metadatos del reporte ---
+        // --- Injetar metadados do relatório ---
         string today = DateTime.UtcNow.ToString("dd/MM/yyyy");
         string dateRange = $"{dateRangeStart} - {dateRangeEnd}";
 
@@ -251,13 +251,13 @@ public class FxContosoRetail
             "<span id=\"report-date-range\"></span>",
             $"<span id=\"report-date-range\">{dateRange}</span>");
 
-        // --- Agrupar líneas por orden ---
+        // --- Agrupar linhas por pedido ---
         var orders = lines
             .GroupBy(l => new { l.OrderNumber, l.OrderDate })
             .OrderBy(g => g.Key.OrderDate)
             .ThenBy(g => g.Key.OrderNumber);
 
-        // --- Construir bloques HTML de órdenes ---
+        // --- Construir blocos HTML de pedidos ---
         var ordersHtml = new StringBuilder();
         double grandTotal = 0;
 
@@ -268,8 +268,8 @@ public class FxContosoRetail
 
             ordersHtml.AppendLine("    <div class=\"order-block\">");
             ordersHtml.AppendLine($"        <div class=\"order-header\">");
-            ordersHtml.AppendLine($"            Orden: <span class=\"order-id\">{order.Key.OrderNumber}</span> &nbsp; | &nbsp;");
-            ordersHtml.AppendLine($"            Fecha: <span class=\"order-date\">{order.Key.OrderDate}</span>");
+            ordersHtml.AppendLine($"            Pedido: <span class=\"order-id\">{order.Key.OrderNumber}</span> &nbsp; | &nbsp;");
+            ordersHtml.AppendLine($"            Data: <span class=\"order-date\">{order.Key.OrderDate}</span>");
             ordersHtml.AppendLine($"        </div>");
             ordersHtml.AppendLine();
             ordersHtml.AppendLine("        <table>");
@@ -303,15 +303,15 @@ public class FxContosoRetail
             ordersHtml.AppendLine("        </table>");
             ordersHtml.AppendLine();
             ordersHtml.AppendLine("        <div class=\"order-total\">");
-            ordersHtml.AppendLine($"            Total Orden: <strong class=\"order-total-amount\">{FormatCurrency(orderTotal)}</strong>");
+            ordersHtml.AppendLine($"            Total Pedido: <strong class=\"order-total-amount\">{FormatCurrency(orderTotal)}</strong>");
             ordersHtml.AppendLine("        </div>");
             ordersHtml.AppendLine("    </div>");
             ordersHtml.AppendLine();
         }
 
-        // --- Inyectar órdenes en el contenedor ---
+        // --- Injetar pedidos no contêner ---
         int containerStart = html.IndexOf("<div id=\"orders-container\">");
-        int containerEnd = html.IndexOf("</div>", html.IndexOf("FIN TEMPLATE DE ORDEN"));
+        int containerEnd = html.IndexOf("</div>", html.IndexOf("FIM TEMPLATE DE PEDIDO"));
         if (containerStart >= 0 && containerEnd >= 0)
         {
             int innerStart = html.IndexOf('>', containerStart) + 1;
@@ -329,7 +329,7 @@ public class FxContosoRetail
 
         // --- Subir HTML como blob al container "reports" ---
         string storageAccountName = _configuration["StorageAccountName"]
-            ?? throw new InvalidOperationException("StorageAccountName no está configurada.");
+            ?? throw new InvalidOperationException("StorageAccountName não está configurada.");
 
         string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
         string blobName = $"report-{timestamp}.htm";
@@ -347,9 +347,9 @@ public class FxContosoRetail
             ContentType = "text/html; charset=utf-8"
         });
 
-        _logger.LogInformation("Reporte subido como blob: {BlobName}", blobName);
+        _logger.LogInformation("Relatório enviado como blob: {BlobName}", blobName);
 
-        // --- Generar SAS de solo lectura con duración de 1 hora (User Delegation) ---
+        // --- Gerar SAS somente leitura com duração de 1 hora (User Delegation) ---
         var userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync(
             DateTimeOffset.UtcNow,
             DateTimeOffset.UtcNow.AddHours(1));
@@ -372,7 +372,7 @@ public class FxContosoRetail
     }
 
     /// <summary>
-    /// Formatea un valor monetario como $ 1.234,56 (separador de miles: punto, decimal: coma).
+    /// Formata um valor monetário como $ 1.234,56 (separador de milhar: ponto, decimal: vírgula).
     /// </summary>
     private static string FormatCurrency(double value)
     {

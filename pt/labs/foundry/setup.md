@@ -1,118 +1,118 @@
-# Microsoft Foundry — Taller Multi-Agéntico
+# Microsoft Foundry — Workshop Multi-Agêntico
 
-## Introducción
+## Introdução
 
-Esta sección del taller cubre la **capa de razonamiento y ejecución** de la arquitectura multi-agéntica de Contoso Retail, implementada sobre **Microsoft Foundry**. Aquí se construyen los agentes inteligentes que interpretan datos y planifican acciones (ejecutando algunas), a partir de la información generada por la capa de datos (Microsoft Fabric).
+Esta seção do workshop cobre a **camada de raciocínio e execução** da arquitetura multi-agêntica da Contoso Retail, implementada sobre o **Microsoft Foundry**. Aqui são construídos os agentes inteligentes que interpretam dados e planejam ações (executando algumas delas), a partir das informações geradas pela camada de dados (Microsoft Fabric).
 
-### Agentes de esta capa
+### Agentes desta camada
 
-| Agente | Rol | Descripción |
-|--------|-----|-------------|
-| **Anders** | Executor Agent | Recibe solicitudes de acciones operativas (como la generación de reportes o renderizado de órdenes) y las ejecuta interactuando con servicios externos como la Azure Function `FxContosoRetail`. Tipo: `kind: "prompt"` con herramienta OpenAPI. |
-| **Julie** | Planner Workflow | Orquesta campañas de marketing personalizadas. Recibe una descripción de segmento de clientes y ejecuta un flujo de 5 pasos: (1) extrae el filtro de clientes, (2) invoca a **SqlAgent** para generar T-SQL, (3) ejecuta la consulta contra Fabric vía **Function App OpenAPI**, (4) invoca a **MarketingAgent** (con Bing Search) para generar mensajes por cliente, (5) organiza el resultado como JSON de campaña de correos. Tipo: `kind: "workflow"` con 3 herramientas (2 agentes + 1 OpenAPI). |
+| Agente | Papel | Descrição |
+|--------|-------|-----------|
+| **Anders** | Executor Agent | Recebe solicitações de ações operacionais (como a geração de relatórios ou renderização de pedidos) e as executa interagindo com serviços externos como a Azure Function `FxContosoRetail`. Tipo: `kind: "prompt"` com ferramenta OpenAPI. |
+| **Julie** | Planner Workflow | Orquestra campanhas de marketing personalizadas. Recebe uma descrição de segmento de clientes e executa um fluxo de 5 etapas: (1) extrai o filtro de clientes, (2) invoca o **SqlAgent** para gerar T-SQL, (3) executa a consulta contra o Fabric via **Function App OpenAPI**, (4) invoca o **MarketingAgent** (com Bing Search) para gerar mensagens por cliente, (5) organiza o resultado como JSON de campanha de e-mails. Tipo: `kind: "workflow"` com 3 ferramentas (2 agentes + 1 OpenAPI). |
 
-### Arquitectura general
+### Arquitetura geral
 
-La capa Foundry se ubica en el centro de la arquitectura de tres capas:
+A camada Foundry se localiza no centro da arquitetura de três camadas:
 
 ```
 ┌─────────────────────┐
-│   Copilot Studio    │  ← Capa de interacción (Charles, Bill, Ric)
+│   Copilot Studio    │  ← Camada de interação (Charles, Bill, Ric)
 ├─────────────────────┤
-│  Microsoft Foundry  │  ← Capa de razonamiento (Anders, Julie) ★
+│  Microsoft Foundry  │  ← Camada de raciocínio (Anders, Julie) ★
 ├─────────────────────┤
-│  Microsoft Fabric   │  ← Capa de datos (Mark, Amy)
+│  Microsoft Fabric   │  ← Camada de dados (Mark, Amy)
 └─────────────────────┘
 ```
 
-Los agentes Anders y Julie utilizan modelos GPT-4.1 desplegados en Azure AI Services para razonar sobre la información del negocio. Anders consume directamente la API de `FxContosoRetail` vía herramienta OpenAPI. Julie orquesta un workflow multi-agente: usa **SqlAgent** (genera T-SQL), una **Function App** (ejecuta el SQL contra Fabric vía OpenAPI) y **MarketingAgent** (genera mensajes personalizados con Bing Search), coordinando todo de forma autónoma como un agente de tipo `workflow`.
+Os agentes Anders e Julie utilizam modelos GPT-4.1 implantados no Azure AI Services para raciocinar sobre as informações do negócio. Anders consome diretamente a API do `FxContosoRetail` via ferramenta OpenAPI. Julie orquestra um workflow multi-agente: usa o **SqlAgent** (gera T-SQL), uma **Function App** (executa o SQL contra o Fabric via OpenAPI) e o **MarketingAgent** (gera mensagens personalizadas com Bing Search), coordenando tudo de forma autônoma como um agente do tipo `workflow`.
 
 ---
 
-## Setup de infraestructura
+## Setup de infraestrutura
 
-Antes de iniciar los laboratorios, cada participante debe desplegar la infraestructura de Azure en su propia suscripción. El proceso es automatizado con Bicep y un script de PowerShell.
+Antes de iniciar os laboratórios, cada participante precisa implantar a infraestrutura do Azure em sua própria assinatura. O processo é automatizado com Bicep e um script PowerShell.
 
-### Prerrequisitos
+### Pré-requisitos
 
-- **Azure CLI** instalado y actualizado ([instalar](https://aka.ms/installazurecli))
+- **Azure CLI** instalado e atualizado ([instalar](https://aka.ms/installazurecli))
 
-- **.NET 8 SDK** instalado ([descargar](https://dotnet.microsoft.com/download/dotnet/8.0))
+- **.NET 8 SDK** instalado ([baixar](https://dotnet.microsoft.com/download/dotnet/8.0))
 
-- **PowerShell 7+** (requerido en todos los sistemas operativos, incluido Windows)
-  - Windows: `winget install Microsoft.PowerShell` o [descargar MSI](https://aka.ms/powershell-release?tag=stable)
-  - Linux: [instrucciones](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux)
-  - macOS: `brew install powershell/tap/powershell` o [instrucciones](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-macos)
-  > ⚠️ **Importante:** Ejecuta los scripts desde `pwsh` (PowerShell 7), **no** desde `powershell` (5.1). PowerShell 5.1 no es compatible.
+- **PowerShell 7+** (necessário em todos os sistemas operacionais, incluindo Windows)
+  - Windows: `winget install Microsoft.PowerShell` ou [baixar MSI](https://aka.ms/powershell-release?tag=stable)
+  - Linux: [instruções](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux)
+  - macOS: `brew install powershell/tap/powershell` ou [instruções](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-macos)
+  > ⚠️ **Importante:** Execute os scripts no `pwsh` (PowerShell 7), **não** no `powershell` (5.1). O PowerShell 5.1 não é compatível.
   
-- **ExecutionPolicy** configurada (solo Windows): Para poder ejecutar script provenientes de un origen como Github, es necesario habilitar ésta opción. Para ello abre `pwsh` como administrador y ejecuta:
+- **ExecutionPolicy** configurada (somente Windows): Para executar scripts provenientes de uma origem como o GitHub, é necessário habilitar esta opção. Para isso, abra o `pwsh` como administrador e execute:
   
   ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   ```
   
-  ✅Esto solo es requerido una vez.
+  ✅ Isso só é necessário uma vez.
   
-- Una **suscripción de Azure** activa con permisos de Owner o Contributor
+- Uma **assinatura do Azure** ativa com permissões de Owner ou Contributor
 
-   - Cuando tengas tu tenant listo para trabajar, anota el **número del tenant temporal** asignado: Si el usuario que te asignaron es usuario@azurehol3387.com, entonces tu número de tenant es 3387.
+   - Quando seu tenant estiver pronto para trabalhar, anote o **número do tenant temporário** atribuído: se o usuário atribuído for usuario@azurehol3387.com, então seu número de tenant é 3387.
 
-- Los valores de conexión y base de datos en Microsoft Fabric. Para obtenerlos, sigue [esta](./setup/sql-parameters.md) guía.
+- Os valores de conexão e banco de dados no Microsoft Fabric. Para obtê-los, siga [este](./setup/sql-parameters.md) guia.
 
 
-### ↗️Despliegue
+### ↗️ Implantação
 
-Para desplegar los elementos requeridos en estos laboratorios, hemos preparado unos scripts con Bicep y PowerShell que nos permiten automatizar el proceso sin necesidad de entrar manualmente al portal de Azure o de Foundry a crear recursos manualmente. 
+Para implantar os elementos necessários nestes laboratórios, preparamos scripts com Bicep e PowerShell que permitem automatizar o processo sem precisar acessar manualmente o portal do Azure ou do Foundry para criar recursos. 
 
-Estos scripts pueden ser ejecutados desde nuestras máquinas locales. Pero, para poder ejecutar acciones, necesitamos autenticar nuestro proceso local con Azure para obtener dichos permisos. Por lo tanto, debemos comenzar autenticándonos en Azure desde la terminal.
+Esses scripts podem ser executados nas nossas máquinas locais. Mas, para poder executar ações, precisamos autenticar nosso processo local com o Azure para obter as permissões necessárias. Portanto, devemos começar autenticando no Azure pelo terminal.
 
-1. **Abrir una terminal en VS Code:** usa el menú **Terminal → New Terminal** o el atajo <kbd>Ctrl</kbd>+<kbd>`</kbd>.
+1. **Abrir um terminal no VS Code:** use o menu **Terminal → New Terminal** ou o atalho <kbd>Ctrl</kbd>+<kbd>`</kbd>.
 
-2. **Iniciar sesión con Azure CLI:**
+2. **Fazer login com Azure CLI:**
 
    ```powershell
    az login
    ```
-   Esto abrirá el navegador para que te autentiques con la cuenta de Azure que se te asignó para el laboratorio. Una vez completado, la terminal mostrará la lista de suscripciones disponibles.
+   Isso abrirá o navegador para que você se autentique com a conta do Azure atribuída para o laboratório. Após concluir, o terminal exibirá a lista de assinaturas disponíveis.
 
-3. **Verificar la suscripción activa:**
+3. **Verificar a assinatura ativa:**
 
    ```powershell
    az account show --output table
    ```
-   Confirma que la suscripción mostrada es la correcta para el taller. Si necesitas cambiarla:
+   Confirme que a assinatura exibida é a correta para o workshop. Se precisar alterá-la:
    
    ```powershell
-   az account set --subscription "nombre-o-id-de-la-suscripcion"
+   az account set --subscription "nome-ou-id-da-assinatura"
    ```
 
-### Ejecución del Script
+### Execução do Script
 
-Una vez confirmado el login con el usuario adecuado a tu suscripción de Azure, ejecuta: 
+Após confirmar o login com o usuário adequado para sua assinatura do Azure, execute: 
 
 ``` powershell
 cd labs\foundry\setup\op-flex
 .\deploy.ps1
 ```
 
-Después de esto, el script te preguntará interactivamente por los parámetros de tu despliegue. Presiona **Enter** para aceptar el valor por defecto en el caso de la zona y grupo de recursos. Aquí puedes ver un ejemplo de una ejecución:
+Após isso, o script solicitará interativamente os parâmetros da sua implantação. Pressione **Enter** para aceitar o valor padrão no caso da zona e grupo de recursos. Aqui você pode ver um exemplo de execução:
 
 ``` powershell
 TenantName: 3345
-Presiona Enter para default.
+Pressione Enter para o padrão.
 Location [eastus]: 
 ResourceGroupName [rg-contoso-retail]: 
-¿Deseas configurar ahora la conexión SQL de Fabric para Lab04? (s/N): s
-FabricWarehouseSqlEndpoint (sin protocolo, sin puerto): kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com
+Deseja configurar agora a conexão SQL do Fabric para o Lab04? (s/N): s
+FabricWarehouseSqlEndpoint (sem protocolo, sem porta): kqbvkknqlijebcyrtw2rgtsx2e-dvthxhg2tsuurev2kck26gww4q.database.fabric.microsoft.com
 FabricWarehouseDatabase: retail_sqldatabase_danrdol6ases3c-6d18d61e-43a5-4281-a754-b255fc9a6c9b
 ```
 
-La siguiente confirmación se te presentará:
+A seguinte confirmação será apresentada:
 
 ``` powershell
 ========================================
- Taller Multi-Agéntico - Despliegue
- Plan: Flex Consumption (FC1 / Linux)
+ Workshop Multi-Agêntico - Implantação
+ Plano: Flex Consumption (FC1 / Linux)
 ========================================
 
   Tenant:         3345
@@ -122,19 +122,19 @@ La siguiente confirmación se te presentará:
   Fabric DB:      retail_sqldatabase_danrdol6ases3c-6d18d61e-43a5-4281-a754-b255fc9a6c9b
 ```
 
-Luego de esto comenzarás a ver el progreso del despliegue y se te informará acerca de los recursos que se están desplegando. En menos de 10 minutos deberías tener todo tu ambiente de trabajo listo para la acción.
+Após isso, você começará a ver o progresso da implantação e será informado sobre os recursos que estão sendo criados. Em menos de 10 minutos seu ambiente de trabalho estará pronto.
 
 ---
 
-> 👁️**Revisar la salida.** Al finalizar, el script muestra los nombres y URLs de todos los recursos creados. Toma nota de estos valores, los necesitarás en los laboratorios!
+> 👁️ **Revisar a saída.** Ao finalizar, o script exibe os nomes e URLs de todos os recursos criados. Anote esses valores — você precisará deles nos laboratórios!
 
-> **Nota:** Si no proporcionas los parámetros de Fabric, el despliegue **no falla**. Omite la configuración de la conexión SQL y muestra un aviso para configurarla manualmente después. La conexión SQL solo se necesita para el Lab 5 (Julie) y la Function App `SqlExecutor`.
+> **Nota:** Se você não fornecer os parâmetros do Fabric, a implantação **não falha**. Ela omite a configuração da conexão SQL e exibe um aviso para configurá-la manualmente depois. A conexão SQL só é necessária para o Lab 4 (Julie) e a Function App `SqlExecutor`.
 
 ---
 
-### Verificación
+### Verificação
 
-Después del despliegue, verifica que los recursos se crearon correctamente:
+Após a implantação, verifique que os recursos foram criados corretamente:
 
 ```powershell
 az resource list --resource-group rg-contoso-retail --output table
@@ -142,104 +142,102 @@ az resource list --resource-group rg-contoso-retail --output table
 
 ---
 
-El resultado debería contener estos mismos elementos (los nombres pueden variar):
+O resultado deve conter estes elementos (os nomes podem variar):
 
-| Recurso             | Nombre                        | Descripción                                                  |
+| Recurso             | Nome                          | Descrição                                                    |
 | ------------------- | ----------------------------- | ------------------------------------------------------------ |
-| Storage Account     | `stcontosoretail{suffix}`     | Almacenamiento para la Function App                          |
-| App Service Plan    | `asp-contosoretail-{suffix}`  | Plan de hosting: Flex para Azure Functions                   |
-| Function App        | `func-contosoretail-{suffix}` | API de Contoso Retail (.NET 8, dotnet-isolated)              |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado de AI Foundry (AI Services + gestión de proyectos) con modelo GPT-4.1 desplegado |
-| AI Foundry Project  | `aip-contosoretail-{suffix}`  | Proyecto de trabajo dentro del Foundry Resource              |
+| Storage Account     | `stcontosoretail{suffix}`     | Armazenamento para a Function App                            |
+| App Service Plan    | `asp-contosoretail-{suffix}`  | Plano de hospedagem: Flex para Azure Functions               |
+| Function App        | `func-contosoretail-{suffix}` | API da Contoso Retail (.NET 8, dotnet-isolated)              |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado do AI Foundry (AI Services + gerenciamento de projetos) com modelo GPT-4.1 implantado |
+| AI Foundry Project  | `aip-contosoretail-{suffix}`  | Projeto de trabalho dentro do Foundry Resource               |
 
-> **Nota:** El `{suffix}` es un identificador único de 5 caracteres generado automáticamente a partir del número de tenant que suministraste. Esto garantiza que los nombres de los recursos no colisionen entre participantes.
+> **Nota:** O `{suffix}` é um identificador único de 5 caracteres gerado automaticamente a partir do número de tenant fornecido. Isso garante que os nomes dos recursos não colidam entre participantes.
 
-### Permisos RBAC para Microsoft Foundry
+### Permissões RBAC para o Microsoft Foundry
 
-Para que los agentes puedan crearse y ejecutarse en Microsoft Foundry, tu usuario necesita el rol **Cognitive Services User** sobre el recurso de AI Services. Este rol incluye el data action `Microsoft.CognitiveServices/*` necesario para operaciones de agentes. Si no lo tienes, obtendrás un error `PermissionDenied` al intentar crear agentes.
+Para que os agentes possam ser criados e executados no Microsoft Foundry, seu usuário precisa do role **Cognitive Services User** sobre o recurso de AI Services. Este role inclui o data action `Microsoft.CognitiveServices/*` necessário para operações de agentes. Se não o tiver, você receberá um erro `PermissionDenied` ao tentar criar agentes.
 
-Ejecuta los siguientes comandos para asignar el rol (reemplaza `{suffix}` con tu sufijo de 5 caracteres):
+Execute os seguintes comandos para atribuir o role (substitua `{suffix}` pelo seu sufixo de 5 caracteres):
 
 ```powershell
-# Obtener tu nombre de usuario (UPN)
+# Obter seu nome de usuário (UPN)
 $upn = az account show --query "user.name" -o tsv
 
-# Asignar el rol Cognitive Services User sobre el recurso de AI Services
+# Atribuir o role Cognitive Services User sobre o recurso de AI Services
 az role assignment create `
     --assignee $upn `
     --role "Cognitive Services User" `
     --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/ais-contosoretail-{suffix}"
 ```
 
-> **Nota:** Si no conoces el nombre exacto del recurso, puedes averiguarlo con:
+> **Nota:** Se não souber o nome exato do recurso, você pode verificá-lo com:
 > ```powershell
 > az cognitiveservices account list --resource-group rg-contoso-retail --query "[].name" -o tsv
 > ```
 >
-> La propagación de RBAC puede tardar hasta 1 minuto. Espera antes de intentar crear agentes.
+> A propagação do RBAC pode levar até 1 minuto. Aguarde antes de tentar criar agentes.
 
 ---
 
-## Estructura del código
+## Estrutura do código
 
 ```
 labs/foundry/
-├── README.md                              ← Este archivo
-├── lab04-anders-executor-agent.md          ← Lab 4: Agente Anders
-├── lab05-julie-planner-agent.md           ← Lab 5: Agente Julie
+├── README.md                              ← Este arquivo
+├── lab03-anders-executor-agent.md         ← Lab 3: Agente Anders
+├── lab04-julie-planner-agent.md           ← Lab 4: Agente Julie
 ├── setup/
-│   ├── op-flex/                           ← ⭐ Opción recomendada (Flex Consumption / Linux)
+│   ├── op-flex/                           ← ⭐ Opção recomendada (Flex Consumption / Linux)
 │   │   ├── main.bicep
 │   │   ├── storage-rbac.bicep
 │   │   └── deploy.ps1
-│   └── op-consumption/                    ← Opción clásica (Consumption Y1 / Windows)
+│   └── op-consumption/                    ← Opção clássica (Consumption Y1 / Windows)
 │       ├── main.bicep
 │       ├── storage-rbac.bicep
 │       └── deploy.ps1
 └── code/
     ├── api/
     │   └── FxContosoRetail/               ← Azure Function (API)
-    │       ├── FxContosoRetail.cs          ← Endpoints: HolaMundo, OrdersReporter, SqlExecutor
+    │       ├── FxContosoRetail.cs         ← Endpoints: OlaMundo, OrdersReporter, SqlExecutor
     │       ├── Program.cs
     │       ├── Models/
     │       └── ...
     ├── agents/
     │   ├── AndersAgent/                   ← Console App: Agente Anders (kind: prompt + OpenAPI tool)
-    │   │   ├── ms-foundry/                ← Versión Responses API (recomendada)
+    │   │   ├── ms-foundry/                ← Versão Responses API (recomendada)
     │   │   │   ├── Program.cs
     │   │   │   └── appsettings.json
-    │   │   └── ai-foundry/                ← Versión Persistent Agents API (alternativa)
+    │   │   └── ai-foundry/                ← Versão Persistent Agents API (alternativa)
     │   │       └── ...
     │   └── JulieAgent/                    ← Console App: Agente Julie (kind: workflow)
-    │       ├── Program.cs                 ← Crea los 3 agentes + chat con Julie
-    │       ├── JulieAgent.cs              ← Julie: workflow con 3 tools (SqlAgent, MarketingAgent, OpenAPI)
-    │       ├── SqlAgent.cs                ← Sub-agente: genera T-SQL a partir de lenguaje natural
-    │       ├── MarketingAgent.cs           ← Sub-agente: genera mensajes con Bing Search
-    │       ├── db-structure.txt            ← DDL de la BD inyectada en SqlAgent
+    │       ├── Program.cs                 ← Cria os 3 agentes + chat com Julie
+    │       ├── JulieAgent.cs              ← Julie: workflow com 3 tools (SqlAgent, MarketingAgent, OpenAPI)
+    │       ├── SqlAgent.cs                ← Sub-agente: gera T-SQL a partir de linguagem natural
+    │       ├── MarketingAgent.cs          ← Sub-agente: gera mensagens com Bing Search
+    │       ├── db-structure.txt           ← DDL do BD injetado no SqlAgent
     │       └── appsettings.json
     └── tests/
-        ├── bruno/                         ← Colección Bruno (REST client)
+        ├── bruno/                         ← Coleção Bruno (REST client)
         │   ├── bruno.json
         │   ├── OrdersReporter.bru
         │   └── environments/
         │       └── local.bru
         └── http/
-            └── FxContosoRetail.http       ← Archivo .http (VS Code REST Client)
+            └── FxContosoRetail.http       ← Arquivo .http (VS Code REST Client)
 ```
 
 ---
 
-## Laboratorios
+## Laboratórios
 
-| Lab   | Archivo                                                   | Descripción                                                  |
-| ----- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Lab 4 | [Anders — Executor Agent](lab04-anders-executor-agent.md) | Crear el agente ejecutor que genera reportes e interactúa con servicios de Contoso Retail. |
-| Lab 5 | [Julie — Planner Agent](lab05-julie-planner-agent.md)     | Crear el agente orquestador de campañas de marketing usando el patrón workflow con sub-agentes (SqlAgent, MarketingAgent) y herramienta OpenAPI. |
+| Lab   | Arquivo                                                         | Descrição                                                    |
+| ----- | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| Lab 3 | [Anders — Executor Agent](lab03-anders-executor-agent.md)       | Criar o agente executor que gera relatórios e interage com serviços da Contoso Retail. |
+| Lab 4 | [Julie — Planner Agent](lab04-julie-planner-agent.md)           | Criar o agente orquestrador de campanhas de marketing usando o padrão workflow com sub-agentes (SqlAgent, MarketingAgent) e ferramenta OpenAPI. |
 
 ---
 
-## 
+## Próximo passo
 
-## Siguiente paso
-
-Una vez completado el setup, continúa con el [Lab 4 — Anders (Executor Agent)](lab04-anders-executor-agent.md).
+Após concluir o setup, continue com o [Lab 3 — Anders (Executor Agent)](lab03-anders-executor-agent.md).

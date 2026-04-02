@@ -115,7 +115,7 @@ O workshop está dividido em laboratórios independentes, porém conectados, org
 
 ### 2. Laboratórios de Azure AI Foundry
 
-- [Configuração de infraestrutura do Foundry](./labs/foundry/README.md)
+- [Configuração de infraestrutura do Foundry](./labs/foundry/codespaces-setup.md)
 - [Lab 3 – Agente Anders: suporte a OpenAPI, implantação da Function App e execução do agente executor](./labs/foundry/lab03-anders-executor-agent.md)
 - [Lab 4 – Agente Julie: workflow agent com subagentes SqlAgent e MarketingAgent](./labs/foundry/lab04-julie-planner-agent.md)
 

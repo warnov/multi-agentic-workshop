@@ -30,6 +30,7 @@ var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
 var functionAppBaseUrl = config["FunctionAppBaseUrl"]
     ?? throw new InvalidOperationException("Falta FunctionAppBaseUrl en appsettings.json");
+var tenantId = config["TenantId"];
 var agentName = "Anders";
 
 // =====================================================================
@@ -92,9 +93,15 @@ var andersInstructions = """
     """;
 
 // Cliente del proyecto Foundry (nueva experiencia)
+// Si TenantId está configurado, se usa explícitamente para evitar conflictos
+// en máquinas con múltiples tenants de Azure (error 400 "Token tenant does not match").
+var credentialOptions = new DefaultAzureCredentialOptions();
+if (!string.IsNullOrWhiteSpace(tenantId))
+    credentialOptions.TenantId = tenantId;
+
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
-    tokenProvider: new DefaultAzureCredential());
+    tokenProvider: new DefaultAzureCredential(credentialOptions));
 
 // Verificar si el agente ya existe
 bool shouldCreateAgent = true;
