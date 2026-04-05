@@ -98,7 +98,7 @@ Você deve ver `PowerShell 7.x.x`.
 Se os três responderem corretamente, restaure as dependências .NET do workshop:
 
 ```bash
-dotnet restore pt/labs/foundry/code/taller-multi-agentic.sln
+dotnet restore pt/labs/foundry/code/workshop-multi-agentic.sln
 ```
 
 O ambiente está pronto para os próximos passos.
@@ -165,7 +165,7 @@ Para obtê-los no portal do Fabric, siga o guia [sql-parameters.md](./setup/sql-
 No terminal do Codespace, navegue até a pasta do script:
 
 ```bash
-cd /workspaces/taller-multi-agentic/pt/labs/foundry/setup/op-flex
+cd /workspaces/multi-agentic-workshop/pt/labs/foundry/setup/op-flex
 ```
 
 Execute o script de implantação (usando `pwsh` para iniciar o PowerShell 7):

@@ -98,7 +98,7 @@ You should see `PowerShell 7.x.x`.
 If all three respond correctly, restore the workshop .NET dependencies:
 
 ```bash
-dotnet restore en/labs/foundry/code/taller-multi-agentic.sln
+dotnet restore en/labs/foundry/code/workshop-multi-agentic.sln
 ```
 
 The environment is ready for the next steps.
