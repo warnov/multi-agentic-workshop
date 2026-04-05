@@ -70,7 +70,7 @@ O GitHub Codespaces fornece um ambiente de desenvolvimento completo na nuvem, pr
 4. Aguarde entre **2 e 4 minutos** enquanto o GitHub constrói o ambiente. Você verá uma tela de carregamento com logs de construção. **Isso só ocorre na primeira vez** — as sessões seguintes iniciam em segundos porque o ambiente fica salvo.
 
 5. Quando o ambiente estiver pronto, o **VS Code abrirá no navegador** com todos os arquivos do repositório já disponíveis no painel esquerdo. Se a conexão pelo navegador for problemática, recomenda-se abrir o Codespace no VS Code local, indicando isso na seção Code do repositório no GitHub:  
-   ![Instruções para abrir Codespace no VS Code local](../../assets/codespaces-instructions.png)
+   ![Instruções para abrir Codespace no VS Code local](../../../assets/codespaces-instructions.png)
 
 > 💡 **Prefere o VS Code desktop?** Se você tem o VS Code instalado com a extensão **GitHub Codespaces**, clique no ícone `><` (canto inferior esquerdo) → *Connect to Codespace* para se conectar pelo VS Code local sem perder o ambiente na nuvem.
 

@@ -70,7 +70,7 @@ GitHub Codespaces provides a complete cloud-based development environment, pre-c
 4. Wait **2 to 4 minutes** while GitHub builds the environment. You will see a loading screen with build logs. **This only happens the first time** — subsequent sessions start in seconds because the environment is saved.
 
 5. When the environment is ready, **VS Code will open in the browser** with all repository files already available in the left panel. If the browser connection is problematic, you can launch the Codespace in your local VS Code from the Code section of the repo on GitHub:  
-   ![Instructions to open Codespace in local VS Code](../../assets/codespaces-instructions.png)
+   ![Instructions to open Codespace in local VS Code](../../../assets/codespaces-instructions.png)
 
 > 💡 **Prefer VS Code desktop?** If you have VS Code installed with the **GitHub Codespaces** extension, click the `><` icon (bottom-left corner) → *Connect to Codespace* to connect from local VS Code without losing the cloud environment.
 
