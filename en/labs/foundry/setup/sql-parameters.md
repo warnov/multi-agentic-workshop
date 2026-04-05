@@ -8,7 +8,7 @@ If you are following all the workshop labs in order, these values come from the 
 
 In the Fabric side menu, click **Workspaces** and select your workspace. Locate the item of type **SQL database** (e.g. `db_retail`) and open it.
 
-<img src="../../../assets/sqlstep1.png" alt="Step 1 - Navigate to workspace and open db_retail" align="left" />
+<img src="../../../../assets/sqlstep1.png" alt="Step 1 - Navigate to workspace and open db_retail" align="left" />
 
 <br clear="left" />
 
@@ -18,7 +18,7 @@ In the Fabric side menu, click **Workspaces** and select your workspace. Locate 
 
 Inside the database, click the **settings** (gear) icon in the top toolbar.
 
-<img src="../../../assets/sqlstep2.png" alt="Step 2 - Open settings" align="left" />
+<img src="../../../../assets/sqlstep2.png" alt="Step 2 - Open settings" align="left" />
 
 <br clear="left" />
 
@@ -35,7 +35,7 @@ In the settings panel, select **Connection strings** and find the **ADO.NET** st
 Data Source=xxxxx.database.fabric.microsoft.com,1433;Initial Catalog=retail_sqldatabase_xxx;...
 ```
 
-<img src="../../../assets/sqlstep3.png" alt="Step 3 - Copy connection string" align="left" />
+<img src="../../../../assets/sqlstep3.png" alt="Step 3 - Copy connection string" align="left" />
 
 <br clear="left" />
 

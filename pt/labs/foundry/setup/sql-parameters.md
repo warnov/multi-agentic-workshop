@@ -8,7 +8,7 @@ Se você está seguindo todos os laboratórios do workshop em ordem, esses valor
 
 No menu lateral do Fabric, clique em **Workspaces** e selecione seu workspace. Localize o item do tipo **SQL database** (por exemplo, `db_retail`) e abra-o.
 
-<img src="../../../assets/sqlstep1.png" alt="Passo 1 - Navegar ao workspace e abrir db_retail" align="left" />
+<img src="../../../../assets/sqlstep1.png" alt="Passo 1 - Navegar ao workspace e abrir db_retail" align="left" />
 
 <br clear="left" />
 
@@ -18,7 +18,7 @@ No menu lateral do Fabric, clique em **Workspaces** e selecione seu workspace. L
 
 Dentro do banco de dados, clique no ícone de **configurações** (engrenagem) na barra de ferramentas superior.
 
-<img src="../../../assets/sqlstep2.png" alt="Passo 2 - Abrir configurações" align="left" />
+<img src="../../../../assets/sqlstep2.png" alt="Passo 2 - Abrir configurações" align="left" />
 
 <br clear="left" />
 
@@ -35,7 +35,7 @@ No painel de configurações, selecione **Connection strings** e localize a cade
 Data Source=xxxxx.database.fabric.microsoft.com,1433;Initial Catalog=retail_sqldatabase_xxx;...
 ```
 
-<img src="../../../assets/sqlstep3.png" alt="Passo 3 - Copiar connection string" align="left" />
+<img src="../../../../assets/sqlstep3.png" alt="Passo 3 - Copiar connection string" align="left" />
 
 <br clear="left" />
 
