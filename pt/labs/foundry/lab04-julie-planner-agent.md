@@ -8,7 +8,7 @@ Neste laboratório você vai construir e validar a Julie como agente planejador 
 
 Este laboratório pressupõe que você já concluiu:
 
-- A implantação base de infraestrutura do Foundry (`labs/foundry/README.md`)
+- A implantação base de infraestrutura do Foundry (`pt/labs/foundry/README.md`)
 - O fluxo de dados no Fabric do **Lab 1** (`../fabric/lab01-data-setup.md`)
 
 ## Checklist rápido
@@ -82,7 +82,7 @@ ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-siwhb];
 
 ## Arquitetura do projeto Julie (detalhes)
 
-Esta solução está organizada em 4 classes principais dentro de `labs/foundry/code/agents/JulieAgent/`:
+Esta solução está organizada em 4 classes principais dentro de `pt/labs/foundry/code/agents/JulieAgent/`:
 
 - `SqlAgent.cs`: define o agente que transforma linguagem natural em T-SQL.
 - `MarketingAgent.cs`: define o agente que redige mensagens personalizadas com suporte do Bing.

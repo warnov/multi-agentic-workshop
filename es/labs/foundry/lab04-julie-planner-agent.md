@@ -52,7 +52,7 @@ En este laboratorio construirás y validarás a Julie como agente planner de cam
 
 Este laboratorio asume que ya completaste:
 
-- El despliegue base de infraestructura de Foundry (`labs/foundry/README.md`)
+- El despliegue base de infraestructura de Foundry (`es/labs/foundry/README.md`)
 - El flujo de datos en Fabric del **Lab 1** (`../fabric/lab01-data-setup.md`)
 
 ## Checklist rápido
@@ -126,7 +126,7 @@ ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-siwhb];
 
 ## Arquitectura del proyecto Julie (detalle)
 
-Esta solución está organizada en 4 clases principales dentro de `labs/foundry/code/agents/JulieAgent/`:
+Esta solución está organizada en 4 clases principales dentro de `es/labs/foundry/code/agents/JulieAgent/`:
 
 - `SqlAgent.cs`: define el agente que transforma lenguaje natural en T-SQL.
 - `MarketingAgent.cs`: define el agente que redacta mensajes personalizados apoyado en Bing.
@@ -417,7 +417,7 @@ Con esto, el código local se limita a orquestar infraestructura de agente; la e
 
 ### Paso 1: Configurar appsettings.json
 
-Abre `labs/foundry/code/agents/JulieAgent/appsettings.json` y reemplaza todos los valores `<suffix>` y `<subscription-id>` con los outputs del despliegue (Paso 8 del setup):
+Abre `es/labs/foundry/code/agents/JulieAgent/appsettings.json` y reemplaza todos los valores `<suffix>` y `<subscription-id>` con los outputs del despliegue (Paso 8 del setup):
 
 ```json
 {
@@ -448,7 +448,7 @@ Antes de ejecutar, confirma que ya completaste la sección **Configuración manu
 Desde la terminal, en la raíz del repositorio:
 
 ```bash
-cd /workspaces/taller-multi-agentic/labs/foundry/code/agents/JulieAgent
+cd es/labs/foundry/code/agents/JulieAgent
 dotnet run
 ```
 

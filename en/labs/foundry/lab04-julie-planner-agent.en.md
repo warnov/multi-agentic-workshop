@@ -8,7 +8,7 @@ In this lab you will build and validate Julie as a marketing campaign planner ag
 
 This lab assumes you have already completed:
 
-- The base Foundry infrastructure deployment (`labs/foundry/codespaces-setup.md`)
+- The base Foundry infrastructure deployment (`en/labs/foundry/codespaces-setup.md`)
 - The Fabric data flow from **Lab 1** (`../fabric/lab01-data-setup.en.md`)
 
 ## Quick checklist
@@ -80,7 +80,7 @@ ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-siwhb];
 
 ## Julie project architecture (detailed)
 
-This solution is organized into 4 main classes under `labs/foundry/code/agents/JulieAgent/`:
+This solution is organized into 4 main classes under `en/labs/foundry/code/agents/JulieAgent/`:
 
 - `SqlAgent.cs`: defines the agent that transforms natural language into T-SQL.
 - `MarketingAgent.cs`: defines the agent that writes personalized messages supported by Bing.

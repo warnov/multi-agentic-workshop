@@ -129,7 +129,7 @@ Additionally, validate that `OrdersReporter` and `SqlExecutor` have OpenAPI attr
 ### Step 3: Verify build
 
 ```powershell
-cd labs\foundry\code\api\FxContosoRetail
+cd en\labs\foundry\code\api\FxContosoRetail
 dotnet build
 ```
 
@@ -207,7 +207,7 @@ If you want a full redeploy (infra + publish) using the setup:
 
 ```powershell
 # Flex Consumption
-cd labs\foundry\setup\op-flex
+cd en\labs\foundry\setup\op-flex
 .\deploy.ps1 `
     -TenantName "<tu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -218,7 +218,7 @@ cd labs\foundry\setup\op-flex
 
 ```powershell
 # Consumption (Y1)
-cd labs\foundry\setup\op-consumption
+cd en\labs\foundry\setup\op-consumption
 .\deploy.ps1 `
     -TenantName "<tu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -234,7 +234,7 @@ cd labs\foundry\setup\op-consumption
 If you have [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) installed, redeployment is a single command:
 
 ```powershell
-cd labs\foundry\code\api\FxContosoRetail
+cd en\labs\foundry\code\api\FxContosoRetail
 func azure functionapp publish func-contosoretail-<suffix>
 ```
 
@@ -246,7 +246,7 @@ If you do not have the `func` CLI, you can publish manually using `az`:
 
 ```powershell
 # 1. Build the project
-cd labs\foundry\code\api\FxContosoRetail
+cd en\labs\foundry\code\api\FxContosoRetail
 dotnet publish --configuration Release --output bin\publish
 
 # 2. Create the zip package
@@ -295,7 +295,7 @@ From the Swagger UI interface you can explore the endpoints and test them intera
 
 ## 3.4 — The Anders agent: Two SDK versions
 
-The Anders agent implementation is provided in **two separate versions**, each located under `labs/foundry/code/agents/AndersAgent/`:
+The Anders agent implementation is provided in **two separate versions**, each located under `en/labs/foundry/code/agents/AndersAgent/`:
 
 | Folder | SDK | API paradigm | Status |
 |--------|-----|--------------|--------|
@@ -328,7 +328,7 @@ The `ai-foundry/` version is kept in this workshop for **backward compatibility*
 
 ### Understanding the code (version `ms-foundry/` — recommended)
 
-Open the file `labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` and note that it is organized into **3 phases**:
+Open the file `en/labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` and note that it is organized into **3 phases**:
 
 #### Phase 1 — Download the OpenAPI specification
 
@@ -447,7 +447,7 @@ When the user types `exit`, the chat loop ends. The agent **persists** in Foundr
 
 ### Step 1: Configure `appsettings.json`
 
-Open the file `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` and replace the values with those from your environment:
+Open the file `en/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` and replace the values with those from your environment:
 
 ```json
 {
@@ -465,7 +465,7 @@ Open the file `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json`
 ### Step 2: Build and run
 
 ```powershell
-cd labs\foundry\code\agents\AndersAgent\ms-foundry
+cd en\labs\foundry\code\agents\AndersAgent\ms-foundry
 dotnet build
 ```
 
@@ -549,7 +549,7 @@ If it returns `Disabled`, that is the root cause.
 A convenience script is included in the repository:
 
 ```powershell
-cd labs/foundry/setup
+cd en/labs/foundry/setup
 .\unlock-storage.ps1
 ```
 

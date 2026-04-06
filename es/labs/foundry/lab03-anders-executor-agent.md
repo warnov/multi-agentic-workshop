@@ -56,14 +56,14 @@ En la versión actual del taller, la Function App `FxContosoRetail` **ya incluye
 
 ### Paso 1: Verificar paquetes NuGet
 
-Abre [`labs/foundry/code/api/FxContosoRetail/FxContosoRetail.csproj`](../code/api/FxContosoRetail/FxContosoRetail.csproj) y confirma que existen estas referencias:
+Abre [`es/labs/foundry/code/api/FxContosoRetail/FxContosoRetail.csproj`](../code/api/FxContosoRetail/FxContosoRetail.csproj) y confirma que existen estas referencias:
 
 - `Microsoft.Azure.Functions.Worker.Extensions.OpenApi`
 - `Microsoft.Data.SqlClient`
 
 ### Paso 2: Verificar endpoints expuestos
 
-Abre [`labs/foundry/code/api/FxContosoRetail/FxContosoRetail.cs`](../code/api/FxContosoRetail/FxContosoRetail.cs) y confirma que existen estos endpoints:
+Abre [`es/labs/foundry/code/api/FxContosoRetail/FxContosoRetail.cs`](../code/api/FxContosoRetail/FxContosoRetail.cs) y confirma que existen estos endpoints:
 
 - `HolaMundo`
 - `OrdersReporter`
@@ -130,7 +130,7 @@ Desde la interfaz de Swagger UI puedes explorar los endpoints y probarlos intera
 
 ## 3.3 — El agente Anders: Dos versiones de SDK
 
-La implementación del agente Anders se proporciona en **dos versiones separadas**, cada una ubicada bajo `labs/foundry/code/agents/AndersAgent/`:
+La implementación del agente Anders se proporciona en **dos versiones separadas**, cada una ubicada bajo `es/labs/foundry/code/agents/AndersAgent/`:
 
 | Carpeta | SDK | Paradigma de API | Estado |
 |---------|-----|------------------|--------|
@@ -163,7 +163,7 @@ La versión `ai-foundry/` se conserva en este taller por **retrocompatibilidad**
 
 ### Entendiendo el código (versión `ms-foundry/` — recomendada)
 
-Abre el archivo `labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` y observa que está organizado en **3 fases**:
+Abre el archivo `es/labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` y observa que está organizado en **3 fases**:
 
 #### Fase 1 — Descargar la especificación OpenAPI
 
@@ -282,7 +282,7 @@ Cuando el usuario escribe `salir`, el loop de chat termina. El agente **persiste
 
 ### Paso 1: Configurar `appsettings.json`
 
-Abre el archivo `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` y reemplaza los valores con los de tu entorno:
+Abre el archivo `es/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json` y reemplaza los valores con los de tu entorno:
 
 ```json
 {
@@ -300,7 +300,7 @@ Abre el archivo `labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.jso
 ### Paso 2: Compilar y ejecutar
 
 ```bash
-cd /workspaces/taller-multi-agentic/labs/foundry/code/agents/AndersAgent/ms-foundry
+cd es/labs/foundry/code/agents/AndersAgent/ms-foundry
 dotnet build
 ```
 
@@ -384,7 +384,7 @@ Si retorna `Disabled`, esa es la causa raíz.
 Se incluye un script de conveniencia en el repositorio:
 
 ```bash
-cd /workspaces/taller-multi-agentic/labs/foundry/setup
+cd es/labs/foundry/setup
 pwsh ./unlock-storage.ps1
 ```
 
