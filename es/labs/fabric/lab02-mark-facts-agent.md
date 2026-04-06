@@ -16,7 +16,8 @@ Al completar este laboratorio lograrás:
 1. Crear el agente de datos llamado "Mark".
 2. Revisión y prueba de las respuestas a preguntas.
 3. Publicación del agente de datos.
-4. Usar el modelo Semántico como Fuente de datos del Data Agent
+4. Usar el modelo Semántico como Fuente de datos del Data Agent (Opcional)
+5. Challenge
 
 En la siguiente sección, se presentan los pasos del laboratorio:
 
@@ -252,3 +253,6 @@ ii. Eliminar la instrucciones de la sección "Agent Instructions"
 
 ### f. Si deseas puedes publicar una nueva versión del data agent o dejar la versión construida en el punto anterior
 
+## 5. Challenge
+
+Ir a [Challenge ](Challenge.md)
