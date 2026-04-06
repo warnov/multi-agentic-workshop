@@ -181,7 +181,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'AzureWebJobsStorage__tableServiceUri', value: 'https://${storageAccountName}.table.${environment().suffixes.storage}' }
         { name: 'StorageAccountName', value: storageAccountName }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
-        { name: 'BillTemplate', value: 'https://raw.githubusercontent.com/warnov/multi-agentic-workshop/refs/heads/main/assets/bill-template.html' }
+        { name: 'BillTemplate', value: 'https://raw.githubusercontent.com/warnov/multi-agentic-workshop/refs/heads/master/assets/bill-template.en.html' }
       ], optionalFabricSettings)
     }
   }

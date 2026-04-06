@@ -158,7 +158,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION', value: '1' }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'dotnet-isolated' }
-        { name: 'BillTemplate', value: 'https://raw.githubusercontent.com/warnov/taller-multi-agentic/refs/heads/main/assets/bill-template.html' }
+        { name: 'BillTemplate', value: 'https://raw.githubusercontent.com/warnov/multi-agentic-workshop/refs/heads/master/assets/bill-template.html' }
       ], optionalFabricSettings)
     }
   }
