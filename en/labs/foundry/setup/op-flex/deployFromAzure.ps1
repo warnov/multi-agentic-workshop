@@ -31,7 +31,10 @@ param(
     [string]$FabricWarehouseSqlEndpoint = "",
 
     [Parameter(Mandatory = $false, HelpMessage = "Fabric Warehouse database name.")]
-    [string]$FabricWarehouseDatabase = ""
+    [string]$FabricWarehouseDatabase = "",
+
+    [Parameter(Mandatory = $false, HelpMessage = "GPT deployment capacity in thousands of tokens per minute (default: 30).")]
+    [int]$GptDeploymentCapacity = 30
 )
 
 $ErrorActionPreference = "Stop"
@@ -116,7 +119,8 @@ Write-Host "[2/5] Creating Resource Group '$ResourceGroupName'..." -ForegroundCo
 az group create --name $ResourceGroupName --location $Location --output none
 Write-Host "  Resource Group ready." -ForegroundColor Gray
 
-# Unique suffix derived from subscription ID (matches what main.bicep calculates)
+# Unique suffix used only to probe for an existing Function App name before deployment.
+# NOTE: Bicep derives the real suffix via uniqueString(subscriptionId), which produces a different value.
 $suffixForNames = $account.id.Replace('-', '').Substring(0, 5).ToLower()
 
 if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffixForNames)) {
@@ -136,10 +140,6 @@ if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffix
 # --- 3. Deploy Bicep ---
 Write-Host "[3/5] Deploying infrastructure..." -ForegroundColor Green
 
-# Suffix is calculated the same way as in main.bicep: first 5 hex chars of the subscription ID (without dashes)
-$suffixResult = $account.id.Replace('-', '').Substring(0, 5).ToLower()
-Write-Host "  Suffix:         $suffixResult" -ForegroundColor Yellow
-
 Write-Host "" -ForegroundColor Gray
 Write-Host "  This may take ~5 minutes." -ForegroundColor Yellow
 Write-Host ""
@@ -157,7 +157,7 @@ if (-not (Test-Path $templateFile)) {
 az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $templateFile `
-    --parameters location=$Location tenantName=$TenantName fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
+    --parameters location=$Location tenantName=$TenantName gptDeploymentCapacity=$GptDeploymentCapacity fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
     --name $deploymentName `
     --no-wait `
     --output none
@@ -249,6 +249,10 @@ $result = az deployment group show `
 
 $outputs = $result.properties.outputs
 $functionAppName = $outputs.functionAppName.value
+
+Write-Host ""
+Write-Host "  Unique suffix (Bicep): $($outputs.suffix.value)" -ForegroundColor Cyan
+Write-Host ""
 
 # --- 4. Build and publish Function App code ---
 Write-Host "[4/5] Building FxContosoRetail..." -ForegroundColor Green
@@ -347,7 +351,7 @@ Write-Host "  API OrdersReporter:          $apiUrl" -ForegroundColor White
 Write-Host "  Foundry Project Endpoint:    $($outputs.foundryProjectEndpoint.value)" -ForegroundColor White
 Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" -ForegroundColor White
 Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
-Write-Host "  Bing Connection Name (Julie): $($outputs.bingConnectionName.value)" -ForegroundColor White
+Write-Host "  Bing Connection Id (Julie):  $($outputs.bingConnectionName.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
     Write-Host "  Fabric SQL Connection:       updated from parameters" -ForegroundColor White
 }
