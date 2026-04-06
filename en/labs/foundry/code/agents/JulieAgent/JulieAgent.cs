@@ -1,5 +1,5 @@
 // =====================================================================
-//  JulieAgent — Campaign marketing orchestrator agent
+//  JulieAgent — Marketing campaign orchestrator agent
 //
 //  Julie is a workflow-type agent that coordinates:
 //  1. SqlAgent (type: agent) — generates T-SQL from natural language
@@ -10,7 +10,7 @@
 //
 //  Tools:
 //    - SqlAgent        → agent that generates the T-SQL query
-//    - SqlExecutor     → OpenAPI tool that executes the SQL against the DB
+//    - SqlExecutor     → OpenAPI tool that executes SQL against the DB
 //    - MarketingAgent  → agent that generates marketing messages
 //
 //  The Function App URL is configured in appsettings.json
@@ -36,8 +36,8 @@ public static class JulieOrchestrator
 
         When you receive a campaign request, follow these steps:
 
-        1. EXTRACTION: Analyze the user's prompt and extract the description
-           of the customer segment. Summarize that description in a clear phrase.
+        1. EXTRACTION: Analyze the user prompt and extract the description
+           of the customer segment. Summarize that description into a clear sentence.
 
         2. SQL GENERATION: Invoke SqlAgent, passing it the segment description.
            SqlAgent will return a T-SQL query.
@@ -89,31 +89,29 @@ public static class JulieOrchestrator
         _ = openApiSpec;
 
         var workflowYaml = $$"""
-kind: Workflow
+kind: workflow
 trigger:
-  kind: OnActivity
-workflow:
+  kind: OnConversationStart
+  id: julie_workflow
   actions:
     - kind: InvokeAzureAgent
       id: sql_step
+      conversationId: =System.ConversationId
       agent:
         name: {{SqlAgent.Name}}
-      conversationId: =System.ConversationId
-      input:
-        messages: =System.LastMessage
-      output:
-        messages: Local.SqlMessages
-
     - kind: InvokeAzureAgent
       id: marketing_step
+      conversationId: =System.ConversationId
       agent:
         name: {{MarketingAgent.Name}}
-      conversationId: =System.ConversationId
-      input:
-        messages: =Local.SqlMessages
-      output:
-        autoSend: true
+    - kind: EndConversation
+      id: end_conversation
+name: {{Name}}
 """;
+
+        Console.WriteLine("[DEBUG] Workflow YAML to be sent to Foundry:");
+        Console.WriteLine(workflowYaml);
+        Console.WriteLine("[DEBUG] --- end YAML ---");
 
         return ProjectsOpenAIModelFactory.WorkflowAgentDefinition(workflowYaml: workflowYaml);
     }

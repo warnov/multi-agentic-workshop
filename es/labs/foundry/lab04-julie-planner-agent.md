@@ -161,36 +161,30 @@ La definición se construye con `WorkflowAgentDefinition` y un `workflowYaml` CS
 
 ```csharp
 var workflowYaml = $$"""
-kind: Workflow
+kind: workflow
 trigger:
-	kind: OnActivity
-workflow:
-	actions:
-		- kind: InvokeAzureAgent
-			id: sql_step
-			agent:
-				name: {{SqlAgent.Name}}
-			conversationId: =System.ConversationId
-			input:
-				messages: =System.LastMessage
-			output:
-				messages: Local.SqlMessages
-
-		- kind: InvokeAzureAgent
-			id: marketing_step
-			agent:
-				name: {{MarketingAgent.Name}}
-			conversationId: =System.ConversationId
-			input:
-				messages: =Local.SqlMessages
-			output:
-				autoSend: true
+  kind: OnConversationStart
+  id: julie_workflow
+  actions:
+    - kind: InvokeAzureAgent
+      id: sql_step
+      conversationId: =System.ConversationId
+      agent:
+        name: {{SqlAgent.Name}}
+    - kind: InvokeAzureAgent
+      id: marketing_step
+      conversationId: =System.ConversationId
+      agent:
+        name: {{MarketingAgent.Name}}
+    - kind: EndConversation
+      id: end_conversation
+name: {{Name}}
 """;
 
 return ProjectsOpenAIModelFactory.WorkflowAgentDefinition(workflowYaml: workflowYaml);
 ```
 
-> Nota técnica: Julie queda **workflow-only** y orquesta sub-agentes mediante acciones `InvokeAzureAgent` del YAML CSDL; la ejecución SQL por OpenAPI se encapsula en `SqlAgent` cuando la spec está disponible.
+> Nota técnica: Julie queda **workflow-only** y orquesta sub-agentes mediante acciones `InvokeAzureAgent` del YAML CSDL; la ejecución SQL por OpenAPI se encapsula en `SqlAgent` cuando la spec está disponible. El trigger `OnConversationStart` con `EndConversation` define un flujo secuencial que ejecuta los dos pasos y cierra la conversación del workflow.
 
 La orquestación actual usa 2 sub-agentes:
 
@@ -326,12 +320,16 @@ Cuando recibas una solicitud de campaña sigues estos pasos:
 2. GENERACIÓN SQL: Invoca a SqlAgent pasándole la descripción del segmento.
 	SqlAgent te retornará una consulta T-SQL.
 
-3. MARKETING PERSONALIZADO: Invoca a
+3. EJECUCIÓN SQL: Envía el T-SQL a tu herramienta OpenAPI (SqlExecutor)
+	para ejecutarlo contra la base de datos. La herramienta retornará los
+	resultados como datos de clientes.
+
+4. MARKETING PERSONALIZADO: Para CADA cliente retornado, invoca a
 	MarketingAgent pasándole el nombre del cliente y su categoría favorita.
 	MarketingAgent buscará eventos relevantes en Bing y generará un mensaje
 	personalizado.
 
-4. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
+5. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
 	resultado como un JSON de campaña con el siguiente formato:
 
 ```json

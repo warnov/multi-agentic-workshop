@@ -89,31 +89,29 @@ public static class JulieOrchestrator
         _ = openApiSpec;
 
         var workflowYaml = $$"""
-kind: Workflow
+kind: workflow
 trigger:
-  kind: OnActivity
-workflow:
+  kind: OnConversationStart
+  id: julie_workflow
   actions:
     - kind: InvokeAzureAgent
       id: sql_step
+      conversationId: =System.ConversationId
       agent:
         name: {{SqlAgent.Name}}
-      conversationId: =System.ConversationId
-      input:
-        messages: =System.LastMessage
-      output:
-        messages: Local.SqlMessages
-
     - kind: InvokeAzureAgent
       id: marketing_step
+      conversationId: =System.ConversationId
       agent:
         name: {{MarketingAgent.Name}}
-      conversationId: =System.ConversationId
-      input:
-        messages: =Local.SqlMessages
-      output:
-        autoSend: true
+    - kind: EndConversation
+      id: end_conversation
+name: {{Name}}
 """;
+
+        Console.WriteLine("[DEBUG] Workflow YAML que será enviado ao Foundry:");
+        Console.WriteLine(workflowYaml);
+        Console.WriteLine("[DEBUG] --- fim YAML ---");
 
         return ProjectsOpenAIModelFactory.WorkflowAgentDefinition(workflowYaml: workflowYaml);
     }

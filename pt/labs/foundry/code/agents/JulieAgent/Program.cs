@@ -34,8 +34,8 @@ var foundryEndpoint = config["FoundryProjectEndpoint"]
     ?? throw new InvalidOperationException("Ausente FoundryProjectEndpoint no appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Ausente ModelDeploymentName no appsettings.json");
-var bingConnectionId = config["BingConnectionId"]
-    ?? throw new InvalidOperationException("Ausente BingConnectionId no appsettings.json");
+var bingConnectionName = config["BingConnectionName"]
+    ?? throw new InvalidOperationException("Ausente BingConnectionName no appsettings.json");
 
 // URL base da Function App com o executor de consultas SQL.
 // Configurar em appsettings.json quando a função estiver implantada.
@@ -100,6 +100,22 @@ else
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
+
+// --- Resolver o ID completo da conexão Bing ---
+Console.WriteLine($"[Config] Resolvendo conexão Bing '{bingConnectionName}'...");
+string bingConnectionId;
+try
+{
+    var bingConnection = await projectClient.Connections.GetConnectionAsync(bingConnectionName);
+    bingConnectionId = bingConnection.Value.Id;
+    Console.WriteLine($"[Config] Conexão Bing resolvida: {bingConnectionId}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[Config] Não foi possível resolver a conexão Bing: {ex.Message}");
+    Console.WriteLine($"[Config] Usando o nome como está: {bingConnectionName}");
+    bingConnectionId = bingConnectionName;
+}
 
 // =====================================================================
 //  FASE 1: Criar/verificar os 3 agentes no Microsoft Foundry
