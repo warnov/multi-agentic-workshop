@@ -1,223 +1,115 @@
+using System.ComponentModel;
 using Azure.AI.Projects;
-using Azure.AI.Projects.OpenAI;
 using Azure.Identity;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
-using System.ClientModel;
-using System.ClientModel.Primitives;
-using System.Text.Json;
-using OpenAI.Responses;
+using System.Collections.Generic;
 
-#pragma warning disable OPENAI001 // OpenAI preview API
+namespace MsFoundryAgent;
 
-// =====================================================================
-//  Anders - Agente Ejecutor (Microsoft Foundry - nueva experiencia)
-//
-//  Esta versión usa el SDK Azure.AI.Projects + Azure.AI.Projects.OpenAI
-//  con la API de Responses (nueva experiencia de Microsoft Foundry).
-//
-//  La herramienta OpenAPI se configura vía protocol method (BinaryContent)
-//  ya que los tipos OpenApiAgentTool son internos en el SDK 1.2.x.
-// =====================================================================
+public static class Program
+{
+    private const string DefaultAgentName = "Andres-Agent";
+    private const string DefaultAgentInstructions =
+        "You are an analytical AI agent specialized in reading, understanding, and extracting insights from provided information.";
 
-// --- Cargar configuración ---
-var config = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
-
-var foundryEndpoint = config["FoundryProjectEndpoint"]
-    ?? throw new InvalidOperationException("Falta FoundryProjectEndpoint en appsettings.json");
-var modelDeployment = config["ModelDeploymentName"]
-    ?? throw new InvalidOperationException("Falta ModelDeploymentName en appsettings.json");
-var functionAppBaseUrl = config["FunctionAppBaseUrl"]
-    ?? throw new InvalidOperationException("Falta FunctionAppBaseUrl en appsettings.json");
-var tenantId = config["TenantId"];
-var agentName = "Anders";
-
-// =====================================================================
-//  FASE 1: Obtener la especificación OpenAPI de la Function App
-// =====================================================================
-
-Console.WriteLine("[OpenAPI] Descargando especificación desde la Function App...");
-
-var httpClient = new HttpClient();
-var openApiSpecUrl = $"{functionAppBaseUrl}/openapi/v3.json";
-var openApiSpec = await httpClient.GetStringAsync(openApiSpecUrl);
-
-Console.WriteLine($"[OpenAPI] Especificación descargada ({openApiSpec.Length} bytes)");
-
-// =====================================================================
-//  FASE 2: Crear agente con herramienta OpenAPI (protocol method)
-// =====================================================================
-
-// Instrucciones del agente Anders
-var andersInstructions = """
-    Eres Anders, el agente ejecutor de Contoso Retail.
-
-    Tu responsabilidad es ejecutar acciones operativas concretas cuando se te soliciten.
-    Tu principal capacidad es generar reportes de órdenes de compra de clientes
-    usando la API de Contoso Retail disponible como herramienta OpenAPI.
-
-    Cuando recibas datos de órdenes, debes construir el JSON del request body
-    con EXACTAMENTE este schema para invocar el endpoint ordersReporter:
-
+    // -----------------------------------------------------------------------
+    // Tool: a simple weather stub to demonstrate function calling
+    // -----------------------------------------------------------------------
+    [Description("Get the current weather for a given location.")]
+    public static string GetWeather(
+        [Description("The city or location name, e.g. 'Seattle'")] string location)
     {
-      "customerName": "Nombre del Cliente",
-      "startDate": "YYYY-MM-DD",
-      "endDate": "YYYY-MM-DD",
-      "orders": [
+        var rand = new Random();
+        string[] conditions = ["sunny", "cloudy", "rainy", "stormy"];
+        return $"The weather in {location} is {conditions[rand.Next(conditions.Length)]} " +
+               $"with a high of {rand.Next(10, 35)}°C.";
+    }
+
+    public static async Task Main(string[] args)
+    {
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddEnvironmentVariables()
+            .Build();
+
+        string projectEndpoint = config["Foundry:ProjectEndpoint"]
+            ?? throw new InvalidOperationException("Foundry:ProjectEndpoint is not configured.");
+
+        string modelDeployment = config["Foundry:ModelDeployment"]
+            ?? throw new InvalidOperationException("Foundry:ModelDeployment is not configured.");
+
+        string agentName = config["Foundry:AgentName"] ?? DefaultAgentName;
+        string agentInstructions = config["Foundry:AgentInstructions"] ?? DefaultAgentInstructions;
+
+        var aiProjectClient = new AIProjectClient(
+            new Uri(projectEndpoint),
+            new DefaultAzureCredential());
+
+        Console.WriteLine($"Creating agent '{agentName}' on Azure AI Foundry...");
+
+        ChatClientAgent agent = await aiProjectClient.CreateAIAgentAsync(
+            name: agentName,
+            model: modelDeployment,
+            instructions: agentInstructions,
+            description: null,
+            tools: [AIFunctionFactory.Create(GetWeather)]);
+
+        if (args.Length > 0 && args[0].Equals("deploy", StringComparison.OrdinalIgnoreCase))
         {
-          "orderNumber": "código de la orden",
-          "orderDate": "YYYY-MM-DD",
-          "orderLineNumber": 1,
-          "productName": "nombre del producto",
-          "brandName": "nombre de la marca",
-          "categoryName": "nombre de la categoría",
-          "quantity": 1.0,
-          "unitPrice": 0.00,
-          "lineTotal": 0.00
+            Console.WriteLine($"Agent '{agent.Name}' deployed successfully.");
+            Console.WriteLine("The agent was left in Azure AI Foundry and was not deleted.");
+            return;
         }
-      ]
-    }
 
-    Reglas:
-    - TODOS los campos son obligatorios para cada línea de orden.
-    - Si una orden tiene múltiples productos, cada producto es un elemento
-      separado en el array "orders" con el mismo "orderNumber" y "orderDate"
-      pero diferente "orderLineNumber" (secuencial: 1, 2, 3...).
-    - Las fechas deben estar en formato ISO: YYYY-MM-DD.
-    - "quantity", "unitPrice" y "lineTotal" son numéricos (double).
-
-    Siempre confirma la acción realizada al usuario, incluyendo la URL del reporte.
-    Si los datos son insuficientes o inválidos, explica qué falta.
-    Responde en español.
-    """;
-
-// Cliente del proyecto Foundry (nueva experiencia)
-// Si TenantId está configurado, se usa explícitamente para evitar conflictos
-// en máquinas con múltiples tenants de Azure (error 400 "Token tenant does not match").
-var credentialOptions = new DefaultAzureCredentialOptions();
-if (!string.IsNullOrWhiteSpace(tenantId))
-    credentialOptions.TenantId = tenantId;
-
-AIProjectClient projectClient = new(
-    endpoint: new Uri(foundryEndpoint),
-    tokenProvider: new DefaultAzureCredential(credentialOptions));
-
-// Verificar si el agente ya existe
-bool shouldCreateAgent = true;
-AgentRecord? existingAgent = null;
-
-Console.WriteLine($"[Foundry] Buscando agente existente '{agentName}'...");
-try
-{
-    existingAgent = projectClient.Agents.GetAgent(agentName);
-    Console.WriteLine($"[Foundry] Agente encontrado: {existingAgent.Name} (ID: {existingAgent.Id})");
-    Console.Write("[Foundry] ¿Desea sobreescribirlo con una nueva versión? (s/N): ");
-    var answer = Console.ReadLine();
-    shouldCreateAgent = answer?.Trim().Equals("s", StringComparison.OrdinalIgnoreCase) == true
-                     || answer?.Trim().Equals("si", StringComparison.OrdinalIgnoreCase) == true
-                     || answer?.Trim().Equals("sí", StringComparison.OrdinalIgnoreCase) == true;
-
-    if (!shouldCreateAgent)
-    {
-        Console.WriteLine("[Foundry] Se conserva el agente existente.");
-    }
-}
-catch (ClientResultException ex) when (ex.Status == 404)
-{
-    Console.WriteLine($"[Foundry] No se encontró un agente existente con nombre '{agentName}'. Se creará uno nuevo.");
-}
-
-AgentRecord agentRecord;
-
-if (shouldCreateAgent)
-{
-    // Construir el JSON con la definición del agente incluyendo herramienta OpenAPI
-    // (los tipos OpenApiAgentTool son internos, se usa protocol method con BinaryContent)
-    Console.WriteLine("[Foundry] Creando/actualizando agente Anders con herramienta OpenAPI...");
-
-    var openApiSpecJson = JsonSerializer.Deserialize<JsonElement>(openApiSpec);
-
-    var agentDefinitionJson = new
-    {
-        definition = new
+        if (args.Length > 0 && args[0].Equals("verify", StringComparison.OrdinalIgnoreCase))
         {
-            kind = "prompt",
-            model = modelDeployment,
-            instructions = andersInstructions,
-            tools = new object[]
+            ChatClientAgent found = await aiProjectClient.GetAIAgentAsync(agentName, tools: [AIFunctionFactory.Create(GetWeather)]);
+            Console.WriteLine("Agent verification succeeded.");
+            Console.WriteLine($"Name: {found.Name}");
+            Console.WriteLine($"Model: {modelDeployment}");
+            Console.WriteLine($"Endpoint: {projectEndpoint}");
+            Console.WriteLine("If the portal does not show it, confirm you are in the same Foundry project and tenant.");
+            return;
+        }
+
+        Console.WriteLine("Agent created. Starting multi-turn conversation (type 'quit' to exit).\n");
+
+        var history = new List<ChatMessage>();
+
+        while (true)
+        {
+            Console.Write("You: ");
+            string? userInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userInput) ||
+                userInput.Equals("quit", StringComparison.OrdinalIgnoreCase))
             {
-                new
+                break;
+            }
+
+            history.Add(new ChatMessage(ChatRole.User, userInput));
+
+            Console.Write("Agent: ");
+            var assistantText = new System.Text.StringBuilder();
+            await foreach (AgentResponseUpdate update in agent.RunStreamingAsync(history))
+            {
+                if (!string.IsNullOrEmpty(update.Text))
                 {
-                    type = "openapi",
-                    openapi = new
-                    {
-                        name = "ContosoRetailAPI",
-                        description = "API de Contoso Retail para generar reportes de órdenes de compra",
-                        spec = openApiSpecJson,
-                        auth = new { type = "anonymous" }
-                    }
+                    Console.Write(update.Text);
+                    assistantText.Append(update.Text);
                 }
             }
+            Console.WriteLine("\n");
+
+            // Append the assistant reply so future turns have full context
+            if (assistantText.Length > 0)
+                history.Add(new ChatMessage(ChatRole.Assistant, assistantText.ToString()));
         }
-    };
 
-    var jsonContent = JsonSerializer.Serialize(agentDefinitionJson, new JsonSerializerOptions { WriteIndented = false });
-    var result = await projectClient.Agents.CreateAgentVersionAsync(
-        agentName,
-        BinaryContent.Create(BinaryData.FromString(jsonContent)),
-        new RequestOptions());
-
-    // Parsear respuesta para obtener info del agente
-    var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
-    var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
-    Console.WriteLine($"[Foundry] Agente creado/actualizado: {agentName} (v{version})");
-}
-
-// Obtener el agente registrado
-agentRecord = projectClient.Agents.GetAgent(agentName);
-Console.WriteLine($"[Foundry] Agente obtenido: {agentRecord.Name} (ID: {agentRecord.Id})");
-
-// =====================================================================
-//  FASE 3: Interactuar con el agente (Responses API + Conversations)
-// =====================================================================
-
-// Crear conversación para multi-turn
-ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
-Console.WriteLine($"[Foundry] Conversación creada: {conversation.Id}");
-
-// Obtener cliente de Responses vinculado al agente y conversación
-ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
-    defaultAgent: agentName,
-    defaultConversationId: conversation.Id);
-
-Console.WriteLine();
-Console.WriteLine("=== Chat con Anders (escribe 'salir' para terminar) ===");
-Console.WriteLine();
-
-while (true)
-{
-    Console.Write("Tú: ");
-    var input = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(input) ||
-        input.Equals("salir", StringComparison.OrdinalIgnoreCase))
-        break;
-
-    // Enviar mensaje y obtener respuesta del agente
-    Console.Write("Anders: ");
-    try
-    {
-        ResponseResult response = responseClient.CreateResponse(input);
-        Console.WriteLine(response.GetOutputText());
+        Console.WriteLine("Cleaning up agent...");
+        await aiProjectClient.Agents.DeleteAgentAsync(agent.Name);
+        Console.WriteLine("Done.");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"\n[Error] {ex.Message}");
-    }
-
-    Console.WriteLine();
 }
-
-Console.WriteLine("[Foundry] Chat finalizado.");
-Console.WriteLine($"[Foundry] El agente '{agentName}' permanece disponible.");
