@@ -165,7 +165,7 @@ To obtain them from the Fabric portal, follow the [sql-parameters.md](./setup/sq
 In the Codespace terminal, navigate to the script folder:
 
 ```bash
-cd /workspaces/multi-agentic-workshop/en/labs/foundry/setup/op-flex
+cd en/labs/foundry/setup/op-flex
 ```
 
 Run the deployment script (using `pwsh` to start PowerShell 7):
