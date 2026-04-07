@@ -2,7 +2,7 @@
 
 ## Tabla de contenido
 
-- [Lab 3: Anders — Executor Agent](#lab-3-anders--executor-agent)
+- [Lab 4: Anders — Executor Agent](#lab-4-anders--executor-agent)
   - [Tabla de contenido](#tabla-de-contenido)
   - [Introducción](#introducción)
     - [¿Qué vamos a hacer en este lab?](#qué-vamos-a-hacer-en-este-lab)
