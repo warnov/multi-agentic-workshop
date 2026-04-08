@@ -154,9 +154,7 @@ Pega la definición JSON de la API (Swagger/OpenAPI) de tu servicio (ej. una Azu
 https://func-contosoretail-<suffix>.azurewebsites.net/api/openapi/v3.json
 ```
 
-Haz clic en Create tool.
-
-Activar Code Interpreter: Asegúrate de que el interruptor de "Code Interpreter" esté encendido para permitir cálculos matemáticos complejos sobre los datos.
+Haz clic en Create tool y no olvider precionar "Save" o "Guardar los cambios del agente, si no lo hacer tendras un error al probarlo.
 
 
 ### Paso 5: Inspeccionar el agente en Azure AI Foundry
@@ -170,7 +168,7 @@ Activar Code Interpreter: Asegúrate de que el interruptor de "Code Interpreter"
 Observa dos cosas clave:
 
 - **System prompt (instrucciones):** Verás las instrucciones completas que le dimos al agente, incluyendo el schema JSON. Esto es lo que guía su comportamiento al decidir cuándo y cómo invocar la API.
-- **Tools (herramientas):** Verás **ContosoRetailAPI** listada como herramienta OpenAPI. Puedes expandirla para ver la especificación completa con el endpoint `ordersReporter`, los schemas de request/response, y la configuración de autenticación anónima.
+- **Tools (herramientas):** Verás **myapitool** listada como herramienta OpenAPI. Puedes expandirla para ver la especificación completa con el endpoint `ordersReporter`, los schemas de request/response, y la configuración de autenticación anónima.
 
 > [!TIP]
 > El system prompt y las tools son los dos pilares que determinan qué puede hacer un agente y cómo lo hace. Entender esta relación es clave para diseñar agentes efectivos.
@@ -188,7 +186,7 @@ Hola Anders, ¿qué puedes hacer?
 Anders debería responder explicando que puede generar reportes de órdenes, aAhora pidele un reporte
 
 ```
-"Genera un reporte para el cliente Marco Rivera del periodo de enero a febrero de 2026. Muestra los pedidos en una tabla y calcula el total gastado."
+Genera un reporte para el cliente Marco Rivera del periodo de enero a febrero de 2026. Muestra los pedidos en una tabla y calcula el total gastado.
 ```
 
 Resultados Esperados:
