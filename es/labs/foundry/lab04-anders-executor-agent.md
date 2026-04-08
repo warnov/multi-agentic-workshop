@@ -132,7 +132,9 @@ export FOUNDRY_AGENT_INSTRUCTIONS="Eres un agente analítico especializado en le
 
 Ejecuta el script de despliegue para registrar el agente en el servicio:
 
-./deploy-foundry-agent.sh
+```
+./es/labs/foundry/code/agents/AndersAgent/ms-foundry/deploy-foundry-agent.sh
+```
 
 ### Paso 4: Configuración de Herramientas (Portal)
 
@@ -177,22 +179,28 @@ Observa dos cosas clave:
 
 Inicia una sesión de chat en el Playground del agente y prueba con prompts de negocio como:
 
+Para iniciar pregunata a Ander que pude hacer 
+
+```
+Hola Anders, ¿qué puedes hacer?
+```
+
+Anders debería responder explicando que puede generar reportes de órdenes, aAhora pidele un reporte
+
 ```
 "Genera un reporte para el cliente Marco Rivera del periodo de enero a febrero de 2026. Muestra los pedidos en una tabla y calcula el total gastado."
 ```
 
 Resultados Esperados:
-El agente debe identificar qué herramienta llamar, procesar los datos y gGenerar una tabla de salida y un enlace de descarga para el reporte.
+El agente debe identificar qué herramienta llamar, pero necesita de algunos datos adiconales como: 
+
+- Número de orden
+- Fecha de la orden
+- Producto, marca, categoría
+- Cantidad, precio unitario, total por línea
 
 
-### Paso 7: Validación y Pruebas
-Inicia una sesión de chat en el Playground del agente y prueba con prompts de negocio como:
-
-```
-Tú: Hola Anders, ¿qué puedes hacer?
-```
-
-Anders debería responder explicando que puede generar reportes de órdenes. Luego, prueba con datos reales (pega todo en una sola línea):
+Luego, prueba con datos reales (pega todo en una sola línea):
 
 ```
 Genera un reporte para Izabella Celma (periodo: 1-31 enero 2026). Orden ORD-CID-069-001 (2026-01-04): Sport-100 Helmet Black, Contoso Outdoor, Helmets, 6x$34.99=$209.94 | HL Road Frame Red 62, Contoso Outdoor, Road Frames, 10x$1431.50=$14315.00 | Long-Sleeve Logo Jersey S, Contoso Outdoor, Jerseys, 8x$49.99=$399.92. Orden ORD-CID-069-003 (2026-01-08): HL Road Frame Black 58, Contoso Outdoor, Road Frames, 3x$1431.50=$4294.50 | HL Road Frame Red 44, Contoso Outdoor, Road Frames, 7x$1431.50=$10020.50. Orden ORD-CID-069-002 (2026-01-17): HL Road Frame Red 62, Contoso Outdoor, Road Frames, 2x$1431.50=$2863.00 | LL Road Frame Black 60, Contoso Outdoor, Road Frames, 4x$337.22=$1348.88.
@@ -210,7 +218,7 @@ Abre la URL del reporte en el navegador para verificar que se generó correctame
 Ahora prueba con un caso más sencillo — un solo pedido con dos productos:
 
 ```
-Tú: Genera un reporte para Marco Rivera (periodo: 5-10 febrero 2026). Orden ORD-CID-112-001 (2026-02-07): Mountain Bike Socks M, Contoso Outdoor, Socks, 3x$9.50=$28.50 | Water Bottle 30oz, Contoso Outdoor, Bottles and Cages, 1x$6.99=$6.99.
+Genera un reporte para Marco Rivera (periodo: 5-10 febrero 2026). Orden ORD-CID-112-001 (2026-02-07): Mountain Bike Socks M, Contoso Outdoor, Socks, 3x$9.50=$28.50 | Water Bottle 30oz, Contoso Outdoor, Bottles and Cages, 1x$6.99=$6.99.
 ```
 
 ---
