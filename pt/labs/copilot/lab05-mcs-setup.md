@@ -4,7 +4,7 @@ Neste laboratório guiado e prático, você aprenderá a estabelecer seu ambient
 ## 🔎 Objetivos
 Ao completar este laboratório, você produzirá o seguinte: 
 - Criar seu ambiente de trabalho "**MultiAgentWrkshp**" para o Copilot Studio 
-- Criar uma solução onde todos os seus agentes e componentes do Copilot Studio serão armazenados. 
+- Criar uma solução onde todos os seus agentes e componentes do Copilot Studio serão armazenados.
 - Estabelecer sua solução como a solução padrão, para que os novos componentes sejam armazenados nela por padrão 
 **Agora, vamos aos passos do laboratório:** 
 - Crie seu ambiente 
