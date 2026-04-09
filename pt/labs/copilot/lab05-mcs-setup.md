@@ -1,179 +1,179 @@
-# **Microsoft Copilot Studio - Configuración**
-## 🎯Resumen de la misión
-En este laboratorio guiado y práctico, aprenderás a establecer tu entorno base para Copilot Studio creando y configurando un espacio de trabajo llamado “MultiAgentWrkshp”. También crearás una solución que servirá como el centro para todos tus agentes y componentes de Copilot Studio, asegurando que tu proceso de desarrollo sea organizado y eficiente. Al seguir las instrucciones paso a paso, obtendrás experiencia práctica para configurar, administrar y personalizar tu entorno y así agilizar futuros proyectos de Copilot Studio. 
+﻿# **Microsoft Copilot Studio - Configuração**
+## 🎯Resumo da missão
+Neste laboratório guiado e prático, você aprenderá a estabelecer seu ambiente base para o Copilot Studio criando e configurando um espaço de trabalho chamado "MultiAgentWrkshp". Você também criará uma solução que servirá como o centro para todos os seus agentes e componentes do Copilot Studio, garantindo que seu processo de desenvolvimento seja organizado e eficiente. Ao seguir as instruções passo a passo, você obterá experiência prática para configurar, administrar e personalizar seu ambiente e assim agilizar futuros projetos do Copilot Studio. 
 ## 🔎 Objetivos
-Al completar este laboratorio, producirás lo siguiente: 
-- Crea tu entorno de trabajo “**MultiAgentWrkshp**” para Copilot Studio 
-- Crea una solución donde se contengan todos tus agentes y componentes de Copilot Studio. 
-- Establece tu solución como la solución predeterminada, para que los componentes nuevos se almacenen en ella de forma predeterminada 
-**Ahora, pasemos a los pasos del laboratorio:** 
-- Crea tu entorno 
-- En este laboratorio crearás un entorno de Power Platform donde vivirán todos tus agentes de Microsoft Copilot Studio.
+Ao completar este laboratório, você produzirá o seguinte: 
+- Criar seu ambiente de trabalho "**MultiAgentWrkshp**" para o Copilot Studio 
+- Criar uma solução onde todos os seus agentes e componentes do Copilot Studio serão armazenados. 
+- Estabelecer sua solução como a solução padrão, para que os novos componentes sejam armazenados nela por padrão 
+**Agora, vamos aos passos do laboratório:** 
+- Crie seu ambiente 
+- Neste laboratório você criará um ambiente do Power Platform onde todos os seus agentes do Microsoft Copilot Studio ficarão hospedados.
   
- 1- Ve a la consola de administración de Power Platform http://aka.ms/ppac y selecciona la opción “Manage” en la barra lateral izquierda
+ 1- Acesse o console de administração do Power Platform http://aka.ms/ppac e selecione a opção "Manage" na barra lateral esquerda
  
- ![imagen](img/image1_MCS_Setup.png)
+ ![imagem](img/image1_MCS_Setup.png)
  
- 2- Haz clic en la opción Environments:
+ 2- Clique na opção Environments:
  
- ![imagen](img/image2_MCS_Setup.png)
+ ![imagem](img/image2_MCS_Setup.png)
  
- 3- Selecciona “New” para crear un nuevo entorno:
+ 3- Selecione "New" para criar um novo ambiente:
  
- ![imagen](img/image3_MCS_Setup.png)
+ ![imagem](img/image3_MCS_Setup.png)
 
- 4- El panel de detalles de New Environment aparece en el lado derecho de la pantalla.
+ 4- O painel de detalhes do New Environment aparece no lado direito da tela.
  
- ![imagen](img/image4_MCS_Setup.png)
+ ![imagem](img/image4_MCS_Setup.png)
 
-En el panel de detalles de New Environment, ingresa lo siguiente: 
-- Nombre: **MultiAgentWrkshp** 
-- Región:** asegúrate de que esté seleccionado “United States - Default”** 
+No painel de detalhes do New Environment, insira o seguinte: 
+- Nome: **MultiAgentWrkshp** 
+- Região:** certifique-se de que "United States - Default" esteja selecionado** 
 - Tipo: **Sandbox** 
-- Propósito:** este es el entorno para ejecutar los laboratorios del taller Multi-Agent** 
-- Agregar un almacén de datos de Dataverse? : **activa el interruptor (Toggle) en ON**
-- El panel de detalles de tu nuevo entorno debería verse así:
+- Propósito:** este é o ambiente para executar os laboratórios do workshop Multi-Agent** 
+- Adicionar um armazenamento de dados do Dataverse? : **ative o interruptor (Toggle) em ON**
+- O painel de detalhes do seu novo ambiente deve ficar assim:
  
-    ![imagen](img/image5_MCS_Setup.png)
+    ![imagem](img/image5_MCS_Setup.png)
 
-- Haz clic en “Next” para ingresar configuraciones adicionales para tu entorno de Microsoft Copilot Studio.
+- Clique em "Next" para inserir configurações adicionais para o seu ambiente do Microsoft Copilot Studio.
 
-    ![imagen](img/image6_MCS_Setup.png)
+    ![imagem](img/image6_MCS_Setup.png)
 
-En el panel Next, sigue los pasos de la tabla a continuación: 
+No painel Next, siga os passos da tabela abaixo: 
 
-| Haz clic en “+ Select” debajo de “Security Group *” | Selecciona la opción “All Company” en la sección “Restricted Access” | Tus detalles adicionales del nuevo entorno deberían verse así |
+| Clique em "+ Select" abaixo de "Security Group *" | Selecione a opção "All Company" na seção "Restricted Access" | Os detalhes adicionais do seu novo ambiente devem ficar assim |
 | --- | --- | --- |
-| ![imagen](img/image7_MCS_Setup.png) | ![imagen](img/image8_MCS_Setup.png) | ![imagen](img/image9_MCS_Setup.png) |
+| ![imagem](img/image7_MCS_Setup.png) | ![imagem](img/image8_MCS_Setup.png) | ![imagem](img/image9_MCS_Setup.png) |
 
-Haz clic en “Save” para crear tu entorno de Microsoft Copilot Studio.
+Clique em "Save" para criar seu ambiente do Microsoft Copilot Studio.
 
-![imagen](img/image10_MCS_Setup.png)
+![imagem](img/image10_MCS_Setup.png)
 
-Deberías ver una pantalla como la siguiente, que indica que tu entorno se está preparando: 
+Você deve ver uma tela como a seguinte, indicando que seu ambiente está sendo preparado: 
 
-![imagen](img/image11_MCS_Setup.png)
+![imagem](img/image11_MCS_Setup.png)
 
-Una vez aprovisionado por completo y listo, obtendrás una confirmación como la imagen de abajo. Usa el botón “Refresh” disponible para actualizar el estado de creación del entorno. 
+Uma vez totalmente provisionado e pronto, você receberá uma confirmação como a imagem abaixo. Use o botão "Refresh" disponível para atualizar o status de criação do ambiente. 
 
-![imagen](img/image12_MCS_Setup.png)
+![imagem](img/image12_MCS_Setup.png)
 
-Verifica que las propiedades de tu entorno recién creado estén correctas. Principalmente: Name, Type, State=Ready y Dataverse=YES. 
+Verifique se as propriedades do seu ambiente recém-criado estão corretas. Principalmente: Name, Type, State=Ready e Dataverse=YES. 
 
-# Crea una solución para almacenar todos tus componentes de trabajo
+# Crie uma solução para armazenar todos os seus componentes de trabalho
 
-En este laboratorio, aprenderás a armar una solución (Solution), el vehículo oficial de implementación para tus agentes de Microsoft Copilot Studio.
-Piensa en esto como crear un maletín digital que contiene tu agente y sus artefactos/componentes. 
-Cada agente necesita un hogar bien estructurado. Eso es lo que proporciona una solución de Power Platform: orden, portabilidad y preparación para producción.  
+Neste laboratório, você aprenderá a montar uma solução (Solution), o veículo oficial de implementação para os seus agentes do Microsoft Copilot Studio.
+Pense nisso como criar uma maleta digital que contém o seu agente e seus artefatos/componentes. 
+Cada agente precisa de um lar bem estruturado. É isso que uma solução do Power Platform proporciona: ordem, portabilidade e preparação para produção.  
 
-Manos a la obra. 
-1. Ve a Copilot Studio. Asegúrate de estar en el entorno correcto (Environment) = **MultiAgentWrkshp**
+Mãos à obra. 
+1. Acesse o Copilot Studio. Certifique-se de estar no ambiente correto (Environment) = **MultiAgentWrkshp**
 
-![imagen](img/image13_MCS_Setup.png)
+![imagem](img/image13_MCS_Setup.png)
 
-2. Haz clic en “…” en el menú de la barra izquierda. 
+2. Clique em "…" no menu da barra esquerda. 
 
-![imagen](img/image14_MCS_Setup.png)
+![imagem](img/image14_MCS_Setup.png)
 
-3. Selecciona **Solutions**
+3. Selecione **Solutions**
    
-![imagen](img/image15_MCS_Setup.png)
+![imagem](img/image15_MCS_Setup.png)
 
-4. Esto abrirá una nueva pestaña en tu navegador.
-5. Ahora Vamos a crear una <u>Solution</u>. Se cargará el **Solution Explorer** en Copilot Studio. Selecciona **+ New solution**
+4. Isso abrirá uma nova aba no seu navegador.
+5. Agora vamos criar uma <u>Solution</u>. O **Solution Explorer** será carregado no Copilot Studio. Selecione **+ New solution**
    
-![imagen](img/image16_MCS_Setup.png)
+![imagem](img/image16_MCS_Setup.png)
 
-6. Aparecerá el panel New solution, donde podremos definir los detalles de nuestra solución.
+6. O painel New solution aparecerá, onde poderemos definir os detalhes da nossa solução.
    
-![imagen](img/image17_MCS_Setup.png)
+![imagem](img/image17_MCS_Setup.png)
 
-7. Primero, necesitamos crear un nuevo publisher. Selecciona **+ New publisher**. Aparecerá la pestaña Properties del panel New publisher, con campos obligatorios y no obligatorios para completar en la pestaña Properties. Aquí podemos detallar la información del publisher, que se usará como la etiqueta o marca que identifica quién creó o es dueño de la solución.
+7. Primeiro, precisamos criar um novo publisher. Selecione **+ New publisher**. A aba Properties do painel New publisher aparecerá, com campos obrigatórios e não obrigatórios para preencher na aba Properties. Aqui podemos detalhar as informações do publisher, que será usado como a etiqueta ou marca que identifica quem criou ou é dono da solução.
 
-![imagen](img/image18_MCS_Setup.png)
+![imagem](img/image18_MCS_Setup.png)
 
-| Propiedad | Descripción | Obligatorio |
+| Propriedade | Descrição | Obrigatório |
 | --- | --- | --- |
-| Nombre para mostrar | Nombre para mostrar del publisher | Sí |
-| Nombre | El nombre único y el nombre del esquema para el publisher | Sí |
-| Descripción | Describe el propósito de la solución | No |
-| Prefijo | Prefijo del publisher que se aplicará a los componentes recién creados | Sí |
-| Prefijo del valor de opción | Genera un número basado en el prefijo del publisher. Este número se usa cuando agregas opciones a opciones (choices) y da un indicador de qué solución se usó para agregar la opción. | Sí |
+| Nome de exibição | Nome de exibição do publisher | Sim |
+| Nome | O nome único e o nome do esquema para o publisher | Sim |
+| Descrição | Descreve o propósito da solução | Não |
+| Prefixo | Prefixo do publisher que será aplicado aos componentes recém-criados | Sim |
+| Prefixo do valor de opção | Gera um número baseado no prefixo do publisher. Este número é usado quando você adiciona opções a opções (choices) e dá um indicador de qual solução foi usada para adicionar a opção. | Sim |
 
-Copia y pega lo siguiente 
-- Como **Display name**:  **My Multi Agent Publisher** 
-- Como **Name**: **MyMultiAgentPublr** 
-- Como **Description**: **This is the publisher for my Multi Agent Workshop Solution**  
-- Para el **Prefix**: **mmap** 
-- De forma predeterminada, el **Choice value** prefix mostrará un valor entero. Actualiza este valor entero al millar más cercano. Por ejemplo, en mi captura de pantalla de abajo, inicialmente era 77074. Actualízalo de 77074 a 77000.
+Copie e cole o seguinte 
+- Como **Display name**:  **My Multi Agent Publisher** 
+- Como **Name**: **MyMultiAgentPublr** 
+- Como **Description**: **This is the publisher for my Multi Agent Workshop Solution**  
+- Para o **Prefix**: **mmap** 
+- Por padrão, o **Choice value** prefix mostrará um valor inteiro. Atualize este valor inteiro para o milhar mais próximo. Por exemplo, na minha captura de tela abaixo, inicialmente era 77074. Atualize de 77074 para 77000.
   
-![imagen](img/image19_MCS_Setup.png)
+![imagem](img/image19_MCS_Setup.png)
 
-8. Si quieres proporcionar los datos de contacto de la solución, selecciona la pestaña **Contact** y completa las columnas que se muestran.
+8. Se você quiser fornecer os dados de contato da solução, selecione a aba **Contact** e preencha as colunas mostradas.
    
-![imagen](img/image20_MCS_Setup.png)
+![imagem](img/image20_MCS_Setup.png)
 
-9. Selecciona la pestaña **Properties** y selecciona **Save** para crear el publisher.
+9. Selecione a aba **Properties** e selecione **Save** para criar o publisher.
 
-![imagen](img/image21_MCS_Setup.png)
+![imagem](img/image21_MCS_Setup.png)
 
-9. El panel New publisher se cerrará y volverás al panel **New solution** con el publisher recién creado seleccionado.
+9. O painel New publisher será fechado e você voltará ao painel **New solution** com o publisher recém-criado selecionado.
     
-Bien hecho, ¡ya creaste un Solution Publisher! 🙌🏼 
+Muito bem, você criou um Solution Publisher! 🙌🏼 
 
-# A continuación aprenderemos a crear una nueva solución personalizada.
-Ahora que tenemos el nuevo Solution Publisher
-Podemos completar el resto del formulario en el panel **New solution** .. 
+# A seguir, aprenderemos a criar uma nova solução personalizada.
+Agora que temos o novo Solution Publisher
+Podemos completar o restante do formulário no painel **New solution** .. 
 
-1. Copia y pega lo siguiente: 
-- Como **Display name: My Multi Agent Solution** 
-- Como **Name**: **MyMultiAgentSln** 
-- Como estamos creando una solución nueva, el número de **Version** de forma predeterminada será 1.0.0.0. 
-- Marca la casilla **Set as your preferred solution** . 
-- Despliega **More options** para ver detalles adicionales que se pueden proporcionar en una solución. 
+1. Copie e cole o seguinte: 
+- Como **Display name: My Multi Agent Solution** 
+- Como **Name**: **MyMultiAgentSln** 
+- Como estamos criando uma solução nova, o número de **Version** por padrão será 1.0.0.0. 
+- Marque a caixa **Set as your preferred solution** . 
+- Expanda **More options** para ver detalhes adicionais que podem ser fornecidos em uma solução. 
 
-Verás lo siguiente: 
-- **Installed on** - la fecha en la que se instaló la solución. 
-- **Configuration page** - los desarrolladores configuran un recurso web HTML para ayudar a los usuarios a interactuar con su aplicación, agente o herramienta; aparecerá como una página web en la sección Information con instrucciones o botones. Se usa sobre todo en empresas o por desarrolladores que crean y comparten soluciones con otras personas. 
-- **Description** - describe la solución o una descripción de alto nivel de la configuration page. 
+Você verá o seguinte: 
+- **Installed on** - a data em que a solução foi instalada. 
+- **Configuration page** - os desenvolvedores configuram um recurso web HTML para ajudar os usuários a interagir com sua aplicação, agente ou ferramenta; aparecerá como uma página web na seção Information com instruções ou botões. É usado principalmente em empresas ou por desenvolvedores que criam e compartilham soluções com outras pessoas. 
+- **Description** - descreve a solução ou uma descrição de alto nível da configuration page. 
 
-2. Los dejaremos en blanco para este laboratorio.
+2. Deixaremos em branco para este laboratório.
  
-![imagen](img/image22_MCS_Setup.png)
+![imagem](img/image22_MCS_Setup.png)
 
-3. Selecciona **Create**. 
+3. Selecione **Create**. 
 
-![imagen](img/image23_MCS_Setup.png)
+![imagem](img/image23_MCS_Setup.png)
 
-4. La solución **My Multi Agent Solution** ya se creó. No habrá componentes hasta que creemos un agente en Copilot Studio. 
+4. A solução **My Multi Agent Solution** já foi criada. Não haverá componentes até que criemos um agente no Copilot Studio. 
 
-![imagen](img/image24_MCS_Setup.png)
+![imagem](img/image24_MCS_Setup.png)
 
-5. Selecciona el ícono de flecha hacia atrás para volver al Solution Explorer.
+5. Selecione o ícone de seta para trás para voltar ao Solution Explorer.
    
-![imagen](img/image25_MCS_Setup.png)
+![imagem](img/image25_MCS_Setup.png)
 
-6. Haz que tu solución sea la solución predeterminada / Confírmalo
-7. Verifica que tu solución “” tenga la etiqueta “Preferred Solution” al lado. 
+6. Torne sua solução a solução padrão / Confirme
+7. Verifique se a sua solução "" possui a etiqueta "Preferred Solution" ao lado. 
 
-![imagen](img/image26_MCS_Setup.png)
+![imagem](img/image26_MCS_Setup.png)
 
-8. Si no es así, selecciona los puntos suspensivos “…” junto a tu solución y luego selecciona la opción “Set preferred solution” en el menú desplegable, como se muestra a continuación: 
+8. Caso contrário, selecione as reticências "…" ao lado da sua solução e depois selecione a opção "Set preferred solution" no menu suspenso, como mostrado abaixo: 
 
-![imagen](img/image27_MCS_Setup.png)
+![imagem](img/image27_MCS_Setup.png)
 
-9. En la ventana emergente, haz clic en la lista desplegable y selecciona tu solución “**MyMultiAgentSln**” 
+9. Na janela pop-up, clique na lista suspensa e selecione a sua solução "**MyMultiAgentSln**" 
 
-![imagen](img/image28_MCS_Setup.png)
+![imagem](img/image28_MCS_Setup.png)
 
-10. Haz clic en “Apply” para confirmar que quieres establecer tu solución “**MyMultiAgentSln**” como la solución preferida. 
+10. Clique em "Apply" para confirmar que deseja estabelecer sua solução "**MyMultiAgentSln**" como a solução preferida. 
 
-![imagen](img/image29_MCS_Setup.png)
+![imagem](img/image29_MCS_Setup.png)
 
-11. Ahora tu solución “**MyMultiAgentSln**” debe tener la etiqueta “Preferred solution” al lado. 
+11. Agora sua solução "**MyMultiAgentSln**" deve ter a etiqueta "Preferred solution" ao lado. 
 
-![imagen](img/image26_MCS_Setup.png)
+![imagem](img/image26_MCS_Setup.png)
 
-# **🎉**** Misión completada **
+# **🎉**** Missão completada **
 
-✅**Ahora has terminado de configurar tu entorno de laboratorio para Microsoft Copilot Studio.** ¡Felicitaciones!
+✅**Agora você terminou de configurar seu ambiente de laboratório para o Microsoft Copilot Studio.** Parabéns!
