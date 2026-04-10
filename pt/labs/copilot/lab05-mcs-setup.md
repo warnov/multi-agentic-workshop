@@ -1,6 +1,8 @@
-﻿# **Microsoft Copilot Studio - Configuração**
+﻿# **Lab 05: Microsoft Copilot Studio - Configuração**
+
 ## 🎯Resumo da missão
 Neste laboratório guiado e prático, você aprenderá a estabelecer seu ambiente base para o Copilot Studio criando e configurando um espaço de trabalho chamado "MultiAgentWrkshp". Você também criará uma solução que servirá como o centro para todos os seus agentes e componentes do Copilot Studio, garantindo que seu processo de desenvolvimento seja organizado e eficiente. Ao seguir as instruções passo a passo, você obterá experiência prática para configurar, administrar e personalizar seu ambiente e assim agilizar futuros projetos do Copilot Studio. 
+
 ## 🔎 Objetivos
 Ao completar este laboratório, você produzirá o seguinte: 
 - Criar seu ambiente de trabalho "**MultiAgentWrkshp**" para o Copilot Studio 

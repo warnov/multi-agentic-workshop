@@ -1,163 +1,163 @@
-# MCS – Construyamos el agente Charlie
+# **Lab 06: MCS – Vamos construir o agente "Charlie"**
 
-## 🎯 Resumen de la misión
+## 🎯 Resumo da missão
 
-En este laboratorio práctico, crearás, publicarás y desplegarás Charlie, nuestro agente Analista de Producto, que se enfocará en:
-Recuperación de conocimiento: buscar descripciones de productos desde un archivo, responder las preguntas del usuario basándote en estos "datos" y realizar un análisis competitivo del mercado para estos productos.
-También crearás un sitio de SharePoint y almacenarás los documentos de producto como fuente de conocimiento.
+Neste laboratório prático, você criará, publicará e implantará o "**Charlie**", nosso agente Analista de Produto, que terá como foco:
+Recuperação de conhecimento: buscar descrições de produtos a partir de um arquivo, responder às perguntas do usuário com base nesses "dados" e realizar uma análise competitiva de mercado para esses produtos.
+Você também criará um site do SharePoint e armazenará os documentos de produto como fonte de conhecimento.
 
 ## 🔎 Objetivos
 
-Al completar este laboratorio, lograrás:
+Ao concluir este laboratório, você será capaz de:
 
-- Construir este agente Charlie siguiendo las instrucciones descritas en este documento.
-- Crear un sitio de SharePoint y almacenar la documentación de producto.
-- Probar y publicar.
+- Construir o agente "**Charlie**" seguindo as instruções descritas neste documento.
+- Criar um site do SharePoint e armazenar a documentação de produto.
+- Testar e publicar.
 
 ---
 
-## Crear el nuevo agente
+## Criar o novo agente
 
-**Navega** a Copilot Studio. Asegúrate de que tu entorno siga seleccionado en el selector de Entorno en la esquina superior derecha.
+**Navegue** até o Copilot Studio. Certifique-se de que seu ambiente ainda esteja selecionado no seletor de Ambiente no canto superior direito.
 
-1. Selecciona la pestaña **Agentes** en la navegación izquierda y selecciona **Crear un Agente**.
+1. Selecione a aba **Agents** na navegação à esquerda e selecione **Create an Agent**.
 
-   ![imagen](img/image1_Charlie.png)
+   ![imagem](img/image1_Charlie.png)
 
-2. Selecciona la pestaña **Configure** y completa las siguientes propiedades:
-   - **Edita el nombre a**: Charlie
-   - **Descripción**: "Ayuda a los usuarios a responder preguntas de productos usando contenido de SharePoint y a realizar comparaciones de mercado o competidores usando información pública cuando se solicite".
-   - **Dejar el modelo de la IA por default.**
+2. Selecione a aba **Configure** e preencha as seguintes propriedades:
+   - **Edite o nome para**: Charlie
+   - **Description**: "Ajuda os usuários a responder perguntas sobre produtos usando conteúdo do SharePoint e a realizar comparações de mercado ou concorrentes usando informações públicas quando solicitado".
+   - **Deixe o modelo de IA padrão.**
 
-3. Agrega las instrucciones del agente según se indica a continuación:
+3. Adicione as instruções do agente conforme indicado a seguir:
 
-   ![imagen](img/image2_Charlie.png)
+   ![imagem](img/image2_Charlie.png)
 
-   **Instrucciones del agente a agregar:**
+   **Instruções do agente a adicionar:**
 
    ```text
-   Eres un Agente de Preguntas y Respuestas de Producto y Comparación de Mercado.
+   Você é um Agente de Perguntas e Respostas de Produto e Comparação de Mercado.
 
-   # Tu objetivo es ayudar a los usuarios a:
-   - Entender los productos usando información interna almacenada en SharePoint.
-   - Responder preguntas, resumir y analizar esa información.
-   - Comparar con el mercado usando información pública de internet SOLO cuando el usuario lo solicite explícitamente.
+   # Seu objetivo é ajudar os usuários a:
+   - Entender os produtos usando informações internas armazenadas no SharePoint.
+   - Responder perguntas, resumir e analisar essas informações.
+   - Comparar com o mercado usando informações públicas da internet SOMENTE quando o usuário solicitar explicitamente.
 
-   # Reglas clave:
-   1. Usa SharePoint como fuente principal de forma predeterminada.
-   2. Si la pregunta se puede responder usando SharePoint, NO uses internet.
-   3. Usa información de internet solo cuando el usuario pida:
-      - análisis de mercado
-      - comparación con competidores
-      - información externa o pública
-   4. No inventes información. Si algo no está disponible, indícalo con claridad.
+   # Regras principais:
+   1. Use o SharePoint como fonte principal por padrão.
+   2. Se a pergunta puder ser respondida usando o SharePoint, NÃO use a internet.
+   3. Use informações da internet somente quando o usuário pedir:
+      - análise de mercado
+      - comparação com concorrentes
+      - informações externas ou públicas
+   4. Não invente informações. Se algo não estiver disponível, indique com clareza.
 
-   # Formato de respuesta:
-   - Respuestas claras y estructuradas.
-   - Usa listas o tablas cuando ayuden a la comprensión.
-   - Distingue claramente entre:
-     - Información interna (SharePoint)
-     - Información pública (internet)
-   - Si falta información importante, indícalo en lugar de hacer suposiciones.
+   # Formato de resposta:
+   - Respostas claras e estruturadas.
+   - Use listas ou tabelas quando ajudarem na compreensão.
+   - Distinga claramente entre:
+     - Informações internas (SharePoint)
+     - Informações públicas (internet)
+   - Se faltar informação importante, indique em vez de fazer suposições.
    ```
 
 ---
 
-## Creación del SharePoint
+## Criação do SharePoint
 
-### Crear el repositorio de conocimiento en SharePoint
+### Criar o repositório de conhecimento no SharePoint
 
-1. En otra pestaña, navega a <https://www.office.com>.
-2. Selecciona la sección Apps en la esquina inferior izquierda.
+1. Em outra aba, navegue até <https://www.office.com>.
+2. Selecione a seção Apps no canto inferior esquerdo.
 
-   ![imagen](img/image3_Charlie.png)
+   ![imagem](img/image3_Charlie.png)
 
-3. Abre SharePoint.
-4. Creemos un nuevo sitio seleccionando "+ create a site" en la esquina superior izquierda.
-5. Selecciona "Teams Site".
+3. Abra o SharePoint.
+4. Vamos criar um novo site selecionando "+ create a site" no canto superior esquerdo.
+5. Selecione "Teams Site".
 
-   ![imagen](img/image4_Charlie.png)
+   ![imagem](img/image4_Charlie.png)
 
-6. Elige una plantilla de equipo estándar y selecciona "Use Template".
-7. Para el nombre, usemos "Product Repository".
-8. En Configuración de privacidad: "Public – anyone in the organization can access this site".
-9. En la sección "add members", selecciona tu usuario y presiona Finish.
+6. Escolha um modelo de equipe padrão e selecione "Use Template".
+7. Para o nome, vamos usar "Product Repository".
+8. Em configuração de privacidade: "Public – anyone in the organization can access this site".
+9. Na seção "add members", selecione seu usuário e pressione Finish.
 
-¡Excelente! Ahora tenemos nuestro sitio de SharePoint; vayamos a la sección Documents:
+Excelente! Agora temos nosso site do SharePoint; vamos para a seção Documents:
 
-![imagen](img/image5_Charlie.png)
+![imagem](img/image5_Charlie.png)
 
-10. Ahora creemos una nueva carpeta y llamémosla "Products".
-11. Cuando esté listo, sube el archivo "Product\_Catalog" que descargaste desde el repositorio de GitHub [taller-multi-agentic/assets/Product_Catalog.docx](https://github.com/warnov/taller-multi-agentic/blob/main/assets/Product_Catalog.docx).
-12. ¡La base de conocimiento está lista! Volvamos a la configuración del agente.
-
----
-
-## Configurar fuentes de conocimiento
-
-En la sección Overview del agente, agrega las fuentes de conocimiento del agente según se indica a continuación:
-
-![imagen](img/image6_Charlie.png)
-
-**Asegúrate de que la opción "Web Search" esté habilitada.**
-
-![imagen](img/image7_Charlie.png)
-
-1. Elige SharePoint y luego selecciona Browse items.
-
-   ![imagen](img/image8_Charlie.png)
-
-2. En el sitio Product Repository, selecciona la carpeta "Products" y luego presiona "Confirm Selection".
-3. Ahora selecciona "Add to agent" para finalizar el proceso.
-
-   ![imagen](img/image9_Charlie.png)
+10. Agora vamos criar uma nova pasta e chamá-la de "Products".
+11. Quando estiver pronto, faça o upload do arquivo "Product\_Catalog" que você baixou do repositório do GitHub [taller-multi-agentic/assets/Product_Catalog.docx](https://github.com/warnov/taller-multi-agentic/blob/main/assets/Product_Catalog.docx).
+12. A base de conhecimento está pronta! Vamos voltar à configuração do agente.
 
 ---
 
-## Publicar el agente
+## Configurar fontes de conhecimento
 
-1. Ahora, selecciona el botón Publish en la esquina superior derecha. Se abrirá una ventana emergente para confirmar que realmente quieres publicar tu agente.
+Na seção Overview do agente, adicione as fontes de conhecimento do agente conforme indicado a seguir:
 
-   ![imagen](img/image10_Charlie.png)
+![imagem](img/image6_Charlie.png)
 
-2. Selecciona Publish para confirmar la publicación de tu agente. Aparecerá un mensaje indicando que el agente se está publicando. No necesitas mantener esa ventana abierta. Recibirás una notificación cuando el agente esté publicado.
+**Certifique-se de que a opção "Web Search" esteja habilitada.**
 
-   ![imagen](img/image11_Charlie.png)
+![imagem](img/image7_Charlie.png)
 
-3. Cuando el agente termine de publicarse, verás la notificación en la parte superior de la página del agente.
-4. Ahora, antes de probar el agente, configuremos un canal. Selecciona la sección Channels como se muestra a continuación.
+1. Escolha SharePoint e em seguida selecione Browse items.
 
-   ![imagen](img/image12_Charlie.png)
+   ![imagem](img/image8_Charlie.png)
 
-5. En la sección Channels, selecciona "Teams and Microsoft 365 Copilot".
+2. No site Product Repository, selecione a pasta "Products" e em seguida pressione "Confirm Selection".
+3. Agora selecione "Add to agent" para finalizar o processo.
 
-   ![imagen](img/image13_Charlie.png)
-
-6. Ahora, en el panel lateral, selecciona la opción "Turn on Microsoft 365" y luego selecciona Add Channel.
-
-   ![imagen](img/image14_Charlie.png)
-
-7. La adición tardará un poco. Cuando se complete, aparecerá una notificación verde en la parte superior de la barra lateral. Si aparece una ventana emergente solicitando publicar nuevamente, selecciona Publish y espera a que termine.
-8. Selecciona "See agent in Microsoft 365" para abrir una nueva pestaña.
-9. Ahora, en la aplicación de Microsoft 365, verás una ventana emergente. Selecciona "Add".
-
-   ![imagen](img/image15_Charlie.png)
-
-10. ¡Ahora nuestro agente está listo para probarse!
+   ![imagem](img/image9_Charlie.png)
 
 ---
 
-## Probar el agente
+## Publicar o agente
 
-Probemos Charlie desde la aplicación de Microsoft 365.
+1. Agora, selecione o botão Publish no canto superior direito. Uma janela pop-up será aberta para confirmar que você realmente deseja publicar seu agente.
 
-1. Usa este prompt: "Enumera el nombre de los productos disponibles en una estructura de viñetas".
-2. Elige el producto sobre el que quieras realizar investigación de mercado.
-3. Usa este prompt: "Realiza una investigación de mercado ligera para el producto \"Inserta el producto\"; enumera ventajas y desventajas competitivas y compara precios".
+   ![imagem](img/image10_Charlie.png)
+
+2. Selecione Publish para confirmar a publicação do seu agente. Uma mensagem aparecerá indicando que o agente está sendo publicado. Você não precisa manter essa janela aberta. Você receberá uma notificação quando o agente estiver publicado.
+
+   ![imagem](img/image11_Charlie.png)
+
+3. Quando o agente terminar de ser publicado, você verá a notificação na parte superior da página do agente.
+4. Agora, antes de testar o agente, vamos configurar um canal. Selecione a seção Channels conforme mostrado a seguir.
+
+   ![imagem](img/image12_Charlie.png)
+
+5. Na seção Channels, selecione "Teams and Microsoft 365 Copilot".
+
+   ![imagem](img/image13_Charlie.png)
+
+6. Agora, no painel lateral, selecione a opção "Turn on Microsoft 365" e em seguida selecione Add Channel.
+
+   ![imagem](img/image14_Charlie.png)
+
+7. A adição levará um momento. Quando for concluída, uma notificação verde aparecerá na parte superior da barra lateral. Se aparecer uma janela pop-up solicitando publicar novamente, selecione Publish e aguarde a conclusão.
+8. Selecione "See agent in Microsoft 365" para abrir uma nova aba.
+9. Agora, na aplicação do Microsoft 365, você verá uma janela pop-up. Selecione "Add".
+
+   ![imagem](img/image15_Charlie.png)
+
+10. Agora nosso agente está pronto para ser testado!
 
 ---
 
-# **🎉 Misión completada**
+## Testar o agente
 
-✅ ¡Excelente trabajo! Nuestro agente Charlie ya está completo.
+Vamos testar o "**Charlie**" a partir da aplicação do Microsoft 365.
+
+1. Use este prompt: "Liste o nome dos produtos disponíveis em uma estrutura de tópicos".
+2. Escolha o produto sobre o qual deseja realizar pesquisa de mercado.
+3. Use este prompt: "Realize uma pesquisa de mercado leve para o produto \"Insira o produto\"; liste vantagens e desvantagens competitivas e compare preços".
+
+---
+
+# **🎉 Missão concluída**
+
+✅ Excelente trabalho! Nosso agente "**Charlie**" está completo.
 
