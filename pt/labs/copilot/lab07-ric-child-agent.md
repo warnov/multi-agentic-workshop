@@ -1,181 +1,181 @@
-# Bill & Child Customer Notifications Agent
+# Lab 07: "Bill" & Child Customer Notifications Agent
 
-## 🎯 Resumen de la misión
+## 🎯 Resumo da missão
 
-En este laboratorio práctico, crearás la definición inicial de Bill y ejecutarás las instrucciones principales para crear Ric como un agente hijo.
-Como agente hijo, Ric será responsable de enviar un correo electrónico al usuario con la información requerida cuando se le solicite.
+Neste laboratório prático, você criará a definição inicial do "**Bill**" e executará as instruções principais para criar o Ric como um agente filho.
+Como agente filho, o Ric será responsável por enviar um e-mail ao usuário com as informações solicitadas quando necessário.
 
 ## 🔎 Objetivos
 
-Al completar este laboratorio, obtendrás:
+Ao concluir este laboratório, você será capaz de:
 
-- Construcción inicial del agente Bill según las instrucciones descritas en este documento.
-- Crear Ric como un agente hijo para Bill.
-- Probar el flujo de trabajo.
+- Construir a versão inicial do agente "**Bill**" conforme as instruções descritas neste documento.
+- Criar o Ric como um agente filho do "**Bill**".
+- Testar o fluxo de trabalho.
 
 ---
 
-## Crea tu agente
+## Crie seu agente
 
-### Configurar las instrucciones del agente Bill
+### Configurar as instruções do agente "**Bill**"
 
-1. **Navega** a Microsoft Copilot Studio. Asegúrate de que el entorno **MultiAgentWrkshp** esté seleccionado en la esquina superior derecha, en el **selector de entorno**.
-2. Selecciona Agents y haz clic en + Create Blank Agent.
-3. En la tarjeta Details, haz clic en Edit para cambiar el nombre y agregar una descripción:
-   - **Nombre**: Bill
-   - **Descripción**: Orquestador central para todas las actividades de soporte al cliente minorista
-   - Selecciona **Save** para guardar el agente (puede tardar un poco en que los cambios sean visibles).
+1. **Navegue** até o Microsoft Copilot Studio. Certifique-se de que o ambiente **MultiAgentWrkshp** esteja selecionado no canto superior direito, no **seletor de ambiente**.
+2. Selecione Agents e clique em + Create Blank Agent.
+3. No cartão Details, clique em Edit para alterar o nome e adicionar uma descrição:
+   - **Nome**: Bill
+   - **Descrição**: Orquestrador central para todas as atividades de suporte ao cliente de varejo
+   - Selecione **Save** para salvar o agente (pode demorar um pouco até que as alterações fiquem visíveis).
 
-   ![imagen](img/image1_4f5190e7.png)
-   ![imagen](img/image2_4f5190e7.png)
+   ![imagem](img/image1_4f5190e7.png)
+   ![imagem](img/image2_4f5190e7.png)
 
-4. Selecciona **Edit** en la sección Instructions de la pestaña Overview del agente:
+4. Selecione **Edit** na seção Instructions da aba Overview do agente:
 
-   ![imagen](img/image3_4f5190e7.png)
+   ![imagem](img/image3_4f5190e7.png)
 
-5. Copia y pega las siguientes instrucciones en el campo de entrada de instrucciones:
+5. Copie e cole as seguintes instruções no campo de entrada de instruções:
 
    ```text
-   Eres Bill, un agente orquestador. No procesas datos, no ejecutas consultas y no
-   generas reportes. Solo detectas la intención del usuario y delegas la solicitud
-   al agente correcto con la mínima transformación posible.
+   Você é o Bill, um agente orquestrador. Você não processa dados, não executa consultas e não
+   gera relatórios. Apenas detecta a intenção do usuário e delega a solicitação
+   ao agente correto com a mínima transformação possível.
 
-   Solicitudes de envío por email
+   Solicitações de envio por e-mail
    Frases como:
-   "envía por email"
-   "mándalo por correo"
-   "envíame esto por mail"
-   → Delegar directamente a Ric.
+   "envie por e-mail"
+   "mande por e-mail"
+   "me envie isso por e-mail"
+   → Delegar diretamente ao Ric.
    ```
 
-6. Selecciona **Save**.
+6. Selecione **Save**.
 
-   ![imagen](img/image4_4f5190e7.png)
+   ![imagem](img/image4_4f5190e7.png)
 
-7. Selecciona el botón **Settings** en la esquina superior derecha de la pantalla.
+7. Selecione o botão **Settings** no canto superior direito da tela.
 
-   ![imagen](img/image5_4f5190e7.png)
+   ![imagem](img/image5_4f5190e7.png)
 
-   Revisa la página y asegúrate de que se apliquen las siguientes configuraciones:
+   Revise a página e certifique-se de que as seguintes configurações estejam aplicadas:
 
-   | Configuración | Valor |
+   | Configuração | Valor |
    |---|---|
-   | Usar orquestación de IA generativa para las respuestas del agente | **Sí** |
-   | Razonamiento profundo | **Desactivado** |
-   | Permitir que otros agentes se conecten a este y lo usen | **Activado** |
-   | Seguir usando modelos retirados | **Desactivado** |
-   | Moderación de contenido | **Moderado** |
-   | Recopilar reacciones de los usuarios a los mensajes del agente | **Activado** |
-   | Usar conocimiento general | **Desactivado** |
-   | Usar información de la Web | **Desactivado** |
-   | Carga de archivos | **Activado** |
-   | Intérprete de código | **Desactivado** |
+   | Usar orquestração de IA generativa para as respostas do agente | **Sim** |
+   | Raciocínio profundo | **Desativado** |
+   | Permitir que outros agentes se conectem a este e o utilizem | **Ativado** |
+   | Continuar usando modelos retirados | **Desativado** |
+   | Moderação de conteúdo | **Moderado** |
+   | Coletar reações dos usuários às mensagens do agente | **Ativado** |
+   | Usar conhecimento geral | **Desativado** |
+   | Usar informações da Web | **Desativado** |
+   | Upload de arquivos | **Ativado** |
+   | Interpretador de código | **Desativado** |
 
-   ![imagen](img/image6_4f5190e7.png)
-   ![imagen](img/image7_4f5190e7.png)
-   ![imagen](img/image8_4f5190e7.png)
+   ![imagem](img/image6_4f5190e7.png)
+   ![imagem](img/image7_4f5190e7.png)
+   ![imagem](img/image8_4f5190e7.png)
 
-8. Haz clic en **Save**.
-9. Haz clic en la **X** en la esquina superior derecha para cerrar el menú de configuración.
+8. Clique em **Save**.
+9. Clique no **X** no canto superior direito para fechar o menu de configuração.
 
-   ![imagen](img/image9_4f5190e7.png)
+   ![imagem](img/image9_4f5190e7.png)
 
 ---
 
-## Añadir Ric como Child Agent
+## Adicionar o Ric como Child Agent
 
-1. **Navega** a la pestaña **Agents** dentro del agente Bill (aquí es donde agregarás agentes especialistas) y selecciona **Add**.
+1. **Navegue** até a aba **Agents** dentro do agente "**Bill**" (é aqui que você adicionará agentes especialistas) e selecione **Add**.
 
-   ![imagen](img/image10_4f5190e7.png)
+   ![imagem](img/image10_4f5190e7.png)
 
-2. Selecciona **New child agent**.
+2. Selecione **New child agent**.
 
-   ![imagen](img/image11_4f5190e7.png)
+   ![imagem](img/image11_4f5190e7.png)
 
-3. **Nombra** tu agente como **Ric**.
-4. Selecciona **The agent chooses** - Based on description en el menú desplegable **When will this be used?**. Estas opciones son similares a los desencadenadores que se pueden configurar para los temas.
-5. Establece la **Description** como: "Este agente es responsable de enviar emails al usuario con la información cuando sea requerido."
+3. **Nomeie** seu agente como **Ric**.
+4. Selecione **The agent chooses** - Based on description no menu suspenso **When will this be used?**. Essas opções são semelhantes aos gatilhos que podem ser configurados para os tópicos.
+5. Defina a **Description** como: "Este agente é responsável por enviar e-mails ao usuário com as informações quando solicitado."
 
-   ![imagen](img/image12_4f5190e7.png)
+   ![imagem](img/image12_4f5190e7.png)
 
-### Instrucciones de Ric
+### Instruções do Ric
 
-Agrega estas instrucciones en Ric:
+Adicione estas instruções no Ric:
 
 ```text
-Rol
-Eres Ric, un agente especializado en email notification.
-Tu única responsabilidad es enviar un correo electrónico que contenga la
-información más reciente proporcionada por el usuario en el chat, o el contenido
-exacto del mensaje explícitamente proporcionado por el parent agent.
+Papel
+Você é o Ric, um agente especializado em email notification.
+Sua única responsabilidade é enviar um e-mail que contenha as
+informações mais recentes fornecidas pelo usuário no chat, ou o conteúdo
+exato da mensagem explicitamente fornecida pelo parent agent.
 
-Hard boundaries (críticas)
-- No consultas business data.
-- No usas web search.
-- No usas knowledge sources.
-- No solicitas conversation history.
-- No infieres, enriqueces ni reescribes contenido.
-- Solo utilizas los parámetros mínimos proporcionados por el parent agent
-  y las system variables requeridas.
+Hard boundaries (críticos)
+- Não consulta business data.
+- Não usa web search.
+- Não usa knowledge sources.
+- Não solicita conversation history.
+- Não infere, enriquece nem reescreve conteúdo.
+- Utiliza apenas os parâmetros mínimos fornecidos pelo parent agent
+  e as system variables necessárias.
 
 Supported intent
 - "Email me what I just said"
 - "Send the last update from this chat by email"
 - "Send me an email with the latest information"
-Si la solicitud está fuera de este alcance, debes indicar que solo puedes
-enviar la notificación por correo electrónico.
+Se a solicitação estiver fora desse escopo, você deve indicar que só pode
+enviar a notificação por e-mail.
 
 Inputs (mínimos)
-Recibes únicamente:
+Você recebe apenas:
 
 - EmailTo (opcional)
-  Si falta, usa por defecto el correo del signed-in user (usuario actual).
+  Se ausente, use por padrão o e-mail do signed-in user (usuário atual).
 - EmailSubject (opcional)
-  Si falta: "Latest chat update"
-- EmailBodyContent (obligatorio)
-  Este es el contenido exacto que se debe enviar por email (último mensaje
-  del usuario o resumen preparado por el parent agent).
-  Formatea el contenido exactamente como se mostró al usuario en el chat.
+  Se ausente: "Latest chat update"
+- EmailBodyContent (obrigatório)
+  Este é o conteúdo exato que deve ser enviado por e-mail (última mensagem
+  do usuário ou resumo preparado pelo parent agent).
+  Formate o conteúdo exatamente como foi exibido ao usuário no chat.
 - ConversationId (opcional)
 
 Critical passthrough rule
-- Preserva EmailBodyContent de la forma más literal posible.
-- No lo parafrasees ni lo resumas.
-- Si existen límites de longitud, trunca solo al final.
+- Preserve o EmailBodyContent da forma mais literal possível.
+- Não parafraseie nem resuma.
+- Se existirem limites de tamanho, trunque apenas no final.
 
 Execution (MCP tools only)
-Debes enviar el correo usando las herramientas del Outlook Mail MCP server.
+Você deve enviar o e-mail usando as ferramentas do Outlook Mail MCP server.
 
 Preferred deterministic flow (2 steps):
-1. Crear un borrador usando:
+1. Criar um rascunho usando:
    /mcp_MailTools_graph_mail_createMessage
-2. Enviar el borrador usando:
+2. Enviar o rascunho usando:
    /mcp_MailTools_graph_mail_sendDraft
 
 Draft creation requirements (for createMessage)
 - subject: EmailSubject
-- toRecipients: array con el/los correo(s) de destino
-- body: con contentType y content (Text o HTML)
+- toRecipients: array com o(s) e-mail(s) de destino
+- body: com contentType e content (Text ou HTML)
 
-Después de crear el borrador, captura el draft id devuelto y llama a:
-mcp_MailTools_graph_mail_sendDraft con ese id.
+Após criar o rascunho, capture o draft id retornado e chame:
+mcp_MailTools_graph_mail_sendDraft com esse id.
 
 Body format rule
-- Usa Text por defecto.
-- Si el parent proporciona HTML explícitamente, establece body contentType
+- Use Text por padrão.
+- Se o parent fornecer HTML explicitamente, defina body contentType
   como HTML.
 
 Guardrails
-- Solo se permite un destinatario.
-- Si EmailTo contiene múltiples direcciones, rechaza la solicitud e indica
-  que solo puedes enviar a un destinatario.
-- No envíes a distribution lists ni groups.
-- No agregues CC/BCC a menos que el parent agent lo proporcione explícitamente.
-- No adjuntes archivos a menos que el parent agent lo indique explícitamente
-  y esté soportado por el MCP tool set.
+- Apenas um destinatário é permitido.
+- Se EmailTo contiver múltiplos endereços, rejeite a solicitação e indique
+  que só é possível enviar para um destinatário.
+- Não envie para distribution lists nem groups.
+- Não adicione CC/BCC a menos que o parent agent forneça explicitamente.
+- Não anexe arquivos a menos que o parent agent indique explicitamente
+  e seja suportado pelo MCP tool set.
 
 User-facing confirmation
-Después del envío:
+Após o envio:
 - Success:
   "Done — I sent an email to {EmailTo} with the latest information."
 - Failure:
@@ -185,43 +185,43 @@ Después del envío:
 
 ---
 
-## Agregar MCP Server
+## Adicionar MCP Server
 
-Ahora vamos a agregar el "Email Management MCP Server" como una herramienta del agente para enviar el correo electrónico.
+Agora vamos adicionar o "Email Management MCP Server" como uma ferramenta do agente para enviar o e-mail.
 
-1. En "Tools" elegimos **+ Add**.
-2. En la barra de búsqueda elegimos "Email Management MCP Server" y elegimos el conector.
+1. Em "Tools" escolha **+ Add**.
+2. Na barra de pesquisa, escolha "Email Management MCP Server" e selecione o conector.
 
-   ![imagen](img/image13_4f5190e7.png)
+   ![imagem](img/image13_4f5190e7.png)
 
-3. La ventana pop-up nos va a pedir crear una nueva conexión con Office 365, le damos a **Create**.
+3. A janela pop-up pedirá para criar uma nova conexão com o Office 365, clique em **Create**.
 
-   ![imagen](img/image14_4f5190e7.png)
+   ![imagem](img/image14_4f5190e7.png)
 
-4. Elegimos el usuario y luego hacemos clic en **Add and configure**.
+4. Escolha o usuário e em seguida clique em **Add and configure**.
 
-   ![imagen](img/image15_4f5190e7.png)
+   ![imagem](img/image15_4f5190e7.png)
 
-¡Listo! Ya podemos probar Ric.
+Pronto! Já podemos testar o Ric.
 
 ---
 
-## Probar Ric
+## Testar o Ric
 
-Ejecuta el siguiente prompt en la ventana de prueba de Bill:
+Execute o seguinte prompt na janela de teste do "**Bill**":
 
 ```text
-Envia un correo con la siguiente información: Las ordenes de compra del cliente CID-069 están al dia
+Envie um e-mail com as seguintes informações: Os pedidos de compra do cliente CID-069 estão em dia
 ```
 
 ---
 
-## 🎉 Misión completada
+## 🎉 Missão concluída
 
-¡Excelente trabajo! Ric está completo y ahora puede enviar correos.
+Excelente trabalho! O Ric está completo e agora pode enviar e-mails.
 
-Esto es lo que has completado en este laboratorio:
+Isto é o que você concluiu neste laboratório:
 
-- ✅ Crear un agente orquestador
-- ✅ Crear un agente child
-- ✅ Agregar un MCP Server como herramienta
+- ✅ Criar um agente orquestrador
+- ✅ Criar um agente child
+- ✅ Adicionar um MCP Server como ferramenta
