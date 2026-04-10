@@ -8,7 +8,7 @@ Neste laboratório, vamos conectar os agentes **Mark**, **Anders**, **Charlie** 
 
 Ao concluir este laboratório, você aprenderá:
 
-- Como conectar agentes externos do Fabric e do Microsoft Foundry.
+- Como conectar agentes externos do Fabric e do Azure AI Foundry.
 - Como conectar agentes internos desenvolvidos no Copilot Studio.
 - Como gerar regras de orquestração para que o Copilot Studio possa navegar entre agentes.
 
@@ -77,9 +77,9 @@ Ao concluir este laboratório, você aprenderá:
 
 ---
 
-## Agente "**Charlie**
+## Agente "**Charlie**"
 
-Vamos repetir o processo realizado com o Mark e Anders, mas selecionando o Charlie como um agente interno criado em nosso ambiente.
+Vamos repetir o processo realizado com o "**Mark**" e "**Anders**", mas selecionando o "**Charlie**" como um agente interno criado em nosso ambiente.
 
 ![imagem](img/image10_Bill.png)
 ![imagem](img/image11_Bill.png)
