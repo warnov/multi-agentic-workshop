@@ -129,7 +129,7 @@ Additionally, validate that `OrdersReporter` and `SqlExecutor` have OpenAPI attr
 ### Step 3: Verify build
 
 ```powershell
-cd en\labs\foundry\code\api\FxContosoRetail
+cd en/labs/foundry/code/api/FxContosoRetail
 dotnet build
 ```
 
@@ -207,7 +207,7 @@ If you want a full redeploy (infra + publish) using the setup:
 
 ```powershell
 # Flex Consumption
-cd en\labs\foundry\setup\op-flex
+cd en/labs/foundry/setup/op-flex
 .\deploy.ps1 `
     -TenantName "<tu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -218,7 +218,7 @@ cd en\labs\foundry\setup\op-flex
 
 ```powershell
 # Consumption (Y1)
-cd en\labs\foundry\setup\op-consumption
+cd en/labs/foundry/setup/op-consumption
 .\deploy.ps1 `
     -TenantName "<tu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -234,7 +234,7 @@ cd en\labs\foundry\setup\op-consumption
 If you have [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) installed, redeployment is a single command:
 
 ```powershell
-cd en\labs\foundry\code\api\FxContosoRetail
+cd en/labs/foundry/code/api/FxContosoRetail
 func azure functionapp publish func-contosoretail-<suffix>
 ```
 
@@ -246,7 +246,7 @@ If you do not have the `func` CLI, you can publish manually using `az`:
 
 ```powershell
 # 1. Build the project
-cd en\labs\foundry\code\api\FxContosoRetail
+cd en/labs/foundry/code/api/FxContosoRetail
 dotnet publish --configuration Release --output bin\publish
 
 # 2. Create the zip package
@@ -465,7 +465,7 @@ Open the file `en/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.js
 ### Step 2: Build and run
 
 ```powershell
-cd en\labs\foundry\code\agents\AndersAgent\ms-foundry
+cd en/labs/foundry/code/agents/AndersAgent/ms-foundry
 dotnet build
 ```
 
