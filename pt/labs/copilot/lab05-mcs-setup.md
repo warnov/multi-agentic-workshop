@@ -119,13 +119,13 @@ Copie e cole o seguinte
 
 ![imagem](img/image21_MCS_Setup.png)
 
-9. O painel New publisher será fechado e você voltará ao painel **New solution** com o publisher recém-criado selecionado.
+10. O painel New publisher será fechado e você voltará ao painel **New solution** com o publisher recém-criado selecionado.
     
 Muito bem, você criou um Solution Publisher! 🙌🏼 
 
 # A seguir, aprenderemos a criar uma nova solução personalizada.
 Agora que temos o novo Solution Publisher
-Podemos completar o restante do formulário no painel **New solution** .. 
+Podemos completar o restante do formulário no painel **New solution**. 
 
 1. Copie e cole o seguinte: 
 - Como **Display name: My Multi Agent Solution** 
@@ -156,7 +156,7 @@ Você verá o seguinte:
 ![imagem](img/image25_MCS_Setup.png)
 
 6. Torne sua solução a solução padrão / Confirme
-7. Verifique se a sua solução "" possui a etiqueta "Preferred Solution" ao lado. 
+7. Verifique se a sua solução possui a etiqueta "Preferred Solution" ao lado. 
 
 ![imagem](img/image26_MCS_Setup.png)
 
@@ -176,6 +176,6 @@ Você verá o seguinte:
 
 ![imagem](img/image26_MCS_Setup.png)
 
-# **🎉**** Missão completada **
+# **🎉** **Missão completada**
 
 ✅**Agora você terminou de configurar seu ambiente de laboratório para o Microsoft Copilot Studio.** Parabéns!
