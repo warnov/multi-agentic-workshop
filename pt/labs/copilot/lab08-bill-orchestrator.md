@@ -27,7 +27,7 @@ Ao concluir este laboratório, você aprenderá:
 
 ---
 
-## Agente Mark
+## Agente "**Mark**"
 
 1. Clique em "Add Agent" e em seguida selecione "Connect to an external agent".
 
@@ -40,32 +40,32 @@ Ao concluir este laboratório, você aprenderá:
    ![imagem](img/image4_Bill.png)
 
 5. Após iniciar a sessão, a conexão com o Fabric está pronta e já podemos escolher os agentes que definimos no ambiente do Fabric. Clique em "next".
-6. Na janela de seleção de agentes, escolha "Mark" e clique em next.
+6. Na janela de seleção de agentes, escolha "**Mark**" e clique em next.
 
    ![imagem](img/image5_Bill.png)
 
-7. Na janela de configuração, podemos adicionar uma descrição que servirá de guia para o orquestrador sobre o que o Mark fará quando for chamado. Vamos adicionar a seguinte descrição: "Fornece informações detalhadas sobre os pedidos de compra dos clientes" e clicamos em add.
+7. Na janela de configuração, podemos adicionar uma descrição que servirá de guia para o orquestrador sobre o que o "**Mark**" fará quando for chamado. Vamos adicionar a seguinte descrição: "Fornece informações detalhadas sobre os pedidos de compra dos clientes" e clicamos em add.
 
    ![imagem](img/image6_Bill.png)
 
-8. Pronto, adicionamos o Mark.
+8. Pronto, adicionamos o "**Mark**".
 
 ---
 
-## Agente Anders
+## Agente "**Anders**"
 
-1. Vamos repetir o processo realizado com o Mark, mas selecionando como conector externo o **Microsoft Foundry**.
-2. Repita o passo 1 do Mark e selecione Microsoft Foundry. Em seguida, vamos criar uma conexão.
-3. Na janela de conexão, os dados a configurar são diferentes dos que vimos com o Mark.
+1. Vamos repetir o processo realizado com o "**Mark**", mas selecionando como conector externo o **Azure AI Foundry**.
+2. Repita o passo 1 do "**Mark**" e selecione Azure AI Foundry. Em seguida, vamos criar uma conexão.
+3. Na janela de conexão, os dados a configurar são diferentes dos que vimos com o "**Mark**".
 
    ![imagem](img/image7_Bill.png)
 
-4. Em "Authentication type" vamos manter Microsoft Entra, para que o agente delegue a autenticação ao usuário final. No campo seguinte, vamos adicionar a URL do projeto do Microsoft Foundry.
-5. Navegue até o portal do Microsoft Foundry, onde criaram o Anders. Na seção "Overview", copie o link do endpoint e cole na janela do Copilot Studio.
+4. Em "Authentication type" vamos manter Microsoft Entra, para que o agente delegue a autenticação ao usuário final. No campo seguinte, vamos adicionar a URL do projeto do Azure AI Foundry.
+5. Navegue até o portal do Azure AI Foundry, onde criaram o "**Anders**". Na seção "Overview", copie o link do endpoint e cole na janela do Copilot Studio.
 
    ![imagem](img/image8_Bill.png)
 
-6. Repetimos o passo 4 do Mark, selecionamos o usuário do laboratório e continuamos com a conexão. Clique em next.
+6. Repetimos o passo 4 do "**Mark**", selecionamos o usuário do laboratório e continuamos com a conexão. Clique em next.
 7. Na janela de configuração do agente, vamos preencher os seguintes dados:
    - **Name**: "Anders"
    - **Description**: "Anders vai receber a lista completa de pedidos retornados pelo Mark para gerar um relatório"
@@ -73,7 +73,7 @@ Ao concluir este laboratório, você aprenderá:
 
    ![imagem](img/image9_Bill.png)
 
-8. Ao finalizar, clique em add. Pronto, o Anders foi adicionado.
+8. Ao finalizar, clique em add. Pronto, o "**Anders**" foi adicionado.
 
 ---
 
@@ -232,5 +232,5 @@ Resumo mental
 
 Excelente trabalho! Aprendemos:
 
-- ✅ Como adicionar um agente do Fabric, Microsoft Foundry e um agente do Copilot Studio em uma mesma arquitetura.
+- ✅ Como adicionar um agente do Fabric, Azure AI Foundry e um agente do Copilot Studio em uma mesma arquitetura.
 - ✅ Como gerar instruções no Copilot Studio para orquestrar múltiplos agentes.

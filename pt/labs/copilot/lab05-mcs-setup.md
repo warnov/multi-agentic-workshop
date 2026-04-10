@@ -30,9 +30,9 @@ Ao completar este laboratório, você produzirá o seguinte:
 
 No painel de detalhes do New Environment, insira o seguinte: 
 - Nome: **MultiAgentWrkshp** 
-- Região:** certifique-se de que "United States - Default" esteja selecionado** 
+- Região: **certifique-se de que "United States - Default" esteja selecionado** 
 - Tipo: **Sandbox** 
-- Propósito:** este é o ambiente para executar os laboratórios do workshop Multi-Agent** 
+- Propósito: **este é o ambiente para executar os laboratórios do workshop Multi-Agent** 
 - Adicionar um armazenamento de dados do Dataverse? : **ative o interruptor (Toggle) em ON**
 - O painel de detalhes do seu novo ambiente deve ficar assim:
  
@@ -156,7 +156,7 @@ Você verá o seguinte:
 ![imagem](img/image25_MCS_Setup.png)
 
 6. Torne sua solução a solução padrão / Confirme
-7. Verifique se a sua solução possui a etiqueta "Preferred Solution" ao lado. 
+7. Verifique se a sua solução possui a etiqueta "**Preferred Solution**" ao lado. 
 
 ![imagem](img/image26_MCS_Setup.png)
 
@@ -176,6 +176,6 @@ Você verá o seguinte:
 
 ![imagem](img/image26_MCS_Setup.png)
 
-# **🎉** **Missão completada**
+# **🎉 Missão concluída**
 
 ✅**Agora você terminou de configurar seu ambiente de laboratório para o Microsoft Copilot Studio.** Parabéns!

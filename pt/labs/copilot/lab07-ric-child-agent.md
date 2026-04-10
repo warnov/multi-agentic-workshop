@@ -2,7 +2,7 @@
 
 ## 🎯 Resumo da missão
 
-Neste laboratório prático, você criará a definição inicial do "**Bill**" e executará as instruções principais para criar o Ric como um agente filho.
+Neste laboratório prático, você criará a definição inicial do "**Bill**" e executará as instruções principais para criar o "**Ric** como um agente filho.
 Como agente filho, o "**Ric**" será responsável por enviar um e-mail ao usuário com as informações solicitadas quando necessário.
 
 ## 🔎 Objetivos
