@@ -1,4 +1,4 @@
-# Lab 08: MCS – "**Bill**": Orquestração de Agentes
+# Lab 08: MCS – "**Bill**" [Orquestração de Agentes]
 
 ## 🎯 Resumo da missão
 

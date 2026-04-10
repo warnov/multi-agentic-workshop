@@ -1,4 +1,4 @@
-# Lab 09: MCS – "**Bill**": Publicação e Testes
+# Lab 09: MCS – "**Bill**" [Publicação e Testes]
 
 ## 🎯 Resumo da missão
 

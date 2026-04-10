@@ -1,4 +1,4 @@
-# Lab 07: "Bill" & Child Customer Notifications Agent
+# Lab 07: "Bill" & "**Ric**" [Child Customer Notifications Agent]
 
 ## 🎯 Resumo da missão
 
