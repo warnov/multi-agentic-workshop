@@ -1,87 +1,87 @@
-# MCS – Bill: Publicación y Pruebas
+# Lab 09: MCS – "**Bill**": Publicação e Testes
 
-## 🎯 Resumen de la misión
+## 🎯 Resumo da missão
 
-En este laboratorio vamos a publicar el agente Bill y realizar pruebas a través de la aplicación de Microsoft 365.
+Neste laboratório, vamos publicar o agente "**Bill**" e realizar testes através da aplicação do Microsoft 365.
 
 ## 🔎 Objetivos
 
-Al completar este laboratorio, ustedes van a aprender:
+Ao concluir este laboratório, você aprenderá:
 
-- Cómo publicar el agente usando el canal de Microsoft 365 y Microsoft Teams.
-- Consultar el agente desde Microsoft 365.
-
----
-
-## Proceso de Publicación
-
-1. Ahora, selecciona el botón **Publicar** en la esquina superior derecha. Se abrirá una ventana emergente para confirmar que realmente quieres publicar tu agente.
-
-   ![imagen](img/image1_Publish_Bill.png)
-   ![imagen](img/image2_Publish_Bill.png)
-
-2. Selecciona **Publicar** para confirmar la publicación de tu agente. Aparecerá un mensaje indicando que tu agente se está publicando. No es necesario que mantengas abierta esa ventana emergente. Recibirás una notificación cuando el agente se haya publicado.
-
-   ![imagen](img/image3_Publish_Bill.png)
-
-3. Cuando el agente termine de publicarse, verás la notificación en la parte superior de la página del agente.
-4. Ahora, antes de probar el agente, configuremos un canal. Selecciona la sección **Canales** como se muestra a continuación.
-
-   ![imagen](img/image4_Publish_Bill.png)
-
-5. En la sección **Canales**, selecciona "Teams y Microsoft 365 Copilot".
-
-   ![imagen](img/image5_Publish_Bill.png)
-
-6. Ahora, en el panel lateral, selecciona la opción "Activar Microsoft 365" y luego selecciona **Agregar canal**.
-
-   ![imagen](img/image6_Publish_Bill.png)
-
-7. Tomará un poco de tiempo hasta que se agregue. Cuando se haya agregado, aparecerá una notificación verde en la parte superior de la barra lateral. Si aparece un mensaje emergente solicitando publicar nuevamente, selecciona **Publicar** y espera a que finalice.
-8. Selecciona "Ver agente en Microsoft 365" para abrir una nueva pestaña.
-
-   ![imagen](img/image7_Publish_Bill.png)
-
-9. Ahora, en la aplicación de Microsoft 365, verás una ventana emergente. Selecciona "Agregar".
-
-   ![imagen](img/image8_Publish_Bill.png)
-
-10. ¡Ahora nuestro agente está listo para ser probado!
+- Como publicar o agente usando o canal do Microsoft 365 e do Microsoft Teams.
+- Consultar o agente a partir do Microsoft 365.
 
 ---
 
-## Probar Bill
+## Processo de Publicação
 
-Probemos Bill desde la aplicación de Microsoft 365.
+1. Agora, selecione o botão **Publish** no canto superior direito. Uma janela pop-up será aberta para confirmar que você realmente deseja publicar seu agente.
 
-1. Selecciona Bill de tus agentes.
+   ![imagem](img/image1_Publish_Bill.png)
+   ![imagem](img/image2_Publish_Bill.png)
 
-   ![imagen](img/image9_Publish_Bill.png)
+2. Selecione **Publish** para confirmar a publicação do seu agente. Uma mensagem aparecerá indicando que seu agente está sendo publicado. Não é necessário manter essa janela pop-up aberta. Você receberá uma notificação quando o agente estiver publicado.
 
-2. **Prompt de prueba — Escenario 1:**
+   ![imagem](img/image3_Publish_Bill.png)
 
-   ```text
-   Genera un reporte con las ordenes de compra del cliente CID-069, incluye fecha de inicio y fin de la orden, el producto, marca, categoria, cantidad, precio, nombre del cliente y numeros de orden.
-   ```
+3. Quando o agente terminar de ser publicado, você verá a notificação na parte superior da página do agente.
+4. Agora, antes de testar o agente, vamos configurar um canal. Selecione a seção **Channels** conforme mostrado a seguir.
 
-3. **Prompt de prueba — Escenario 2:**
+   ![imagem](img/image4_Publish_Bill.png)
 
-   ```text
-   Muestra el detalle del producto Coffee maker
-   ```
+5. Na seção **Channels**, selecione "Teams and Microsoft 365 Copilot".
 
-   Cuando el agente haya respondido, ingresa el siguiente prompt:
+   ![imagem](img/image5_Publish_Bill.png)
 
-   ```text
-   Envíame un mail con esa información
-   ```
+6. Agora, no painel lateral, selecione a opção "Turn on Microsoft 365" e em seguida selecione **Add Channel**.
 
-4. Ahora en otra pestaña, abre <https://outlook.office.com> y en la bandeja de entrada encontrarás el mail con la información.
+   ![imagem](img/image6_Publish_Bill.png)
+
+7. Levará um momento até que seja adicionado. Quando estiver pronto, uma notificação verde aparecerá na parte superior da barra lateral. Se aparecer uma janela pop-up solicitando publicar novamente, selecione **Publish** e aguarde a conclusão.
+8. Selecione "See agent in Microsoft 365" para abrir uma nova aba.
+
+   ![imagem](img/image7_Publish_Bill.png)
+
+9. Agora, na aplicação do Microsoft 365, você verá uma janela pop-up. Selecione "Add".
+
+   ![imagem](img/image8_Publish_Bill.png)
+
+10. Agora nosso agente está pronto para ser testado!
 
 ---
 
-## 🎉 Misión completada
+## Testar o "**Bill**"
 
-¡Excelente trabajo! Nuestro agente Bill ya está completo.
+Vamos testar o "**Bill**" a partir da aplicação do Microsoft 365.
 
-✅ ¡Felicitaciones! Has publicado tu agente con éxito, lo implementaste en un sitio web de demostración y lo probaste antes de implementarlo para los usuarios finales en el sitio web de la empresa minorista.
+1. Selecione o "**Bill**" nos seus agentes.
+
+   ![imagem](img/image9_Publish_Bill.png)
+
+2. **Prompt de teste — Cenário 1:**
+
+   ```text
+   Gere um relatório com os pedidos de compra do cliente CID-069, inclua data de início e fim do pedido, o produto, marca, categoria, quantidade, preço, nome do cliente e números de pedido.
+   ```
+
+3. **Prompt de teste — Cenário 2:**
+
+   ```text
+   Mostre o detalhe do produto Coffee maker
+   ```
+
+   Quando o agente tiver respondido, insira o seguinte prompt:
+
+   ```text
+   Me envie um e-mail com essa informação
+   ```
+
+4. Agora, em outra aba, abra <https://outlook.office.com> e na caixa de entrada você encontrará o e-mail com as informações.
+
+---
+
+## 🎉 Missão concluída
+
+Excelente trabalho! Nosso agente "**Bill**" está completo.
+
+✅ Parabéns! Você publicou seu agente com sucesso, implementou-o em um site de demonstração e o testou antes de implantá-lo para os usuários finais no site da empresa de varejo.
