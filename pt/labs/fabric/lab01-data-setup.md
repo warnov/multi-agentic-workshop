@@ -1,4 +1,4 @@
-# Laboratório 01: Configuração de Dados
+# Lab 01: Configuração de Dados
 
 # MF – Configuração do Ambiente
 
