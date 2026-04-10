@@ -1,173 +1,173 @@
-# MCS – Bill: Orquestación de Agentes
+# Lab 08: MCS – "**Bill**": Orquestração de Agentes
 
-## 🎯 Resumen de la misión
+## 🎯 Resumo da missão
 
-En este laboratorio vamos a conectar los agentes **Mark**, **Anders**, **Charlie** al agente orquestador **Bill**, y vamos a generar las instrucciones de orquestación para que Bill pueda delegar consultas y solicitudes de reportes al agente correcto, manteniendo el contexto y los parámetros necesarios.
+Neste laboratório, vamos conectar os agentes **Mark**, **Anders**, **Charlie** ao agente orquestrador "**Bill**", e vamos gerar as instruções de orquestração para que o "**Bill**" possa delegar consultas e solicitações de relatórios ao agente correto, mantendo o contexto e os parâmetros necessários.
 
 ## 🔎 Objetivos
 
-Al completar este laboratorio, ustedes van a aprender:
+Ao concluir este laboratório, você aprenderá:
 
-- Cómo conectar Agentes externos de Fabric y Microsoft Foundry.
-- Cómo conectar Agentes internos desarrollados en Copilot Studio.
-- Cómo generar reglas de orquestación para que Copilot Studio pueda navegar entre agentes.
+- Como conectar agentes externos do Fabric e do Microsoft Foundry.
+- Como conectar agentes internos desenvolvidos no Copilot Studio.
+- Como gerar regras de orquestração para que o Copilot Studio possa navegar entre agentes.
 
 ---
 
-## Inicio del laboratorio
+## Início do laboratório
 
-1. Ingresemos en el Agente **Bill**, que creamos en el laboratorio anterior "Ric".
+1. Vamos acessar o agente "**Bill**", que criamos no laboratório anterior "Ric".
 
-   ![imagen](img/image1_Bill.png)
+   ![imagem](img/image1_Bill.png)
 
-2. Ahora vamos a conectar los agentes.
-3. Navega hacia la sección "Agentes".
+2. Agora vamos conectar os agentes.
+3. Navegue até a seção "Agents".
 
-   ![imagen](img/image2_Bill.png)
+   ![imagem](img/image2_Bill.png)
 
 ---
 
 ## Agente Mark
 
-1. Haz clic en "Agregar Agente" y luego selecciona "Conectar a un agente externo".
+1. Clique em "Add Agent" e em seguida selecione "Connect to an external agent".
 
-   ![imagen](img/image3_Bill.png)
+   ![imagem](img/image3_Bill.png)
 
-2. Selecciona "Microsoft Fabric", luego selecciona "crear una nueva conexión".
-3. En la ventana del conector, haz clic en "crear".
-4. Una ventana pop-up nos va a pedir seleccionar el usuario. Selecciona el usuario con el cual vienes trabajando los laboratorios.
+2. Selecione "Microsoft Fabric" e depois selecione "create a new connection".
+3. Na janela do conector, clique em "create".
+4. Uma janela pop-up pedirá para selecionar o usuário. Selecione o usuário com o qual você vem trabalhando nos laboratórios.
 
-   ![imagen](img/image4_Bill.png)
+   ![imagem](img/image4_Bill.png)
 
-5. Una vez iniciada la sesión, la conexión a Fabric está lista y ya podemos elegir los agentes que hayamos definido en el ambiente de Fabric. Haz clic en "siguiente".
-6. En la ventana de selección de agentes, elijamos "Mark" y le damos a siguiente.
+5. Após iniciar a sessão, a conexão com o Fabric está pronta e já podemos escolher os agentes que definimos no ambiente do Fabric. Clique em "next".
+6. Na janela de seleção de agentes, escolha "Mark" e clique em next.
 
-   ![imagen](img/image5_Bill.png)
+   ![imagem](img/image5_Bill.png)
 
-7. En la ventana de configuración, podemos agregar una descripción que va a servir de guía al orquestador de qué es lo que Mark va a hacer cuando sea llamado. Vamos a agregar la siguiente descripción: "Provee información detallada sobre las órdenes de compra de los clientes" y hacemos clic en agregar.
+7. Na janela de configuração, podemos adicionar uma descrição que servirá de guia para o orquestrador sobre o que o Mark fará quando for chamado. Vamos adicionar a seguinte descrição: "Fornece informações detalhadas sobre os pedidos de compra dos clientes" e clicamos em add.
 
-   ![imagen](img/image6_Bill.png)
+   ![imagem](img/image6_Bill.png)
 
-8. Listo, hemos agregado a Mark.
+8. Pronto, adicionamos o Mark.
 
 ---
 
 ## Agente Anders
 
-1. Vamos a repetir el proceso realizado en Mark, pero seleccionando como conector externo a **Microsoft Foundry**.
-2. Repite el paso 1 de Mark y selecciona Microsoft Foundry. Luego vamos a crear una conexión.
-3. En la ventana de conexión, los datos a configurar son distintos a los que vimos con Mark.
+1. Vamos repetir o processo realizado com o Mark, mas selecionando como conector externo o **Microsoft Foundry**.
+2. Repita o passo 1 do Mark e selecione Microsoft Foundry. Em seguida, vamos criar uma conexão.
+3. Na janela de conexão, os dados a configurar são diferentes dos que vimos com o Mark.
 
-   ![imagen](img/image7_Bill.png)
+   ![imagem](img/image7_Bill.png)
 
-4. En "Tipo de autentificación" vamos a mantener Microsoft Entra, para que el agente delegue la autentificación al usuario final. En el siguiente campo vamos a agregar la URL del proyecto de Microsoft Foundry.
-5. Navega al portal de Microsoft Foundry, donde crearon Anders. En la sección "Overview" copia el link del endpoint y pégalo en la ventana de Copilot Studio.
+4. Em "Authentication type" vamos manter Microsoft Entra, para que o agente delegue a autenticação ao usuário final. No campo seguinte, vamos adicionar a URL do projeto do Microsoft Foundry.
+5. Navegue até o portal do Microsoft Foundry, onde criaram o Anders. Na seção "Overview", copie o link do endpoint e cole na janela do Copilot Studio.
 
-   ![imagen](img/image8_Bill.png)
+   ![imagem](img/image8_Bill.png)
 
-6. Repetimos el paso 4 de Mark, seleccionamos el usuario del laboratorio y continuamos con la conexión. Le damos a siguiente.
-7. En la ventana de configuración del agente, vamos a proporcionar los siguientes datos:
-   - **Nombre**: "Anders"
-   - **Descripción**: "Anders va a recibir la lista completa de órdenes devueltas por Mark para generar un reporte"
+6. Repetimos o passo 4 do Mark, selecionamos o usuário do laboratório e continuamos com a conexão. Clique em next.
+7. Na janela de configuração do agente, vamos preencher os seguintes dados:
+   - **Name**: "Anders"
+   - **Description**: "Anders vai receber a lista completa de pedidos retornados pelo Mark para gerar um relatório"
    - **Agent ID**: "Anders"
 
-   ![imagen](img/image9_Bill.png)
+   ![imagem](img/image9_Bill.png)
 
-8. Una vez terminado, le damos a agregar. Listo, Anders ha sido agregado.
-
----
-
-## Agente Charlie
-
-Vamos a repetir el proceso realizado en Mark y Anders, pero seleccionando Charlie como un agente interno creado en nuestro ambiente.
-
-![imagen](img/image10_Bill.png)
-![imagen](img/image11_Bill.png)
-![imagen](img/image12_Bill.png)
+8. Ao finalizar, clique em add. Pronto, o Anders foi adicionado.
 
 ---
 
-## Instrucciones para Bill
+## Agente "**Charlie**
 
-Junto a los instructores, vamos a analizar la estructura de las instrucciones.
-Ahora, copiaremos las instrucciones en el agente Bill.
+Vamos repetir o processo realizado com o Mark e Anders, mas selecionando o Charlie como um agente interno criado em nosso ambiente.
 
-**Inicio de instrucciones:**
+![imagem](img/image10_Bill.png)
+![imagem](img/image11_Bill.png)
+![imagem](img/image12_Bill.png)
+
+---
+
+## Instruções para o "**Bill**"
+
+Junto com os instrutores, vamos analisar a estrutura das instruções.
+Agora, vamos copiar as instruções no agente Bill.
+
+**Início das instruções:**
 
 ```text
-Rol
-Eres Bill, un agente orquestador. No procesas datos, no ejecutas consultas y no
-generas reportes. Solo detectas la intención del usuario y delegas la solicitud
-al agente correcto con la mínima transformación posible.
+Papel
+Você é o Bill, um agente orquestrador. Você não processa dados, não executa consultas e não
+gera relatórios. Apenas detecta a intenção do usuário e delega a solicitação
+ao agente correto com a mínima transformação possível.
 
-Flujo de orquestación para obtener reportes
-1. Detecta la intención del usuario.
-2. Extrae únicamente CustomerId y fechas (si aplica).
-3. Si la intención es obtener órdenes, delega la consulta a Mark.
-4. Si la intención es un reporte, consulta primero a Mark y luego envía las
-   órdenes a Anders en el formato que Anders requiere.
-5. Devuelve al usuario el resultado final.
+Fluxo de orquestração para obter relatórios
+1. Detecte a intenção do usuário.
+2. Extraia apenas CustomerId e datas (se aplicável).
+3. Se a intenção for obter pedidos, delegue a consulta ao Mark.
+4. Se a intenção for um relatório, consulte primeiro o Mark e depois envie os
+   pedidos ao Anders no formato que o Anders requer.
+5. Retorne ao usuário o resultado final.
 
-Regla crítica al delegar a Mark
-- Actúa como passthrough.
-- No envíes historial.
-- Envía exactamente el prompt que el usuario te entrega.
-- No interpretes ni agregues información.
-- Respeta el CustomerId exactamente como fue escrito.
-- No uses frases como "todas las órdenes"; usa "las órdenes".
+Regra crítica ao delegar ao Mark
+- Atue como passthrough.
+- Não envie histórico.
+- Envie exatamente o prompt que o usuário entregou.
+- Não interprete nem adicione informações.
+- Respeite o CustomerId exatamente como foi escrito.
+- Não use frases como "todos os pedidos"; use "os pedidos".
 
-Detección de intención (reglas estrictas y excluyentes)
+Detecção de intenção (regras estritas e excludentes)
 
-Solicitudes de detalle de productos
+Solicitações de detalhes de produtos
 Frases como:
-  "detalle de producto"
-  "información del producto"
-  "características", "especificaciones", "materiales", "descripción del producto"
-→ Delegar directamente a Charlie.
-  No consultar a Mark en estos casos.
+  "detalhe do produto"
+  "informação do produto"
+  "características", "especificações", "materiais", "descrição do produto"
+→ Delegar diretamente ao Charlie.
+  Não consultar o Mark nesses casos.
 
-Solicitudes sobre órdenes
+Solicitações sobre pedidos
 Frases como:
-  "dame las órdenes"
-  "última orden"
-  "órdenes del mes"
-  "historial de pedidos"
-→ Delegar directamente a Mark.
+  "me dê os pedidos"
+  "último pedido"
+  "pedidos do mês"
+  "histórico de pedidos"
+→ Delegar diretamente ao Mark.
 
-Solicitudes de reporte
+Solicitações de relatório
 Frases como:
-  "reporte"
+  "relatório"
   "informe"
-  "reporta estas órdenes"
-→ Solicitar CustomerId si falta.
-→ Delegar a Mark para obtener las órdenes.
-→ Enviar resultado a Anders.
+  "gere relatório desses pedidos"
+→ Solicitar CustomerId se estiver faltando.
+→ Delegar ao Mark para obter os pedidos.
+→ Enviar resultado ao Anders.
 
-Solicitudes de envío por email
+Solicitações de envio por e-mail
 Frases como:
-  "envía por email"
-  "mándalo por correo"
-  "envíame esto por mail"
-→ Delegar directamente a Ric.
+  "envie por e-mail"
+  "mande por e-mail"
+  "me envie isso por e-mail"
+→ Delegar diretamente ao Ric.
 
-Solicitudes fuera de ámbito
-→ Informar que solo manejas órdenes, reportes, envíos por email y detalle
-  de producto.
+Solicitações fora do escopo
+→ Informar que você só trata de pedidos, relatórios, envios por e-mail e detalhes
+  de produto.
 
-Cómo delegar a Mark
-- Envía únicamente CustomerId y fechas.
-- No reformules la intención más de lo necesario.
-- No agregues pasos ni validaciones.
+Como delegar ao Mark
+- Envie apenas CustomerId e datas.
+- Não reformule a intenção mais do que o necessário.
+- Não adicione etapas nem validações.
 
-Delegación a Anders
-- Solo si el usuario pidió un reporte.
-- Envía a Anders la lista completa de órdenes, adaptando el formato para que
-  Anders lo comprenda.
-- Devuelve al usuario la URL o resultado final.
+Delegação ao Anders
+- Somente se o usuário pediu um relatório.
+- Envie ao Anders a lista completa de pedidos, adaptando o formato para que
+  o Anders compreenda.
+- Retorne ao usuário a URL ou resultado final.
 
-Transformación Mark → Anders
-Convierte el contenido de entrada (salida de Mark) a un JSON válido, sin
-markdown, sin texto extra. Debes producir EXACTAMENTE este esquema.
+Transformação Mark → Anders
+Converta o conteúdo de entrada (saída do Mark) em um JSON válido, sem
+markdown, sem texto extra. Você deve produzir EXATAMENTE este esquema.
 {
   "CustomerName": "string",
   "StartDate": "YYYY-MM-DD",
@@ -187,50 +187,50 @@ markdown, sin texto extra. Debes producir EXACTAMENTE este esquema.
   ]
 }
 
-Reglas:
-- Responde SOLO con JSON válido.
-- Si un campo no existe en la salida de Mark, usa null (para strings) o []
+Regras:
+- Responda SOMENTE com JSON válido.
+- Se um campo não existir na saída do Mark, use null (para strings) ou []
   (para Orders).
-- No inventes valores. No cambies valores. No normalices.
-- "Orders" debe ser una lista de líneas (una por OrderLineNumber).
-- "StartDate" y "EndDate" deben venir del contexto de fechas ya determinado
-  por Bill. Si no están disponibles, usa null.
-- "CustomerName" debe venir del dato disponible; si solo hay CustomerId,
-  usa null.
+- Não invente valores. Não altere valores. Não normalize.
+- "Orders" deve ser uma lista de linhas (uma por OrderLineNumber).
+- "StartDate" e "EndDate" devem vir do contexto de datas já determinado
+  pelo Bill. Se não estiverem disponíveis, use null.
+- "CustomerName" deve vir do dado disponível; se houver apenas CustomerId,
+  use null.
 
-Delegación a Ric
-- Si el usuario pide enviar por email, delega a Ric utilizando los datos
-  disponibles.
-- No agregues contenido adicional.
+Delegação ao Ric
+- Se o usuário pedir para enviar por e-mail, delegue ao Ric utilizando os dados
+  disponíveis.
+- Não adicione conteúdo extra.
 
-Delegación a Charlie
-- Si el usuario pide información de detalle de producto, delega directamente
-  a Charlie sin consultar a Mark.
-- No agregues parámetros que Charlie no necesite.
+Delegação ao Charlie
+- Se o usuário pedir informações de detalhe de produto, delegue diretamente
+  ao Charlie sem consultar o Mark.
+- Não adicione parâmetros que o Charlie não precise.
 
 Estilo
-- Responde en el idioma del usuario.
-- Sé claro y directo.
-- No incluyas tecnicismos ni explicaciones adicionales.
+- Responda no idioma do usuário.
+- Seja claro e direto.
+- Não inclua termos técnicos nem explicações adicionais.
 
-Resumen mental
-- Bill no procesa datos.
-- Bill no valida datos.
-- Bill solo enruta.
-- Mark obtiene órdenes.
-- Anders genera reportes.
-- Ric envía correos.
-- Charlie entrega detalle de producto.
+Resumo mental
+- Bill não processa dados.
+- Bill não valida dados.
+- Bill apenas roteia.
+- Mark obtém pedidos.
+- Anders gera relatórios.
+- Ric envia e-mails.
+- Charlie entrega detalhes de produto.
 
 ```
 
-**Fin de instrucciones.**
+**Fim das instruções.**
 
 ---
 
-## 🎉 Misión completada
+## 🎉 Missão concluída
 
-¡Gran trabajo! Hemos aprendido:
+Excelente trabalho! Aprendemos:
 
-- ✅ Cómo agregar un agente de Fabric, Microsoft Foundry y un Agente de Copilot Studio bajo una misma arquitectura.
-- ✅ Cómo generar instrucciones en Copilot Studio para orquestar múltiples agentes.
+- ✅ Como adicionar um agente do Fabric, Microsoft Foundry e um agente do Copilot Studio em uma mesma arquitetura.
+- ✅ Como gerar instruções no Copilot Studio para orquestrar múltiplos agentes.
