@@ -1,11 +1,6 @@
 # Lab 01: Configuração de Dados
 
-# MF – Configuração do Ambiente
-
-
-MF – Configuração do Ambiente 
-
-Microsoft Fabric – Configuração do Ambiente
+# Microsoft Fabric – Configuração do Ambiente
 
 
 ## 🎯 Resumo da Missão
@@ -214,6 +209,6 @@ h. Resultado final do modelo semântico
 
 ---
 
-## Mission Complete
+## Mission Concluída
 
 Sua plataforma de dados foi criada e seus dados estão prontos para serem processados e consumidos por agentes de IA.

@@ -139,7 +139,7 @@ Abra `FxContosoRetail.csproj` e confirme que existem estas referências:
 
 Abra `FxContosoRetail.cs` e confirme que existem estes endpoints:
 
-- `OlaMundo`
+- `HelloWorld`
 - `OrdersReporter`
 - `SqlExecutor`
 
