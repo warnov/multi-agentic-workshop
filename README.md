@@ -25,4 +25,5 @@ Each language README describes the scenario, architecture and labs in detail for
 - 🇲🇽 Alejandro Vargas – Security Architect
 - 🇲🇽 Jesús Hernández – Data & AI Architect
 - 🇨🇴 Oscar Gutiérrez – C&AI Architect
+- us Sergio Plascencia Schaefer - AIBS Architect
 - 🇨🇴 [Walter Novoa](https://github.com/warnov) – C&AI Architect
