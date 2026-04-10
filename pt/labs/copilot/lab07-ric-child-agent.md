@@ -3,14 +3,14 @@
 ## 🎯 Resumo da missão
 
 Neste laboratório prático, você criará a definição inicial do "**Bill**" e executará as instruções principais para criar o Ric como um agente filho.
-Como agente filho, o Ric será responsável por enviar um e-mail ao usuário com as informações solicitadas quando necessário.
+Como agente filho, o "**Ric**" será responsável por enviar um e-mail ao usuário com as informações solicitadas quando necessário.
 
 ## 🔎 Objetivos
 
 Ao concluir este laboratório, você será capaz de:
 
 - Construir a versão inicial do agente "**Bill**" conforme as instruções descritas neste documento.
-- Criar o Ric como um agente filho do "**Bill**".
+- Criar o "**Ric**" como um agente filho do "**Bill**".
 - Testar o fluxo de trabalho.
 
 ---
@@ -82,7 +82,7 @@ Ao concluir este laboratório, você será capaz de:
 
 ---
 
-## Adicionar o Ric como Child Agent
+## Adicionar o "**Ric**" como Child Agent
 
 1. **Navegue** até a aba **Agents** dentro do agente "**Bill**" (é aqui que você adicionará agentes especialistas) e selecione **Add**.
 
@@ -98,9 +98,9 @@ Ao concluir este laboratório, você será capaz de:
 
    ![imagem](img/image12_4f5190e7.png)
 
-### Instruções do Ric
+### Instruções do "**Ric**"
 
-Adicione estas instruções no Ric:
+Adicione estas instruções no "**Ric**":
 
 ```text
 Papel
@@ -206,7 +206,7 @@ Pronto! Já podemos testar o Ric.
 
 ---
 
-## Testar o Ric
+## Testar o "**Ric**"
 
 Execute o seguinte prompt na janela de teste do "**Bill**":
 
@@ -218,7 +218,7 @@ Envie um e-mail com as seguintes informações: Os pedidos de compra do cliente 
 
 ## 🎉 Missão concluída
 
-Excelente trabalho! O Ric está completo e agora pode enviar e-mails.
+Excelente trabalho! O "**Ric**" está completo e agora pode enviar e-mails.
 
 Isto é o que você concluiu neste laboratório:
 
