@@ -18,8 +18,8 @@ targetScope = 'resourceGroup'
 // Parâmetros
 // ============================================================================
 
-@description('Nome do tenant temporário atribuído ao participante (ex: "contoso-abc123tenant").')
-param tenantName string
+@description('Nome do tenant temporário atribuído ao participante (ex: "contoso-abc123tenant"). Opcional: usa o ID da assinatura quando não fornecido.')
+param tenantName string = ''
 
 @description('Localização dos recursos. Padrão: eastus.')
 param location string = 'eastus'
@@ -46,7 +46,7 @@ param fabricWarehouseConnectionString string = ''
 // Variáveis - Sufixo e nomes
 // ============================================================================
 
-var suffix = substring(uniqueString(tenantName), 0, 5)
+var suffix = substring(uniqueString(empty(tenantName) ? subscription().subscriptionId : tenantName), 0, 5)
 
 var storageAccountName = 'stcontosoretail${suffix}'
 var appServicePlanName = 'asp-contosoretail-${suffix}'
