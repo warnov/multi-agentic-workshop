@@ -550,7 +550,7 @@ A convenience script is included in the repository:
 
 ```powershell
 cd en/labs/foundry/setup
-.\unlock-storage.ps1
+pwsh unlock-storage.ps1
 ```
 
 The script automatically detects the suffix from the Function App. If you need to force it, it also accepts `-Suffix` or `-FunctionAppName`.
