@@ -58,18 +58,18 @@ iv. product
 
 ---
 
-## 2. Review and test responses to questions.
+## 2. Review and testing of question responses.
 
 ### a. In the "Test the agent's response" section, test the following questions in the interface available for the agent
 
 ![Test Mark](images/M2.a.png)
 
-i. Which are the orders from Omar Bennett? / Which are the orders from Omar Bennett?  
-ii. Which are the orders from Omar Bennett and the detailed products for each order? / Which are the orders from Omar Bennett and the product details for each order?  
-iii. Which are the order from customer CID-069 from June 2019 to May 2021? / Which are the orders for customer CID-069 between July 2019 and May 2021?  
-iv. Which are the historical trends across all my data? / Which are the historical trends across all my data?  
+i. what are the orders from Omar Bennett? / What are the orders from Omar Bennett?  
+ii. what are the orders from Omar Bennett and the detailed products for each order? / What are the orders from Omar Bennett and the detailed products for each order?  
+iii. What are the order from customer CID-069 from June 2019 to May 2021? / What are the orders for customer CID-069 between July 2019 and May 2021?  
+iv. What are the historical trends across all my data? / What are the historical trends across all my data?
 
-v. Which are the product details for order F100241? / Which are the product details for order F100241?
+v. What are the product details for order F100241? What are the product details for order F100241?
 
 ![Test Mark](images/M2.a.v.png)
 
@@ -79,9 +79,9 @@ If when trying to retrieve the products you do not get a response, perform step 
 
 ### b. Adjust the Agent behavior in the "Agent Instructions" section.
 
-The Agent Instructions section defines the meta-prompt of the Data Agent: it establishes how it should reason, what business context to use, and how to respond. It does not execute queries, but it guides all reasoning, helping to produce more accurate responses, with correct source prioritization, better interpretation of user intent, and an expected format/style.
+The Agent Instructions section defines the Data Agent’s meta-prompt: it establishes how it should reason, what business context to use, and how to respond. It does not execute queries, but it guides all reasoning, helping to produce more accurate answers, with correct source prioritization, better interpretation of user intent, and an expected format/style.
 
-For more information about Agent Instructions you can consult https://learn.microsoft.com/en-us/fabric/data-science/data-agent-configurations#data-agent-instructions.
+For more information about Agent Instructions you can consult [Data agent configurations](https://learn.microsoft.com/en-us/fabric/data-science/data-agent-configurations#data-agent-instructions).
 
 ![Agent Instructions empty](images/M2.b.png)
 
@@ -89,7 +89,8 @@ For more information about Agent Instructions you can consult https://learn.micr
 
 ### i. Add the following instructions in the "Agent Instructions" section
 
-```markdown
+```markdown 
+
 These instructions are for the overall data agent and will always be sent regardless of the question asked.
 Explain:
 - Rules for planning how to approach each question
@@ -116,134 +117,136 @@ The agent must always respect the following relationships when generating querie
 
 1. **Customer → Orders**
    - `customers.customerId = orders.customerId`
-      - One customer can have multiple orders.
+   - One customer can have multiple orders.
 
-      2. **Orders → Order details**
-         - `orders.orderId = orderline.orderId`
-            - One order can contain multiple product lines.
-            
-            3. **Order details → Products**
-                - `orderline.productID = products.productID`
-                    - Each order line references a product from the catalog.
-                    
-                    When a query involves customers, orders, and products, the agent must traverse the full chain:
-                    
-                    --
-                    ## Reasoning principles
-                    
-                    - Questions about **customers** must start from the `customers` table.
-                    - Questions about **orders** must use `orders` as the main table.
-                    - Questions about **order details** must join `orders` with `orderline` and `products`.
-                    - Questions about **products purchased** or **Which a customer bought** must use `orderline` as the central table, filtering by customer through `orders`.
-                    - If a question is ambiguous (for example, no specific order is provided), the agent should return a **reasonable summary** and clearly explain the criteria used.
+2. **Orders → Order details**
+   - `orders.orderId = orderline.orderId`
+   - One order can contain multiple product lines.
 
-                    ---
+3. **Order details → Products**
+   - `orderline.productID = products.productID`
+   - Each order line references a product from the catalog.
 
-                    ## Table descriptions
+When a query involves customers, orders, and products, the agent must traverse the full chain:
 
-                    ### customers
-                    - Purpose: stores customer information.
-                    - Primary key: `customerId`.
-                    - Contains descriptive customer attributes such as name, email, segment, country, etc.
 
-                    ### orders
-                    - Purpose: represents the order header.
-                    - Primary key: `orderId`.
-                    - Foreign key: `customerId`.
-                    - Contains general information such as order date, status, and order total.
+---
 
-                    ### orderline
-                    - Purpose: stores detailed product information per order.
-                    - Foreign keys:
-                        - `orderId` → orders
-                            - `productID` → products
-                            - Contains quantity, prices, discounts, taxes, and line totals.
+## Reasoning principles
 
-                            ### products
-                            - Purpose: master product catalog.
-                            - Primary key: `productID`.
-                            - Contains attributes such as product name, category, and product characteristics.
+- Questions about **customers** must start from the `customers` table.
+- Questions about **orders** must use `orders` as the main table.
+- Questions about **order details** must join `orders` with `orderline` and `products`.
+- Questions about **products purchased** or **what a customer bought** must use `orderline` as the central table, filtering by customer through `orders`.
+- If a question is ambiguous (for example, no specific order is provided), the agent should return a **reasonable summary** and clearly explain the criteria used.
 
-                            ---
+---
 
-                            ## When asked about
+## Table descriptions
 
-                            ### Customers
-                            - Use `customers` as the primary table.
-                            - If orders or purchases are required, join with `orders` using `customerId`.
+### customers
+- Purpose: stores customer information.
+- Primary key: `customerId`.
+- Contains descriptive customer attributes such as name, email, segment, country, etc.
 
-                            ### Orders for a customer
-                            - Filter `orders` by `orders.customerId`.
-                            - Enrich results with customer information from `customers`.
+### orders
+- Purpose: represents the order header.
+- Primary key: `orderId`.
+- Foreign key: `customerId`.
+- Contains general information such as order date, status, and order total.
 
-                            ### Order details
-                            - Use `orders` for general order information.
-                            - Join with `orderline` for details and `products` for product information.
+### orderline
+- Purpose: stores detailed product information per order.
+- Foreign keys:
+  - `orderId` → orders
+  - `productID` → products
+- Contains quantity, prices, discounts, taxes, and line totals.
 
-                            ### Products purchased by a customer
-                            - Use `orderline` as the central table.
-                            - Join with `orders` to filter by customer.
-                            - Join with `products` to retrieve product details.
+### products
+- Purpose: master product catalog.
+- Primary key: `productID`.
+- Contains attributes such as product name, category, and product characteristics.
 
-                            ---
-                            
-                            ```
+---
 
-                            iii. At the end of configuring the agent behavior, the "Agent Instructions" section will look like this
+## When asked about
 
-                            ![Agent Instructions](images/M2.b.3.png)
+### Customers
+- Use `customers` as the primary table.
+- If orders or purchases are required, join with `orders` using `customerId`.
 
-                            iv. Test the agent again with the added instructions:
-                            1. clear the chat  
-                            2. confirm that you want to clear the chat  
+### Orders for a customer
+- Filter `orders` by `orders.customerId`.
+- Enrich results with customer information from `customers`.
 
-                            ![Clear chat](images/M2.b.4.png)
+### Order details
+- Use `orders` for general order information.
+- Join with `orderline` for details and `products` for product information.
 
-                            v. Test the agent again with the question that could not be resolved: Which are the product details for order F100241?
+### Products purchased by a customer
+- Use `orderline` as the central table.
+- Join with `orders` to filter by customer.
+- Join with `products` to retrieve product details.
 
-                            ![New chat session](images/M2.b.5.png)
+---
 
-                            ---
+```
 
-                            ## 3. Publish the data agent.
+iii. Once the agent behavior configuration is completed, the "Agent Instructions" section will appear as follows
 
-                            ### a. Select "Publish" in the agent options menu
+![Agent Instructions](images/M2.b.3.png)
 
-                            ![Publish Agent](images/M3.a.png)
+iv. Test the agent again with the added instructions:
+1. clear the chat
+2. confirm that you want to clear the chat
 
-                            ### b. Add a description that details the expected objective when it is used in Copilot Studio
+![Clear chat](images/M2.b.4.png)
 
-                            ### c. Select the option to publish it in "Agent Store in Microsoft 365 Copilot"
+v. Test the agent again with the question that could not be resolved: What are the product details for order F100241?
 
-                            ![Publish Agent](images/M3.c.png)
+![New chat session](images/M2.b.5.png)
 
-                            ---
+---
+## 3. Publishing the data agent.
 
-                            ## 4. Use the Semantic model as the Data Agent data source (Optional)
+### a. Select "Publish" from the agent options menu
 
-                            Implement point 4 of [Data setup](lab01-data-setup.en.md)
+![Publish Agent](images/M3.a.png)
 
-                            ### a. You can create a new data Agent or delete Mark's data source
+### b. Add a description that details the expected objective when it is used in Copilot Studio
 
-                            i. Delete Mark's data source
+### c. Select the option to publish it in the "Agent Store in Microsoft 365 Copilot"
 
-                            ![Delete data source](images/M4.a.png)
+![Publish Agent](images/M3.c.png)
 
-                            ii. Delete the instructions from the "Agent Instructions" section
+---
 
-                            ### b. Add the new data source
+## 4. Use the Semantic Model as the Data Agent data source (Optional)
 
-                            ![Add new data source](images/M4.b.png)
+Implement step 4 of [Data setup](lab01-data-setup.md)
 
-                            ### c. Select the semantic model
+### a. You can create a new Data Agent or remove Mark’s data source
 
-                            ![Select semantic model](images/M4.c.png)
+i. Remove Mark’s data source
 
-                            ### d. Include the Customer, Orders, Orderline, and Product tables
+![Remove data source](images/M4.a.png)
 
-                            ![Select tables](images/M4.d.png)
+ii. Remove the instructions from the "Agent Instructions" section
 
-                            ### e. Review the agent and if it does not respond as expected, add the instructions in the Agent Instructions section.
+### b. Add the new data source  
+![Add new data source](images/M4.b.png)
 
-                            ### f. If you wish, you can publish a new version of the data agent or keep the version built in the previous step
-``
+### c. Select the semantic model
+
+![Select the semantic model](images/M4.c.png)
+
+### d. Include the Customer, Orders, Orderline, and Product tables  
+![Select tables](images/M4.d.png)
+
+### e. Review the agent and, if it does not respond as expected, add instructions in the Agent Instructions section.
+
+### f. If desired, you can publish a new version of the data agent or keep the version built in the previous step
+
+## 5. Challenge
+
+Go to [Challenge](Challenge.md)
