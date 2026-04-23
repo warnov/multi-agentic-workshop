@@ -25,7 +25,7 @@ O workshop mostra como uma única arquitetura pode atender a ambos os tipos de n
 
 ------
 
-## <a id="flujos"></a>Escopo do Fluxos de negócio
+## <a id="flujos"></a>Escopo dos Fluxos de negócio
 
 ### <a id="flujo-operativo"></a>Fluxo operacional
 
