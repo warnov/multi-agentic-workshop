@@ -254,7 +254,7 @@ Se você tem o [Azure Functions Core Tools](https://learn.microsoft.com/azure/az
 
 ```powershell
 cd pt\labs\foundry\code\api\FxContosoRetail
-func azure functionapp publish func-contosoretail-<suffix>
+func azure functionapp publish func-contosoretail-<suffix> --dotnet-isolated
 ```
 
 > Substitua `<suffix>` pelo sufixo de 5 caracteres obtido durante o setup (por exemplo, `func-contosoretail-a1b2c`).
