@@ -226,7 +226,7 @@ Se quiser redeploy completo (infra + publish) usando o setup:
 
 ```powershell
 # Flex Consumption
-cd pt\labs\foundry\setup\op-flex
+cd pt/labs/foundry/setup/op-flex
 .\deploy.ps1 `
     -TenantName "<seu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -237,7 +237,7 @@ cd pt\labs\foundry\setup\op-flex
 
 ```powershell
 # Consumption (Y1)
-cd pt\labs\foundry\setup\op-consumption
+cd pt/labs/foundry/setup/op-consumption
 .\deploy.ps1 `
     -TenantName "<seu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -245,6 +245,16 @@ cd pt\labs\foundry\setup\op-consumption
     -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
     -FabricWarehouseDatabase "<database-warehouse>"
 ```
+
+> **Codespaces / Cloud Shell:** Se você fez o deploy original usando `deployFromAzure.ps1`, use esse script:
+>
+> ```powershell
+> # Flex Consumption (Codespaces / Cloud Shell)
+> cd pt/labs/foundry/setup/op-flex
+> pwsh ./deployFromAzure.ps1 `
+>     -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
+>     -FabricWarehouseDatabase "<database-warehouse>"
+> ```
 
 > Se você apenas alterou o código da Function App e não precisa tocar na infraestrutura, use a Opção A ou Opção B abaixo.
 

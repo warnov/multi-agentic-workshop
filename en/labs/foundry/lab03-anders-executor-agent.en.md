@@ -227,6 +227,16 @@ cd en/labs/foundry/setup/op-consumption
     -FabricWarehouseDatabase "<database-warehouse>"
 ```
 
+> **Codespaces / Cloud Shell users:** If you originally deployed using `deployFromAzure.ps1`, use that script instead:
+>
+> ```powershell
+> # Flex Consumption (from Codespaces / Cloud Shell)
+> cd en/labs/foundry/setup/op-flex
+> pwsh ./deployFromAzure.ps1 `
+>     -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
+>     -FabricWarehouseDatabase "<database-warehouse>"
+> ```
+
 > If you only changed Function App code and do not need to touch infrastructure, use Option A or Option B below.
 
 ### Option A: Using Azure Functions Core Tools (recommended)

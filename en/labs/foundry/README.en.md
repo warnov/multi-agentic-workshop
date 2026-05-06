@@ -59,7 +59,7 @@ The project offers **two deployment options** located in sibling folders under `
 
 - **Azure CLI** installed and up to date ([install](https://aka.ms/installazurecli))
 - **.NET 8 SDK** installed ([download](https://dotnet.microsoft.com/download/dotnet/8.0))
-- **PowerShell** 5.1 or later (Windows) or PowerShell Core 7+ (macOS/Linux)
+- **PowerShell** 7+ (all platforms). Do not use PowerShell 5.1.
 - An active **Azure subscription** with Owner or Contributor permissions
 - The assigned **temporary tenant name**
 - (Optional) Fabric Warehouse values:
