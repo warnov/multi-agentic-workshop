@@ -458,7 +458,7 @@ Chat started. Type your campaign request (or 'exit' to quit):
 Type a prompt describing the customer segment for the campaign. For example:
 
 ```
-Create a campaign for customers whose favorite category is Bikes
+Create a campaign for customers whose favorite category is Mountain Bikes
 ```
 
 ```
