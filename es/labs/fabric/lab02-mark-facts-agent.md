@@ -252,7 +252,3 @@ ii. Eliminar la instrucciones de la sección "Agent Instructions"
 ### e. Revisa el agente y si no responde de la forma esperada, agrega las instrucciones en la sección Agent Instructions.
 
 ### f. Si deseas puedes publicar una nueva versión del data agent o dejar la versión construida en el punto anterior
-
-## 5. Challenge
-
-Ir a [Challenge ](Challenge.md)
