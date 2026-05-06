@@ -67,7 +67,7 @@ iv. product
 i. what are the orders from Omar Bennett? / What are the orders from Omar Bennett?  
 ii. what are the orders from Omar Bennett and the detailed products for each order? / What are the orders from Omar Bennett and the detailed products for each order?  
 iii. What are the order from customer CID-069 from June 2019 to May 2021? / What are the orders for customer CID-069 between July 2019 and May 2021?  
-iv. What are the historical trends across all my data? / What are the historical trends across all my data?
+iv. What are the historical trends across all my data?
 
 v. What are the product details for order F100241? What are the product details for order F100241?
 
