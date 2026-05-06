@@ -492,8 +492,9 @@ You will see in the console that the agent checks whether a version already exis
 **Before interacting with Anders**, go to the portal to inspect what was created:
 
 1. Open [Azure AI Foundry](https://ai.azure.com) and navigate to your project
-2. In the side menu, select **Agents**
-3. Find the **"Anders"** agent and click it
+2. Ensure to be in the New Foundry Experience (Top Bar Toggle)
+3. In the side menu, select **Agents**
+4. Find the **"Anders"** agent and click it
 
 Observe two key things:
 
@@ -560,7 +561,7 @@ A convenience script is included in the repository:
 
 ```powershell
 cd en/labs/foundry/setup
-.\unlock-storage.ps1
+pwsh unlock-storage.ps1
 ```
 
 The script automatically detects the suffix from the Function App. If you need to force it, it also accepts `-Suffix` or `-FunctionAppName`.

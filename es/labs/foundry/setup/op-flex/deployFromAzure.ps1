@@ -116,7 +116,8 @@ Write-Host "[2/5] Creando Resource Group '$ResourceGroupName'..." -ForegroundCol
 az group create --name $ResourceGroupName --location $Location --output none
 Write-Host "  Resource Group listo." -ForegroundColor Gray
 
-# Sufijo único derivado del ID de suscripción (coincide con lo que calcula main.bicep)
+# Sufijo para intentar localizar una Function App existente antes del deploy.
+# NOTA: Bicep deriva el sufijo real vía uniqueString(subscriptionId), que produce un valor diferente.
 $suffixForNames = $account.id.Replace('-', '').Substring(0, 5).ToLower()
 
 if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffixForNames)) {
@@ -136,10 +137,6 @@ if (-not $hasCompleteFabricConfig -and -not [string]::IsNullOrWhiteSpace($suffix
 # --- 3. Desplegar Bicep ---
 Write-Host "[3/5] Desplegando infraestructura..." -ForegroundColor Green
 
-# El sufijo se calcula igual que en main.bicep: 5 primeros hex chars del subscription ID (sin guiones)
-$suffixResult = $account.id.Replace('-', '').Substring(0, 5).ToLower()
-Write-Host "  Sufijo:         $suffixResult" -ForegroundColor Yellow
-
 Write-Host "" -ForegroundColor Gray
 Write-Host "  Esto puede tomar ~5 minutos." -ForegroundColor Yellow
 Write-Host ""
@@ -157,7 +154,7 @@ if (-not (Test-Path $templateFile)) {
 az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $templateFile `
-    --parameters location=$Location fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
+    --parameters location=$Location tenantName=$TenantName fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
     --name $deploymentName `
     --no-wait `
     --output none

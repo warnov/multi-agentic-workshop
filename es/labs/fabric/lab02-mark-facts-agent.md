@@ -253,6 +253,6 @@ ii. Eliminar la instrucciones de la sección "Agent Instructions"
 
 ### f. Si deseas puedes publicar una nueva versión del data agent o dejar la versión construida en el punto anterior
 
-## 5. Challenge
+## 5. Problemas?
 
-Ir a [Challenge ](Challenge.md)
+Ir a [Challenge](Challenge.md)
