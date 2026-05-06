@@ -20,7 +20,7 @@ ________________________________________
 orderline
 •	OrderId
 •	OrderLineNumber
-•	ProductId
+•	ProductID
 •	Quantity
 •	UnitPrice
 •	LineTotal
