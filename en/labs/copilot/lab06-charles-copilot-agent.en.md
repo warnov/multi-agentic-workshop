@@ -25,7 +25,7 @@ By completing this lab, you will:
    ![imagen](img/image1_Charlie.png)
 
 2. Select the **Configure** tab and complete the following properties:
-   - **Edit the name to**: Charlie
+   - **Edit the name to**: Charles
    - **Description**: "Helps users answer product questions using SharePoint content and perform market or competitor comparisons using public information when explicitly requested".
    - **Leave the AI model as default.**
 
