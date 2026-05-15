@@ -2,7 +2,7 @@
 
 ## 🎯 Mission summary
 
-In this lab, we will connect the agents **Mark**, **Anders**, and **Charlie** to the orchestrator agent **Bill**, and we will generate the orchestration instructions so that Bill can delegate queries and report requests to the correct agent, preserving context and the required parameters.
+In this lab, we will connect the agents **Mark**, **Anders**, and **Charles** to the orchestrator agent **Bill**, and we will generate the orchestration instructions so that Bill can delegate queries and report requests to the correct agent, preserving context and the required parameters.
 
 ## 🔎 Objectives
 
@@ -78,9 +78,9 @@ By completing this lab, you will learn:
 
 ---
 
-## Agent Charlie
+## Agent Charles
 
-Repeat the same process used for Mark and Anders, but select **Charlie** as an internal agent created in your environment.
+Repeat the same process used for Mark and Anders, but select **Charles** as an internal agent created in your environment.
 
 ![imagen](img/image10_Bill.png)  
 ![imagen](img/image11_Bill.png)  
@@ -124,7 +124,7 @@ Phrases such as:
   "product detail"
   "product information"
   "features", "specifications", "materials", "product description"
-→ Delegate directly to Charlie.
+→ Delegate directly to Charles.
   Do not query Mark in these cases.
 
 Order-related requests
@@ -204,10 +204,10 @@ Delegation to Ric
   available data.
 - Do not add additional content.
 
-Delegation to Charlie
+Delegation to Charles
 - If the user requests product detail information, delegate directly
-  to Charlie without querying Mark.
-- Do not add parameters that Charlie does not need.
+  to Charles without querying Mark.
+- Do not add parameters that Charles does not need.
 
 Style
 - Respond in the user’s language.
@@ -221,7 +221,7 @@ Mental summary
 - Mark retrieves orders.
 - Anders generates reports.
 - Ric sends emails.
-- Charlie provides product details.
+- Charles provides product details.
 ```
 
 **End of instructions.**
