@@ -22,7 +22,7 @@ By completing this lab, you will:
 
 1. Select the **Agents** tab in the left navigation and select **Create an Agent**.
 
-   ![imagen](img/image1_Charles.png)
+   ![imagen](img/image1_charlie.png)
 
 2. Select the **Configure** tab and complete the following properties:
    - **Edit the name to**: Charles
@@ -31,7 +31,7 @@ By completing this lab, you will:
 
 3. Add the agent instructions as indicated below:
 
-   ![imagen](img/image2_Charles.png)
+   ![imagen](img/image2_Charlie.png)
 
    **Agent instructions to add:**
 
@@ -70,13 +70,13 @@ By completing this lab, you will:
 1. In another tab, navigate to <https://www.office.com>.
 2. Select the **Apps** section in the lower-left corner.
 
-   ![imagen](img/image3_Charles.png)
+   ![imagen](img/image3_Charlie.png)
 
 3. Open SharePoint.
 4. Create a new site by selecting **+ create a site** in the upper-left corner.
 5. Select **Teams Site**.
 
-   ![imagen](img/image4_Charles.png)
+   ![imagen](img/image4_Charlie.png)
 
 6. Choose a standard team template and select **Use Template**.
 7. For the name, use **Product Repository**.
@@ -85,7 +85,7 @@ By completing this lab, you will:
 
 Great! Now we have our SharePoint site. Go to the **Documents** section:
 
-![imagen](img/image5_Charles.png)
+![imagen](img/image5_Charlie.png)
 
 10. Create a new folder and name it **Products**.
 11. When ready, upload the file **Product_Catalog** that you downloaded from the GitHub repository [taller-multi-agentic/assets/Product_Catalog.docx](https://github.com/warnov/taller-multi-agentic/blob/main/assets/Product_Catalog.docx).
@@ -97,20 +97,20 @@ Great! Now we have our SharePoint site. Go to the **Documents** section:
 
 In the agent **Overview** section, add the agent knowledge sources as shown below:
 
-![imagen](img/image6_Charles.png)
+![imagen](img/image6_charlie.png)
 
 **Make sure the “Web Search” option is enabled.**
 
-![imagen](img/image7_Charles.png)
+![imagen](img/image7_charlie.png)
 
 1. Choose **SharePoint** and then select **Browse items**.
 
-   ![imagen](img/image8_Charles.png)
+   ![imagen](img/image8_charlie.png)
 
 2. In the **Product Repository** site, select the **Products** folder and then select **Confirm Selection**.
 3. Now select **Add to agent** to complete the process.
 
-   ![imagen](img/image9_Charles.png)
+   ![imagen](img/image9_charlie.png)
 
 ---
 
@@ -118,30 +118,30 @@ In the agent **Overview** section, add the agent knowledge sources as shown belo
 
 1. Select the **Publish** button in the upper-right corner. A pop-up window will open to confirm that you really want to publish your agent.
 
-   ![imagen](img/image10_Charles.png)
+   ![imagen](img/image10_charlie.png)
 
 2. Select **Publish** to confirm publishing your agent. A message will appear indicating that the agent is being published. You do not need to keep that window open. You will receive a notification when the agent is published.
 
-   ![imagen](img/image11_Charles.png)
+   ![imagen](img/image11_charlie.png)
 
 3. When the agent finishes publishing, you will see the notification at the top of the agent page.
 4. Now, before testing the agent, let’s configure a channel. Select the **Channels** section as shown below.
 
-   ![imagen](img/image12_Charles.png)
+   ![imagen](img/image12_charlie.png)
 
 5. In the **Channels** section, select **Teams and Microsoft 365 Copilot**.
 
-   ![imagen](img/image13_Charles.png)
+   ![imagen](img/image13_charlie.png)
 
 6. Now, in the side panel, select **Turn on Microsoft 365** and then select **Add Channel**.
 
-   ![imagen](img/image14_Charles.png)
+   ![imagen](img/image14_charlie.png)
 
 7. Adding the channel will take a moment. When it completes, a green notification will appear at the top of the side panel. If a pop-up appears asking you to publish again, select **Publish** and wait for it to complete.
 8. Select **See agent in Microsoft 365** to open a new tab.
 9. Now, in the Microsoft 365 app, you will see a pop-up window. Select **Add**.
 
-   ![imagen](img/image15_Charles.png)
+   ![imagen](img/image15_charlie.png)
 
 10. Now our agent is ready to be tested!
 
