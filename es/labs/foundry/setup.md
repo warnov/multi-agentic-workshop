@@ -237,8 +237,8 @@ labs/foundry/
 
 | Lab   | Archivo                                                   | Descripción                                                  |
 | ----- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Lab 3 | [Anders — Executor Agent](lab03-anders-executor-agent.md) | Crear el agente ejecutor que genera reportes e interactúa con servicios de Contoso Retail. |
-| Lab 4 | [Julie — Planner Agent](lab04-julie-planner-agent.md)     | Crear el agente orquestador de campañas de marketing usando el patrón workflow con sub-agentes (SqlAgent, MarketingAgent) y herramienta OpenAPI. |
+| Lab 4 | [Anders — Executor Agent](lab04-anders-executor-agent.md) | Crear el agente ejecutor que genera reportes e interactúa con servicios de Contoso Retail. |
+| Lab 5 | [Julie — Planner Agent](lab05-julie-planner-agent.md)     | Crear el agente orquestador de campañas de marketing usando el patrón workflow con sub-agentes (SqlAgent, MarketingAgent) y herramienta OpenAPI. |
 
 ---
 
