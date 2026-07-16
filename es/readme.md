@@ -64,7 +64,7 @@ Ejemplos de preguntas analíticas y de planificación:
 ### <a id="capa-datos"></a>Microsoft Fabric – Capa de datos
 
 - **Mark (Data Agent)**
-  Data Agent de Fabric que interpreta lenguaje natural y consulta el modelo semántico construido sobre la base SQL `db_retail` (tablas `customer`, `orders`, `orderline`, `product`). Reconstruye hechos transaccionales exactos y los entrega como datos trazables, sin interpretación.
+  Data Agent de Fabric que interpreta lenguaje natural y conversa con la base SQL `db_retail` (tablas `customer`, `orders`, `orderline`, `product`). Reconstruye hechos transaccionales exactos y los entrega como datos trazables, sin interpretación.
 
 #### Documentación de la base de datos
 
@@ -73,7 +73,7 @@ Para comprender mejor el modelo de datos sobre el cual operan los agentes de Fab
 - **Diagrama ER (Entidad-Relación)** que muestra las relaciones entre las tablas principales
 - **Esquemas de tablas** con todos los campos y tipos de datos
 
-Puedes consultar la documentación completa aquí: [Database Documentation](./assets/database.md)
+Puedes consultar la documentación completa aquí: [Database Documentation](../assets/database.md)
 
 ### <a id="capa-razonamiento"></a>Microsoft Foundry – Capa de razonamiento
 
@@ -110,8 +110,8 @@ El workshop está dividido en laboratorios independientes pero conectados, organ
 
 ### 1. Laboratorios de Microsoft Fabric
 
-- [Lab 1 – Setup del ambiente: capacidad de Fabric, workspace, base SQL y modelo semántico](./labs/fabric/lab01-data-setup.md)
-- [Lab 2 – Agente Mark: Data Agent sobre el modelo semántico de retail](./labs/fabric/lab02-mark-facts-agent.md)
+- [Lab 1 – Setup del ambiente: capacidad de Fabric, workspace y base de datos Azure SQL](./labs/fabric/lab01-data-setup.md)
+- [Lab 2 – Agente Mark: Data Agent sobre la base de datos de retail](./labs/fabric/lab02-mark-facts-agent.md)
 
 ### 2. Laboratorios de Azure AI Foundry
 
