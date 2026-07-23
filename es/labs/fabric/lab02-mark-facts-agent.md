@@ -226,33 +226,4 @@ v. Probar nuevamente el agente con la pregunta que no se pudo resolver: What are
 
 ---
 
-## 4. Usar el modelo Semántico como Fuente de datos del Data Agent (Opcional)
-
-Implementar el punto 4 de [Data setup](lab01-data-setup.md)
-
-### a. Puedes crear un nuevo data Agent o Eliminar la fuente de datos de Mark
-
-
-i. Eliminar la fuente de datos de Mark
-
-![Eliminar nueva fuente de datos](images/M4.a.png)
-
-ii. Eliminar la instrucciones de la sección "Agent Instructions"
-
-### b. Agregar la nueva fuente de datos
-![Agregar nueva fuente de datos](images/M4.b.png)
-
-### c. Seleccionar el modelo semántico
-
-![Seleccionar el modelo semántico](images/M4.c.png)
-
-### d. Incluir las tablas Customer, Orders, Orderline, y Product
-![seleccionar tablas](images/M4.d.png)
-
-### e. Revisa el agente y si no responde de la forma esperada, agrega las instrucciones en la sección Agent Instructions.
-
-### f. Si deseas puedes publicar una nueva versión del data agent o dejar la versión construida en el punto anterior
-
-## 5. Problemas?
-
-Ir a [Challenge](Challenge.md)
+## Mission Complete

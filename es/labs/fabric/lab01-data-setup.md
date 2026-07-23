@@ -21,7 +21,6 @@ Al completar este laboratorio lograrás:
 1. Crear la capacidad de Microsoft Fabric "wsfbcagentic".
 2. Crear el workspace "wsfcagentic". El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic"
 3. Crear base de datos SQL "db_retail" y cargar los datos.
-4. Crear Modelo Semántico sobre los datos cargados a la base de datos "db_retail".
 
 En la siguiente sección, se presentan los pasos del laboratorio:
 
@@ -150,67 +149,6 @@ h. Para terminar de ajustar los datos, por favor en la pestaña SQL Query 1, ree
 i. Después de ejecutarlo se mostrará que como resultado se han afectado varias filas de las tablas SQL. Este script solo se encarga de hacer ajustes sobre fechas de los datos de la base de datos. 
 
 ![Actualización de datos](images/3.9.png)
-
----
-
-## 4. Crear Modelo Semántico (opcional)
-
-En Microsoft Fabric, un modelo semántico es la capa de negocio que da significado a los datos técnicos y los hace fáciles de analizar, reutilizar y gobernar.
-
-a. Ir al workspace
-
-![ir al Workspace](images/sm4.a.png)
-
-b. Abrir el SQL Analytics Endpoint de la base de datos db_retail
-
-![SQL Analytics Endpoint ](images/sm4.b.png)
-
-c. Crear un nuevo modelo semántico
-
-![Nuevo modelo semántico](images/sm4.c.png)
-
-d. Configurar el modelo semántico:
-
-i. Nombre: sm_retail  
-ii. Workspace correspondiente  
-iii. Tablas: customer, orders, orderline, product  
-iv. Confirmar
-
-
-![Configuración modelo semántico](images/sm4.d.png)
-
-e. Abrir el modelo semántico creado
-
-![Abrir modelo semántico](images/sm4.e.png)
-
-f. Cambiar a la vista de edición
-
-
-![Vista edición](images/sm4.f.png)
-
-g. Crear relaciones del modelo semántico:
-
-![Nueva relación](images/sm.4.g.png)
-Agregar relación 
-![Vista edición](images/sm4.g.1.png)
-
-i. Customer → Orders (1:*)  
-
-![Customer → Orders](images/sm4.g.2.png)
-
-ii. Orders → Orderline (1:*)  
-
-![Orders → Orderline](images/sm4.g.3.png)
-
-iii. Orderline → Product (1:1)
-
-![Orderline → Product](images/sm4.g.4.png)
-
-
-h. Resultado final del modelo semántico
-
-
-![Modelo semántico](images/sm4.g.5.png)
 
 ---
 
