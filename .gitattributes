@@ -1,0 +1,8 @@
+# Normalize line endings across platforms
+* text=auto
+
+# Shell scripts must always use LF (they run in Linux/Codespaces/Git Bash)
+*.sh text eol=lf
+
+# PowerShell scripts use CRLF on Windows
+*.ps1 text eol=crlf
