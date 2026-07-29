@@ -266,25 +266,11 @@ Abra `pt/labs/foundry/code/agents/JulieAgent/appsettings.json` e preencha todos 
 
 Para que os agentes possam ser criados e executados, seu usuário precisa da função **Cognitive Services User** no recurso de AI Services. Sem essa função você receberá um erro `PermissionDenied` ao tentar criar agentes.
 
-Execute estes comandos no terminal do Codespace (bash):
+Execute o script `assign-role.sh` a partir da pasta `setup`. Se você vem do Passo 7 (está em `setup/op-flex`), basta subir um nível:
 
 ```bash
-# Obter o Object ID do usuário autenticado (funciona com contas MSA/pessoais e contas corporativas)
-objectId=$(az ad signed-in-user show --query id -o tsv 2>/dev/null || \
-    az account get-access-token --query accessToken -o tsv | \
-    python3 -c "import sys,base64,json; t=sys.stdin.read().strip(); p=t.split('.')[1]; p+='='*(4-len(p)%4); print(json.loads(base64.b64decode(p))['oid'])")
-
-# Obter o nome do recurso AI Services criado pela implantação
-aisName=$(az cognitiveservices account list \
-    --resource-group rg-contoso-retail \
-    --query "[0].name" -o tsv)
-
-# Atribuir a função usando o Object ID (não requer permissões de Graph API)
-az role assignment create \
-    --assignee-object-id "$objectId" \
-    --assignee-principal-type User \
-    --role "Cognitive Services User" \
-    --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/$aisName"
+cd ..
+bash assign-role.sh
 ```
 
 Aguarde **1 minuto** para que a permissão se propague antes de executar os agentes.
