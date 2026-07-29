@@ -16,8 +16,6 @@ Al completar este laboratorio lograrás:
 1. Crear el agente de datos llamado "Mark".
 2. Revisión y prueba de las respuestas a preguntas.
 3. Publicación del agente de datos.
-4. Usar el modelo Semántico como Fuente de datos del Data Agent (Opcional)
-5. Challenge
 
 En la siguiente sección, se presentan los pasos del laboratorio:
 
@@ -25,13 +23,15 @@ En la siguiente sección, se presentan los pasos del laboratorio:
 
 ## 1. Crear el agente de datos llamado "Mark".
 
+Desde el espacio de trabajo creado en el laboratorio anterior, realizar los siguientes pasos:
+
 ### a. Seleccionar la opción para crear un nuevo item
 
 ![Nuevo Item](images/M1.a.png)
 
 ### b. Buscar "Agent"
 
-### c. Seleccionar el "Data Agent (preview)"
+### c. Seleccionar el "Data Agent"
 
 
 ![Tipo de Nuevo Item](images/M1.c.png)
@@ -218,7 +218,7 @@ v. Probar nuevamente el agente con la pregunta que no se pudo resolver: What are
 
 ![Publicar Agente](images/M3.a.png)
 
-### b. Agregar una descripción que detalle el obejtivo esperado cuando sea utilizado en Copilot Studio
+### b. Agregar una descripción que detalle el objetivo esperado cuando sea utilizado en Copilot Studio
 
 ### c. Seleccionar la opción para que se publique en "Agent Store in Microsoft 365 Copilot"
 
@@ -226,33 +226,4 @@ v. Probar nuevamente el agente con la pregunta que no se pudo resolver: What are
 
 ---
 
-## 4. Usar el modelo Semántico como Fuente de datos del Data Agent (Opcional)
-
-Implementar el punto 4 de [Data setup](lab01-data-setup.md)
-
-### a. Puedes crear un nuevo data Agent o Eliminar la fuente de datos de Mark
-
-
-i. Eliminar la fuente de datos de Mark
-
-![Eliminar nueva fuente de datos](images/M4.a.png)
-
-ii. Eliminar la instrucciones de la sección "Agent Instructions"
-
-### b. Agregar la nueva fuente de datos
-![Agregar nueva fuente de datos](images/M4.b.png)
-
-### c. Seleccionar el modelo semántico
-
-![Seleccionar el modelo semántico](images/M4.c.png)
-
-### d. Incluir las tablas Customer, Orders, Orderline, y Product
-![seleccionar tablas](images/M4.d.png)
-
-### e. Revisa el agente y si no responde de la forma esperada, agrega las instrucciones en la sección Agent Instructions.
-
-### f. Si deseas puedes publicar una nueva versión del data agent o dejar la versión construida en el punto anterior
-
-## 5. Problemas?
-
-Ir a [Challenge](Challenge.md)
+## Mission Complete

@@ -21,7 +21,6 @@ Al completar este laboratorio lograrás:
 1. Crear la capacidad de Microsoft Fabric "wsfbcagentic".
 2. Crear el workspace "wsfcagentic". El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic"
 3. Crear base de datos SQL "db_retail" y cargar los datos.
-4. Crear Modelo Semántico sobre los datos cargados a la base de datos "db_retail".
 
 En la siguiente sección, se presentan los pasos del laboratorio:
 
@@ -33,7 +32,7 @@ a. Abrir Suscripción en Azure Portal
 
 ![Abrir suscripción](images/0.1.png)
 
-b. Registrar el recuerso en la suscripción
+b. Registrar el recurso en la suscripción y esperar hasta que el recurso quede registrado antes de continuar con el siguiente paso.
 ![Registrar Fabric en la suscripción](images/0.2.png)
 
 ## 1. Crear tu capacidad de Microsoft Fabric
@@ -53,7 +52,7 @@ d. Crear un grupo de recursos para la capacidad de Microsoft Fabric
 
 e. Establecer la configuración que se va a crear:
 
-i. Definir nombre. El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic".
+i. Definir nombre. El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic". Si se muestra que es necesario activar MS Fabric, dar click en la opción de activar y completar el formulario usando el usuario provisto para el laboratorio. 
 ii. Seleccionar región  
 iii. Cambiar tamaño de capacidad  
 iv. Seleccionar tamaño de capacidad  
@@ -135,7 +134,7 @@ e. Abrir una pestaña New Query para ejecutar scripts SQL
 
 ![Nueva Consulta](images/3.5.png)
 
-f. Para crear las tablas con sus respectivos datos, copier el código SQL contenido en el archivo [Create database.sql ](SQLScripts/CreateDatabase.sql) y ejecutarlo dando click en la opción Run. 
+f. Para crear las tablas con sus respectivos datos, copiar el código SQL contenido en el archivo [Create database.sql ](SQLScripts/CreateDatabase.sql) y ejecutarlo dando click en la opción Run. 
 
 ![Creación de tablas e inserción de datos](images/3.6.png)
 
@@ -143,74 +142,13 @@ g. Confirmar ejecución correcta del script
 
 ![Script ejecutado correctamente](images/3.7.png)
 
-h. Para terminar de ajustar los datos, por favor en la pestaña SQL Query 1, reemplace el código SQL que ya fue ejecutado en el anterior paso por el código del archivo [Update Dates.sql](SQLScripts/UpdateDates.sql)  y ejecutelo. 
+h. Para terminar de ajustar los datos, de nuevo en la pestaña SQL Query 1, reemplace el código SQL que ya fue ejecutado en el anterior paso por el código del archivo [Update Dates.sql](SQLScripts/UpdateDates.sql)  y ejecutelo. 
 
 ![Abrir pestaña de ejecución de Código SQL](images/3.8.png)
 
 i. Después de ejecutarlo se mostrará que como resultado se han afectado varias filas de las tablas SQL. Este script solo se encarga de hacer ajustes sobre fechas de los datos de la base de datos. 
 
 ![Actualización de datos](images/3.9.png)
-
----
-
-## 4. Crear Modelo Semántico (opcional)
-
-En Microsoft Fabric, un modelo semántico es la capa de negocio que da significado a los datos técnicos y los hace fáciles de analizar, reutilizar y gobernar.
-
-a. Ir al workspace
-
-![ir al Workspace](images/sm4.a.png)
-
-b. Abrir el SQL Analytics Endpoint de la base de datos db_retail
-
-![SQL Analytics Endpoint ](images/sm4.b.png)
-
-c. Crear un nuevo modelo semántico
-
-![Nuevo modelo semántico](images/sm4.c.png)
-
-d. Configurar el modelo semántico:
-
-i. Nombre: sm_retail  
-ii. Workspace correspondiente  
-iii. Tablas: customer, orders, orderline, product  
-iv. Confirmar
-
-
-![Configuración modelo semántico](images/sm4.d.png)
-
-e. Abrir el modelo semántico creado
-
-![Abrir modelo semántico](images/sm4.e.png)
-
-f. Cambiar a la vista de edición
-
-
-![Vista edición](images/sm4.f.png)
-
-g. Crear relaciones del modelo semántico:
-
-![Nueva relación](images/sm.4.g.png)
-Agregar relación 
-![Vista edición](images/sm4.g.1.png)
-
-i. Customer → Orders (1:*)  
-
-![Customer → Orders](images/sm4.g.2.png)
-
-ii. Orders → Orderline (1:*)  
-
-![Orders → Orderline](images/sm4.g.3.png)
-
-iii. Orderline → Product (1:1)
-
-![Orderline → Product](images/sm4.g.4.png)
-
-
-h. Resultado final del modelo semántico
-
-
-![Modelo semántico](images/sm4.g.5.png)
 
 ---
 

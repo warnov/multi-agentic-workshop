@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndersAgent.MsFoundry", "ag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JulieAgent", "agents\JulieAgent\JulieAgent.csproj", "{A1B2C3D4-1111-2222-3333-444455556666}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JulieBackup", "agents\JulieBackup\JulieBackup.csproj", "{A1B2C3D4-1111-2222-3333-444455557777}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,18 +73,6 @@ Global
 		{A1B2C3D4-1111-2222-3333-444455556666}.Release|x64.Build.0 = Release|Any CPU
 		{A1B2C3D4-1111-2222-3333-444455556666}.Release|x86.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-1111-2222-3333-444455556666}.Release|x86.Build.0 = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|x64.Build.0 = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Debug|x86.Build.0 = Debug|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|x64.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|x64.Build.0 = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|x86.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-1111-2222-3333-444455557777}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,7 +82,6 @@ Global
 		{B251FE5C-E696-5D61-C739-59E42B291955} = {474C3F07-706C-8D94-B480-2BD31A190844}
 		{C362FF6D-F7A7-6E72-D84A-6AF53C3A2A66} = {474C3F07-706C-8D94-B480-2BD31A190844}
 		{A1B2C3D4-1111-2222-3333-444455556666} = {474C3F07-706C-8D94-B480-2BD31A190844}
-		{A1B2C3D4-1111-2222-3333-444455557777} = {474C3F07-706C-8D94-B480-2BD31A190844}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D57038D3-EE52-451C-87A0-1A28EBA93739}
