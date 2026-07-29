@@ -32,7 +32,7 @@ a. Abrir Suscripción en Azure Portal
 
 ![Abrir suscripción](images/0.1.png)
 
-b. Registrar el recuerso en la suscripción
+b. Registrar el recurso en la suscripción y esperar hasta que el recurso quede registrado antes de continuar con el siguiente paso.
 ![Registrar Fabric en la suscripción](images/0.2.png)
 
 ## 1. Crear tu capacidad de Microsoft Fabric
@@ -52,7 +52,7 @@ d. Crear un grupo de recursos para la capacidad de Microsoft Fabric
 
 e. Establecer la configuración que se va a crear:
 
-i. Definir nombre. El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic".
+i. Definir nombre. El nombre debe ser único, por lo tanto concatena el nombre de tu usuario a "wsfcagentic". Si se muestra que es necesario activar MS Fabric, dar click en la opción de activar y completar el formulario usando el usuario provisto para el laboratorio. 
 ii. Seleccionar región  
 iii. Cambiar tamaño de capacidad  
 iv. Seleccionar tamaño de capacidad  
@@ -134,7 +134,7 @@ e. Abrir una pestaña New Query para ejecutar scripts SQL
 
 ![Nueva Consulta](images/3.5.png)
 
-f. Para crear las tablas con sus respectivos datos, copier el código SQL contenido en el archivo [Create database.sql ](SQLScripts/CreateDatabase.sql) y ejecutarlo dando click en la opción Run. 
+f. Para crear las tablas con sus respectivos datos, copiar el código SQL contenido en el archivo [Create database.sql ](SQLScripts/CreateDatabase.sql) y ejecutarlo dando click en la opción Run. 
 
 ![Creación de tablas e inserción de datos](images/3.6.png)
 
@@ -142,7 +142,7 @@ g. Confirmar ejecución correcta del script
 
 ![Script ejecutado correctamente](images/3.7.png)
 
-h. Para terminar de ajustar los datos, por favor en la pestaña SQL Query 1, reemplace el código SQL que ya fue ejecutado en el anterior paso por el código del archivo [Update Dates.sql](SQLScripts/UpdateDates.sql)  y ejecutelo. 
+h. Para terminar de ajustar los datos, de nuevo en la pestaña SQL Query 1, reemplace el código SQL que ya fue ejecutado en el anterior paso por el código del archivo [Update Dates.sql](SQLScripts/UpdateDates.sql)  y ejecutelo. 
 
 ![Abrir pestaña de ejecución de Código SQL](images/3.8.png)
 

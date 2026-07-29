@@ -23,13 +23,15 @@ En la siguiente sección, se presentan los pasos del laboratorio:
 
 ## 1. Crear el agente de datos llamado "Mark".
 
+Desde el espacio de trabajo creado en el laboratorio anterior, realizar los siguientes pasos:
+
 ### a. Seleccionar la opción para crear un nuevo item
 
 ![Nuevo Item](images/M1.a.png)
 
 ### b. Buscar "Agent"
 
-### c. Seleccionar el "Data Agent (preview)"
+### c. Seleccionar el "Data Agent"
 
 
 ![Tipo de Nuevo Item](images/M1.c.png)
@@ -216,7 +218,7 @@ v. Probar nuevamente el agente con la pregunta que no se pudo resolver: What are
 
 ![Publicar Agente](images/M3.a.png)
 
-### b. Agregar una descripción que detalle el obejtivo esperado cuando sea utilizado en Copilot Studio
+### b. Agregar una descripción que detalle el objetivo esperado cuando sea utilizado en Copilot Studio
 
 ### c. Seleccionar la opción para que se publique en "Agent Store in Microsoft 365 Copilot"
 
