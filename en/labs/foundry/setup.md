@@ -25,7 +25,7 @@ The Foundry layer sits at the center of the three-layer architecture:
 └─────────────────────┘
 ```
 
-The Anders and Julie agents use GPT-4.1 models deployed in Azure AI Services to reason about business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes the SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
+The Anders and Julie agents use GPT-5.1 models deployed in Azure AI Services to reason about business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes the SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
 
 ---
 
@@ -149,7 +149,7 @@ The output should contain the following resources (names may vary):
 | Storage Account     | `stcontosoretail{suffix}`     | Storage for the Function App                                 |
 | App Service Plan    | `asp-contosoretail-{suffix}`  | Hosting plan: Flex for Azure Functions                       |
 | Function App        | `func-contosoretail-{suffix}` | Contoso Retail API (.NET 8, dotnet-isolated)                 |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Unified AI Foundry resource (AI Services + project management) with GPT-4.1 model deployed |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Unified AI Foundry resource (AI Services + project management) with GPT-5.1 model deployed |
 | AI Foundry Project  | `aip-contosoretail-{suffix}`  | Working project inside the Foundry Resource                  |
 
 > **Note:** The `{suffix}` is a unique 5-character identifier automatically generated from the tenant number you provided. This ensures resource names do not collide between participants.

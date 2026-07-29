@@ -25,7 +25,7 @@ The Foundry layer sits at the center of the three-layer architecture:
 └─────────────────────┘
 ```
 
-The Anders and Julie agents use GPT-4.1 models deployed in Azure AI Services to reason about business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes the SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
+The Anders and Julie agents use GPT-5.1 models deployed in Azure AI Services to reason about business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes the SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
 
 ---
 
@@ -245,7 +245,7 @@ Replace the `<suffix>` values with the suffix you obtained in the previous step:
 ```json
 {
   "FoundryProjectEndpoint": "https://ais-contosoretail-<suffix>.services.ai.azure.com/api/projects/aip-contosoretail-<suffix>",
-  "ModelDeploymentName": "gpt-4.1",
+  "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api"
 }
 ```
@@ -302,7 +302,7 @@ The result should include these resources:
 | Storage Account     | `stcontosoretail{suffix}`       | Storage for the Function App |
 | App Service Plan    | `asp-contosoretail-{suffix}`    | Flex Consumption hosting plan |
 | Function App        | `func-contosoretail-{suffix}`   | Contoso Retail API (.NET 8, dotnet-isolated) |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`    | AI Services + Foundry projects with GPT-4.1 |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`    | AI Services + Foundry projects with GPT-5.1 |
 | AI Foundry Project  | `aip-contosoretail-{suffix}`    | Working project in Foundry |
 | Bing Search         | `bing-contosoretail-{suffix}`   | Web search connection for the Julie agent |
 

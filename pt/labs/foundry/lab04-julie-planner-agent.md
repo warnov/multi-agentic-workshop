@@ -410,7 +410,7 @@ Abra `pt/labs/foundry/code/agents/JulieAgent/appsettings.json` e substitua todos
 ```json
 {
   "FoundryProjectEndpoint": "https://ais-contosoretail-<suffix>.services.ai.azure.com/api/projects/aip-contosoretail-<suffix>",
-  "ModelDeploymentName": "gpt-4.1",
+  "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api",
   "BingConnectionName": "ais-contosoretail-<suffix>-bingsearchconnection"
 }
@@ -558,7 +558,7 @@ Criar um agente chamado **"SalesAnalyst"** a partir da interface visual do Azure
 4. Clique em **+ New Agent**.
 5. Configure o agente:
    - **Nome:** `SalesAnalyst`
-   - **Model:** Selecione `gpt-4.1`
+   - **Model:** Selecione `gpt-deployment`
    - **Instructions:** Copie e cole as seguintes instruções:
 
 ```

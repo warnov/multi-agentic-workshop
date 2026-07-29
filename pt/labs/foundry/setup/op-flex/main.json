@@ -4,15 +4,16 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.40.2.10011",
-      "templateHash": "15355606873966014994"
+      "version": "0.42.1.51946",
+      "templateHash": "7912666429521864030"
     }
   },
   "parameters": {
     "tenantName": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
-        "description": "Nome do tenant temporário atribuído ao participante (ex: \"contoso-abc123tenant\")."
+        "description": "Nome do tenant temporário atribuído ao participante (ex: \"contoso-abc123tenant\"). Opcional: usa o ID da assinatura quando não fornecido."
       }
     },
     "location": {
@@ -24,16 +25,23 @@
     },
     "gptModelName": {
       "type": "string",
-      "defaultValue": "gpt-4.1",
+      "defaultValue": "gpt-5.1",
       "metadata": {
         "description": "Nome do modelo GPT a implantar no AI Services."
       }
     },
     "gptModelVersion": {
       "type": "string",
-      "defaultValue": "2025-04-14",
+      "defaultValue": "2025-11-13",
       "metadata": {
         "description": "Versão do modelo GPT."
+      }
+    },
+    "gptDeploymentName": {
+      "type": "string",
+      "defaultValue": "gpt-deployment",
+      "metadata": {
+        "description": "Nome do deployment do modelo (independente do nome do modelo)."
       }
     },
     "gptDeploymentCapacity": {
@@ -56,19 +64,29 @@
       "metadata": {
         "description": "Nome do banco de dados do Warehouse do Fabric."
       }
+    },
+    "fabricWarehouseConnectionString": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Connection string SQL completa do Fabric. Usada para preservar um valor existente quando endpoint/database não são enviados."
+      }
     }
   },
   "variables": {
-    "suffix": "[substring(uniqueString(parameters('tenantName')), 0, 5)]",
+    "suffix": "[substring(uniqueString(if(empty(parameters('tenantName')), subscription().subscriptionId, parameters('tenantName'))), 0, 5)]",
     "storageAccountName": "[format('stcontosoretail{0}', variables('suffix'))]",
     "appServicePlanName": "[format('asp-contosoretail-{0}', variables('suffix'))]",
     "functionAppName": "[format('func-contosoretail-{0}', variables('suffix'))]",
     "aiFoundryName": "[format('ais-contosoretail-{0}', variables('suffix'))]",
     "aiProjectName": "[format('aip-contosoretail-{0}', variables('suffix'))]",
+    "bingGroundingName": "[format('bingsearch-{0}', variables('suffix'))]",
+    "bingConnectionName": "[format('{0}-bingsearchconnection', variables('aiFoundryName'))]",
     "deploymentContainerName": "[format('app-package-{0}', toLower(variables('functionAppName')))]",
-    "fabricWarehouseConnectionString": "[format('Server=tcp:{0},1433;Database={1};Encrypt=True;TrustServerCertificate=False;Authentication=Active Directory Default;Connection Timeout=30;', parameters('fabricWarehouseSqlEndpoint'), parameters('fabricWarehouseDatabase'))]",
     "hasFabricWarehouseConfig": "[and(not(empty(parameters('fabricWarehouseSqlEndpoint'))), not(empty(parameters('fabricWarehouseDatabase'))))]",
-    "optionalFabricSettings": "[if(variables('hasFabricWarehouseConfig'), createArray(createObject('name', 'FabricWarehouseConnectionString', 'value', variables('fabricWarehouseConnectionString'))), createArray())]",
+    "computedFabricWarehouseConnectionString": "[format('Server=tcp:{0},1433;Database={1};Encrypt=True;TrustServerCertificate=False;Authentication=Active Directory Default;Connection Timeout=30;', parameters('fabricWarehouseSqlEndpoint'), parameters('fabricWarehouseDatabase'))]",
+    "effectiveFabricWarehouseConnectionString": "[if(not(empty(parameters('fabricWarehouseConnectionString'))), parameters('fabricWarehouseConnectionString'), if(variables('hasFabricWarehouseConfig'), variables('computedFabricWarehouseConnectionString'), ''))]",
+    "optionalFabricSettings": "[if(not(empty(variables('effectiveFabricWarehouseConnectionString'))), createArray(createObject('name', 'FabricWarehouseConnectionString', 'value', variables('effectiveFabricWarehouseConnectionString'))), createArray())]",
     "tags": {
       "project": "taller-multi-agentic",
       "environment": "workshop"
@@ -224,7 +242,7 @@
     {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
       "apiVersion": "2025-06-01",
-      "name": "[format('{0}/{1}', variables('aiFoundryName'), parameters('gptModelName'))]",
+      "name": "[format('{0}/{1}', variables('aiFoundryName'), parameters('gptDeploymentName'))]",
       "sku": {
         "name": "Standard",
         "capacity": "[parameters('gptDeploymentCapacity')]"
@@ -238,6 +256,39 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiFoundryName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Bing/accounts",
+      "apiVersion": "2020-06-10",
+      "name": "[variables('bingGroundingName')]",
+      "location": "global",
+      "sku": {
+        "name": "G1"
+      },
+      "kind": "Bing.Grounding"
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/connections",
+      "apiVersion": "2025-04-01-preview",
+      "name": "[format('{0}/{1}', variables('aiFoundryName'), variables('bingConnectionName'))]",
+      "properties": {
+        "category": "ApiKey",
+        "target": "https://api.bing.microsoft.com/",
+        "authType": "ApiKey",
+        "credentials": {
+          "key": "[listKeys(resourceId('Microsoft.Bing/accounts', variables('bingGroundingName')), '2020-06-10').key1]"
+        },
+        "isSharedToAll": true,
+        "metadata": {
+          "ApiType": "Azure",
+          "Location": "[reference(resourceId('Microsoft.Bing/accounts', variables('bingGroundingName')), '2020-06-10', 'full').location]",
+          "ResourceId": "[resourceId('Microsoft.Bing/accounts', variables('bingGroundingName'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiFoundryName'))]",
+        "[resourceId('Microsoft.Bing/accounts', variables('bingGroundingName'))]"
       ]
     },
     {
@@ -263,8 +314,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "12338019398509305567"
+              "version": "0.42.1.51946",
+              "templateHash": "8553219864026725810"
             }
           },
           "parameters": {
@@ -356,6 +407,18 @@
     "foundryProjectEndpoint": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts/projects', variables('aiFoundryName'), variables('aiProjectName')), '2025-06-01').endpoints['AI Foundry API']]"
+    },
+    "bingGroundingName": {
+      "type": "string",
+      "value": "[variables('bingGroundingName')]"
+    },
+    "bingConnectionName": {
+      "type": "string",
+      "value": "[variables('bingConnectionName')]"
+    },
+    "bingConnectionId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.CognitiveServices/accounts/connections', variables('aiFoundryName'), variables('bingConnectionName'))]"
     }
   }
 }

@@ -78,7 +78,7 @@ Puedes consultar la documentación completa aquí: [Database Documentation](../a
 ### <a id="capa-razonamiento"></a>Microsoft Foundry – Capa de razonamiento
 
 - **Anders (Executor Agent)**
-  Ejecuta acciones operativas invocando servicios externos mediante una herramienta OpenAPI. Recibe datos de órdenes y llama al endpoint `OrdersReporter` de la Azure Function `FxContosoRetail`, que genera un reporte HTML y lo publica en Blob Storage, retornando la URL del documento. Usa el SDK `Azure.AI.Agents.Persistent` con un modelo GPT-4.1 para interpretar la solicitud, construir el payload JSON y orquestar la llamada a la API.
+  Ejecuta acciones operativas invocando servicios externos mediante una herramienta OpenAPI. Recibe datos de órdenes y llama al endpoint `OrdersReporter` de la Azure Function `FxContosoRetail`, que genera un reporte HTML y lo publica en Blob Storage, retornando la URL del documento. Usa el SDK `Azure.AI.Agents.Persistent` con un modelo GPT-5.1 para interpretar la solicitud, construir el payload JSON y orquestar la llamada a la API.
 - **Julie (Planner Agent)**
   Agente orquestador de campañas de marketing definido como `kind: "workflow"`. Coordina 3 herramientas: **SqlAgent** (`type: "agent"`) que genera consultas T-SQL a partir de lenguaje natural, y tiene una Azure Function como tool llamada **SqlExecutor** (`type: "openapi"`) que ejecuta el SQL contra la base de datos de Fabric. Dicha función también se encuentra en la Function App `FxContosoRetail` usada previamente por Anders. Finalmente tenemos al **MarketingAgent** (`type: "agent"`) que usa Bing Search para encontrar eventos relevantes y genera mensajes de marketing personalizados por cliente. El resultado final es un JSON de campaña con correos electrónicos listos para enviar.
 
