@@ -25,7 +25,7 @@ La capa Foundry se ubica en el centro de la arquitectura de tres capas:
 └─────────────────────┘
 ```
 
-Los agentes Anders y Julie utilizan modelos GPT-4.1 desplegados en Azure AI Services para razonar sobre la información del negocio. Anders consume directamente la API de `FxContosoRetail` vía herramienta OpenAPI. Julie orquesta un workflow multi-agente: usa **SqlAgent** (genera T-SQL), una **Function App** (ejecuta el SQL contra Fabric vía OpenAPI) y **MarketingAgent** (genera mensajes personalizados con Bing Search), coordinando todo de forma autónoma como un agente de tipo `workflow`.
+Los agentes Anders y Julie utilizan modelos GPT-5.1 desplegados en Azure AI Services para razonar sobre la información del negocio. Anders consume directamente la API de `FxContosoRetail` vía herramienta OpenAPI. Julie orquesta un workflow multi-agente: usa **SqlAgent** (genera T-SQL), una **Function App** (ejecuta el SQL contra Fabric vía OpenAPI) y **MarketingAgent** (genera mensajes personalizados con Bing Search), coordinando todo de forma autónoma como un agente de tipo `workflow`.
 
 ---
 
@@ -115,7 +115,6 @@ En la terminal del Codespace, ejecuta:
 az login --use-device-code
 ```
 
-> ⚠️ Es importante usar `--use-device-code` en Codespaces. El flujo normal (`az login`) intenta abrir un browser local desde el servidor remoto, lo que no funciona correctamente en este entorno. Recuerda que debes abrir la URL de autenticación en tu navegador local, en donde estás logeado con tu cuenta de laboratorio que fue creada para el taller (la que termina en `@azurehol<número>.com`).
 
 Verás una salida similar a esta:
 
@@ -127,7 +126,7 @@ and enter the code XXXXXXXX to authenticate.
 Sigue estos pasos:
 1. Abre `https://microsoft.com/devicelogin` en tu navegador (en una nueva pestaña).
 2. Ingresa el código de 8 caracteres que aparece en la terminal del Codespace.
-3. Selecciona la **cuenta de Azure del taller** (la que termina en `@azurehol<número>.com`).
+3. Selecciona la **cuenta de Azure del taller**.
 4. Autoriza el acceso cuando se te solicite.
 5. Vuelve a la terminal del Codespace — en unos segundos verás la lista de suscripciones disponibles.
 
@@ -243,7 +242,7 @@ Reemplaza los valores `<sufijo>` con el sufijo que obtuviste en el paso anterior
 ```json
 {
   "FoundryProjectEndpoint": "https://ais-contosoretail-<sufijo>.services.ai.azure.com/api/projects/aip-contosoretail-<sufijo>",
-  "ModelDeploymentName": "gpt-4.1",
+  "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<sufijo>.azurewebsites.net/api",
   "TenantId": ""
 }
@@ -306,7 +305,7 @@ El resultado debe incluir estos recursos:
 | Storage Account     | `stcontosoretail{suffix}`       | Almacenamiento para la Function App |
 | App Service Plan    | `asp-contosoretail-{suffix}`    | Plan de hosting Flex Consumption |
 | Function App        | `func-contosoretail-{suffix}`   | API de Contoso Retail (.NET 8, dotnet-isolated) |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`    | AI Services + proyectos Foundry con GPT-4.1 |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`    | AI Services + proyectos Foundry con GPT-5.1 |
 | AI Foundry Project  | `aip-contosoretail-{suffix}`    | Proyecto de trabajo en Foundry |
 | Bing Search         | `bing-contosoretail-{suffix}`   | Conexión de búsqueda web para el agente Julie |
 

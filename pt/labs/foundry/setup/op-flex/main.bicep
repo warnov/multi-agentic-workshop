@@ -25,10 +25,13 @@ param tenantName string = ''
 param location string = 'eastus'
 
 @description('Nome do modelo GPT a implantar no AI Services.')
-param gptModelName string = 'gpt-4.1'
+param gptModelName string = 'gpt-5.1'
 
 @description('Versão do modelo GPT.')
-param gptModelVersion string = '2025-04-14'
+param gptModelVersion string = '2025-11-13'
+
+@description('Nome do deployment do modelo (independente do nome do modelo).')
+param gptDeploymentName string = 'gpt-deployment'
 
 @description('Capacidade do deployment (tokens por minuto em milhares).')
 param gptDeploymentCapacity int = 30
@@ -250,7 +253,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = 
 
 resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
   parent: aiFoundry
-  name: gptModelName
+  name: gptDeploymentName
   sku: {
     name: 'Standard'
     capacity: gptDeploymentCapacity

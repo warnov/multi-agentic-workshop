@@ -462,14 +462,14 @@ Open the file `en/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.js
 ```json
 {
   "FoundryProjectEndpoint": "<YOUR-AI-FOUNDRY-PROJECT-ENDPOINT>",
-  "ModelDeploymentName": "gpt-4.1",
+  "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api"
 }
 ```
 
 > **Where do I find these values?**
 > - **FoundryProjectEndpoint**: The `AI Foundry Endpoint` from the deployment output.
-> - **ModelDeploymentName**: `gpt-4.1` (name of the deployment created by the Bicep).
+> - **ModelDeploymentName**: `gpt-deployment` (name of the deployment created by the Bicep).
 > - **FunctionAppBaseUrl**: The URL of your Function App + `/api`.
 
 ### Step 2: Build and run

@@ -25,7 +25,7 @@ The Foundry layer is located at the center of the three-layer architecture:
 └─────────────────────┘
 ```
 
-Anders and Julie agents use GPT-4.1 models deployed in Azure AI Services to reason over business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
+Anders and Julie agents use GPT-5.1 models deployed in Azure AI Services to reason over business information. Anders directly consumes the `FxContosoRetail` API via an OpenAPI tool. Julie orchestrates a multi-agent workflow: it uses **SqlAgent** (generates T-SQL), a **Function App** (executes SQL against Fabric via OpenAPI), and **MarketingAgent** (generates personalized messages with Bing Search), coordinating everything autonomously as a `workflow`-type agent.
 
 ---
 
@@ -130,7 +130,7 @@ Both options provision the following resources within the Resource Group `rg-con
 | Storage Account | `stcontosoretail{suffix}` | Storage for the Function App |
 | App Service Plan | `asp-contosoretail-{suffix}` | Hosting plan (FC1 in Flex, Y1 in Consumption) |
 | Function App | `func-contosoretail-{suffix}` | Contoso Retail API (.NET 8, dotnet-isolated) |
-| AI Foundry Resource | `ais-contosoretail-{suffix}` | Unified AI Foundry resource (AI Services + project management) with GPT-4.1 model deployed |
+| AI Foundry Resource | `ais-contosoretail-{suffix}` | Unified AI Foundry resource (AI Services + project management) with GPT-5.1 model deployed |
 | AI Foundry Project | `aip-contosoretail-{suffix}` | Working project within the Foundry Resource |
 | Blob Container | `reports` | Container for generated reports |
 

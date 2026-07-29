@@ -27,7 +27,7 @@ La capa Foundry se ubica en el centro de la arquitectura de tres capas:
 └─────────────────────┘
 ```
 
-Los agentes Anders y Julie utilizan modelos GPT-4.1 desplegados en Azure AI Services para razonar sobre la información del negocio. Anders consume directamente la API de `FxContosoRetail` vía herramienta OpenAPI. Julie orquesta un workflow multi-agente: usa **SqlAgent** (genera T-SQL), una **Function App** (ejecuta el SQL contra Fabric vía OpenAPI) y **MarketingAgent** (genera mensajes personalizados con Bing Search), coordinando todo de forma autónoma como un agente de tipo `workflow`.
+Los agentes Anders y Julie utilizan modelos GPT-5.1 desplegados en Azure AI Services para razonar sobre la información del negocio. Anders consume directamente la API de `FxContosoRetail` vía herramienta OpenAPI. Julie orquesta un workflow multi-agente: usa **SqlAgent** (genera T-SQL), una **Function App** (ejecuta el SQL contra Fabric vía OpenAPI) y **MarketingAgent** (genera mensajes personalizados con Bing Search), coordinando todo de forma autónoma como un agente de tipo `workflow`.
 
 ---
 
@@ -152,7 +152,7 @@ El resultado debería contener estos mismos elementos (los nombres pueden variar
 | Storage Account     | `stcontosoretail{suffix}`     | Almacenamiento para la Function App                          |
 | App Service Plan    | `asp-contosoretail-{suffix}`  | Plan de hosting: Flex para Azure Functions                   |
 | Function App        | `func-contosoretail-{suffix}` | API de Contoso Retail (.NET 8, dotnet-isolated)              |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado de AI Foundry (AI Services + gestión de proyectos) con modelo GPT-4.1 desplegado |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado de AI Foundry (AI Services + gestión de proyectos) con modelo GPT-5.1 desplegado |
 | AI Foundry Project  | `aip-contosoretail-{suffix}`  | Proyecto de trabajo dentro del Foundry Resource              |
 
 > **Nota:** El `{suffix}` es un identificador único de 5 caracteres generado automáticamente a partir del número de tenant que suministraste. Esto garantiza que los nombres de los recursos no colisionen entre participantes.

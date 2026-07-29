@@ -25,7 +25,7 @@ A camada Foundry se localiza no centro da arquitetura de três camadas:
 └─────────────────────┘
 ```
 
-Os agentes Anders e Julie utilizam modelos GPT-4.1 implantados no Azure AI Services para raciocinar sobre as informações do negócio. Anders consome diretamente a API do `FxContosoRetail` via ferramenta OpenAPI. Julie orquestra um workflow multi-agente: usa o **SqlAgent** (gera T-SQL), uma **Function App** (executa o SQL contra o Fabric via OpenAPI) e o **MarketingAgent** (gera mensagens personalizadas com Bing Search), coordenando tudo de forma autônoma como um agente do tipo `workflow`.
+Os agentes Anders e Julie utilizam modelos GPT-5.1 implantados no Azure AI Services para raciocinar sobre as informações do negócio. Anders consome diretamente a API do `FxContosoRetail` via ferramenta OpenAPI. Julie orquestra um workflow multi-agente: usa o **SqlAgent** (gera T-SQL), uma **Function App** (executa o SQL contra o Fabric via OpenAPI) e o **MarketingAgent** (gera mensagens personalizadas com Bing Search), coordenando tudo de forma autônoma como um agente do tipo `workflow`.
 
 ---
 
@@ -149,7 +149,7 @@ O resultado deve conter estes elementos (os nomes podem variar):
 | Storage Account     | `stcontosoretail{suffix}`     | Armazenamento para a Function App                            |
 | App Service Plan    | `asp-contosoretail-{suffix}`  | Plano de hospedagem: Flex para Azure Functions               |
 | Function App        | `func-contosoretail-{suffix}` | API da Contoso Retail (.NET 8, dotnet-isolated)              |
-| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado do AI Foundry (AI Services + gerenciamento de projetos) com modelo GPT-4.1 implantado |
+| AI Foundry Resource | `ais-contosoretail-{suffix}`  | Recurso unificado do AI Foundry (AI Services + gerenciamento de projetos) com modelo GPT-5.1 implantado |
 | AI Foundry Project  | `aip-contosoretail-{suffix}`  | Projeto de trabalho dentro do Foundry Resource               |
 
 > **Nota:** O `{suffix}` é um identificador único de 5 caracteres gerado automaticamente a partir do número de tenant fornecido. Isso garante que os nomes dos recursos não colidam entre participantes.

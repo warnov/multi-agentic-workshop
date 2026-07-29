@@ -481,14 +481,14 @@ Abra o arquivo `pt/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.j
 ```json
 {
   "FoundryProjectEndpoint": "<SEU-AI-FOUNDRY-PROJECT-ENDPOINT>",
-  "ModelDeploymentName": "gpt-4.1",
+  "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api"
 }
 ```
 
 > **Onde encontro esses valores?**
 > - **FoundryProjectEndpoint**: O `AI Foundry Endpoint` da saída da implantação.
-> - **ModelDeploymentName**: `gpt-4.1` (nome do deployment criado pelo Bicep).
+> - **ModelDeploymentName**: `gpt-deployment` (nome do deployment criado pelo Bicep).
 > - **FunctionAppBaseUrl**: A URL da sua Function App + `/api`.
 
 ### Passo 2: Compilar e executar
