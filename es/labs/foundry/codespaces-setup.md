@@ -62,7 +62,7 @@ GitHub Codespaces proporciona un entorno de desarrollo completo en la nube, pre-
 
 1. En la página principal del repositorio, haz clic en el botón verde **`< > Code`**.
 2. Selecciona la pestaña **Codespaces**.
-3. Haz clic en **"Create codespace on main"**.
+3. Haz clic en **"Create codespace on one-day"**.
 
    > 💡 Si ves la opción de elegir el tipo de máquina, la opción **2-core** es más que suficiente para este taller.
 
@@ -107,9 +107,7 @@ El entorno está listo para los siguientes pasos.
 
 ### Paso 4: Autenticarse en Azure
 
-> ℹ️ **El sufijo único de tus recursos se genera automáticamente** a partir del ID de tu suscripción de Azure (un UUID globalmente único). No necesitas ingresar ningún número de tenant ni identificador manual.
 
----
 
 En la terminal del Codespace, ejecuta:
 
