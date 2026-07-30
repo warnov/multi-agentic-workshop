@@ -6,3 +6,9 @@
 
 # PowerShell scripts use CRLF on Windows
 *.ps1 text eol=crlf
+
+# codespaces-setup names the working branch per-branch (master vs one-day);
+# keep each branch's own version on merge so it never conflicts.
+en/labs/foundry/codespaces-setup.md merge=ours
+es/labs/foundry/codespaces-setup.md merge=ours
+pt/labs/foundry/codespaces-setup.md merge=ours

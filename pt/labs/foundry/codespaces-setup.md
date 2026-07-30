@@ -63,7 +63,7 @@ O GitHub Codespaces fornece um ambiente de desenvolvimento completo na nuvem, pr
 
 1. Na página principal do repositório, clique no botão verde **`< > Code`**.
 2. Selecione a aba **Codespaces**.
-3. Clique em **"Create codespace on `<branch>`"** — o botão mostra a branch em que você está atualmente, então verifique que seja a branch indicada para este workshop.
+3. Clique em **"Create codespace on master"**.
 
    > 💡 Se aparecer a opção de escolher o tipo de máquina, a opção **2-core** é mais que suficiente para este workshop.
 
