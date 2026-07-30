@@ -63,7 +63,7 @@ O GitHub Codespaces fornece um ambiente de desenvolvimento completo na nuvem, pr
 
 1. Na página principal do repositório, clique no botão verde **`< > Code`**.
 2. Selecione a aba **Codespaces**.
-3. Clique em **"Create codespace on main"**.
+3. Clique em **"Create codespace on one-day"**.
 
    > 💡 Se aparecer a opção de escolher o tipo de máquina, a opção **2-core** é mais que suficiente para este workshop.
 
