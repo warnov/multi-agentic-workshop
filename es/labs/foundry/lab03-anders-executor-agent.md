@@ -361,6 +361,31 @@ Tú: Genera un reporte para Marco Rivera (periodo: 5-10 febrero 2026). Orden ORD
 
 ---
 
+## Publicar Anders para consumirlo desde Copilot Studio (Activity Protocol)
+
+En el Lab 8 conectarás a Anders desde **Copilot Studio** como agente externo. Copilot Studio invoca a los agentes de Foundry usando el **Activity Protocol** (el de Azure Bot Service), pero un agente recién creado en el proyecto **solo expone el protocolo Responses API** por defecto. Si intentas conectarlo sin más, Copilot Studio devuelve un error como:
+
+> `connectorRequestFailure … HTTP 400. Agent Anders endpoint does not support activity. Please update the agent endpoint to support this protocol.`
+
+Para habilitar el Activity Protocol debes **publicar** a Anders en Microsoft 365 y Teams desde el portal de Foundry:
+
+1. En el portal de Microsoft Foundry, abre el agente **Anders** y pulsa **Publish → Teams and Microsoft 365 Copilot**.
+2. Completa la metadata requerida (Name, versión, descripción, developer).
+3. En **Publish options → Direct publish**, elige el alcance **Just you** (no requiere aprobación del administrador) y pulsa **Publish**.
+4. Al publicar, Foundry crea un recurso **Azure Bot Service** y habilita el protocolo `activity` en el endpoint del agente — justo el que Copilot Studio necesita.
+
+> [!IMPORTANT]
+> **Permisos necesarios.** La publicación crea un Azure Bot Service, por lo que tu usuario necesita el rol **Azure Bot Service Contributor** (o Contributor/Owner) en el resource group; los roles de Foundry no otorgan este permiso. Además, registra el proveedor una sola vez:
+>
+> ```bash
+> az provider register --namespace Microsoft.BotService
+> ```
+
+> [!NOTE]
+> Un agente de Foundry solo puede exponer **un** protocolo a la vez (Responses **o** Activity). Al publicarlo a M365/Teams se conmuta a Activity Protocol.
+
+---
+
 ## Solución de problemas
 
 ### Storage Account bloqueado por política (error 503)
