@@ -63,7 +63,7 @@ GitHub Codespaces provides a complete cloud-based development environment, pre-c
 
 1. On the repository home page, click the green **`< > Code`** button.
 2. Select the **Codespaces** tab.
-3. Click **"Create codespace on master"**.
+3. Click **"Create codespace on `<branch>`"** — the button shows the branch you are currently viewing, so make sure it matches the branch indicated for this workshop.
 
    > 💡 If you see an option to choose the machine type, the **2-core** option is more than enough for this workshop.
 
