@@ -300,7 +300,7 @@ Abre el archivo `es/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.
 ### Paso 2: Compilar y ejecutar
 
 ```bash
-cd es/labs/foundry/code/agents/AndersAgent/ms-foundry
+cd /workspaces/multi-agentic-workshop/es/labs/foundry/code/agents/AndersAgent/ms-foundry
 dotnet build
 ```
 
@@ -384,7 +384,7 @@ Si retorna `Disabled`, esa es la causa raíz.
 Se incluye un script de conveniencia en el repositorio:
 
 ```bash
-cd es/labs/foundry/setup
+cd /workspaces/multi-agentic-workshop/es/labs/foundry/setup
 pwsh ./unlock-storage.ps1
 ```
 

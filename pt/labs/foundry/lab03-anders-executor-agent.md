@@ -226,7 +226,7 @@ Se quiser redeploy completo (infra + publish) usando o setup:
 
 ```powershell
 # Flex Consumption
-cd pt/labs/foundry/setup/op-flex
+cd /workspaces/multi-agentic-workshop/pt/labs/foundry/setup/op-flex
 .\deploy.ps1 `
     -TenantName "<seu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -237,7 +237,7 @@ cd pt/labs/foundry/setup/op-flex
 
 ```powershell
 # Consumption (Y1)
-cd pt/labs/foundry/setup/op-consumption
+cd /workspaces/multi-agentic-workshop/pt/labs/foundry/setup/op-consumption
 .\deploy.ps1 `
     -TenantName "<seu-tenant>" `
     -ResourceGroupName "rg-contoso-retail" `
@@ -250,7 +250,7 @@ cd pt/labs/foundry/setup/op-consumption
 >
 > ```powershell
 > # Flex Consumption (Codespaces / Cloud Shell)
-> cd pt/labs/foundry/setup/op-flex
+> cd /workspaces/multi-agentic-workshop/pt/labs/foundry/setup/op-flex
 > pwsh ./deployFromAzure.ps1 `
 >     -FabricWarehouseSqlEndpoint "<endpoint-sql-fabric>" `
 >     -FabricWarehouseDatabase "<database-warehouse>"
@@ -578,7 +578,7 @@ Se retornar `Disabled`, essa é a causa raiz.
 Um script de conveniência está incluído no repositório:
 
 ```powershell
-cd pt/labs/foundry/setup
+cd /workspaces/multi-agentic-workshop/pt/labs/foundry/setup
 .\unlock-storage.ps1
 ```
 

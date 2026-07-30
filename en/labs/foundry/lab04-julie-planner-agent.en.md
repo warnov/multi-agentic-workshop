@@ -434,7 +434,7 @@ Before running, confirm that you have already completed the **Manual configurati
 From the terminal, at the root of the repository:
 
 ```bash
-cd en/labs/foundry/code/agents/JulieAgent
+cd /workspaces/multi-agentic-workshop/en/labs/foundry/code/agents/JulieAgent
 dotnet run
 ```
 
