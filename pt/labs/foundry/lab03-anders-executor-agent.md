@@ -580,11 +580,11 @@ Para habilitar o Activity Protocol você precisa **publicar** o Anders no Micros
 
 ### Automação opcional (sem portal)
 
-Publicar pelo portal é um atalho de UI sobre a REST API do Foundry. Para evitar os passos manuais, execute no **PowerShell** o script que habilita o protocolo `activity` diretamente no endpoint do agente:
+Publicar pelo portal é um atalho de UI sobre a REST API do Foundry. Para evitar os passos manuais, execute com **PowerShell** o script que habilita o protocolo `activity` diretamente no endpoint do agente. O terminal padrão do Codespaces é **bash**, então invoque-o com `pwsh`:
 
-```powershell
+```bash
 cd /workspaces/multi-agentic-workshop/pt/labs/foundry
-./setup/enable-activity-protocol.ps1 -Suffix <suffix>
+pwsh ./setup/enable-activity-protocol.ps1 -Suffix <suffix>
 ```
 
 > [!NOTE]
