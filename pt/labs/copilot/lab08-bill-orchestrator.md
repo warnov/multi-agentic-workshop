@@ -54,6 +54,9 @@ Ao concluir este laboratório, você aprenderá:
 
 ## Agente "**Anders**"
 
+> [!IMPORTANT]
+> Antes de conectar o Anders, certifique-se de tê-lo **publicado no Microsoft 365 e no Teams** a partir do portal do Foundry (passo *"Publicar o Anders para consumi-lo a partir do Copilot Studio"* do Lab 3). O Copilot Studio invoca os agentes do Foundry com o **Activity Protocol**; se o Anders expõe apenas o protocolo Responses API, a conexão falha com `HTTP 400 – endpoint does not support activity`.
+
 1. Vamos repetir o processo realizado com o "**Mark**", mas selecionando como conector externo o **Azure AI Foundry**.
 2. Repita o passo 1 do "**Mark**" e selecione Azure AI Foundry. Em seguida, vamos criar uma conexão.
 3. Na janela de conexão, os dados a configurar são diferentes dos que vimos com o "**Mark**".
