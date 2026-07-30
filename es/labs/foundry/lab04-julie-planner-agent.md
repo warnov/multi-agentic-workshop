@@ -446,7 +446,7 @@ Antes de ejecutar, confirma que ya completaste la sección **Configuración manu
 Desde la terminal, en la raíz del repositorio:
 
 ```bash
-cd es/labs/foundry/code/agents/JulieAgent
+cd /workspaces/multi-agentic-workshop/es/labs/foundry/code/agents/JulieAgent
 dotnet run
 ```
 
