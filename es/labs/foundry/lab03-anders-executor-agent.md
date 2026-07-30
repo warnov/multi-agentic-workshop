@@ -382,7 +382,19 @@ Para habilitar el Activity Protocol debes **publicar** a Anders en Microsoft 365
 > ```
 
 > [!NOTE]
-> Un agente de Foundry solo puede exponer **un** protocolo a la vez (Responses **o** Activity). Al publicarlo a M365/Teams se conmuta a Activity Protocol.
+> El agente puede exponer **ambos** protocolos a la vez (Responses **y** Activity): al habilitar Activity no pierdes la interacción por SDK/portal que usa el resto del taller.
+
+### Automatización opcional (sin portal)
+
+Publicar desde el portal es un atajo de UI sobre la REST API de Foundry. Para evitar los pasos manuales, ejecuta en **PowerShell** el script que habilita el protocolo `activity` directamente sobre el endpoint del agente:
+
+```powershell
+cd /workspaces/multi-agentic-workshop/es/labs/foundry
+./setup/enable-activity-protocol.ps1 -Suffix <suffix>
+```
+
+> [!NOTE]
+> El script usa la REST API **preview** de Foundry (`api-version=v1`). Habilita `activity` conservando `responses` y el esquema `Entra` que Copilot Studio utiliza. Si tu tenant exigiera además el Azure Bot Service, usa la publicación del portal descrita arriba (necesita el rol **Azure Bot Service Contributor**).
 
 ---
 
