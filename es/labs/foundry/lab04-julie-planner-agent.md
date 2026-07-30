@@ -563,7 +563,7 @@ Crear un agente llamado **"SalesAnalyst"** desde la interfaz visual de Azure AI 
 #### Pasos
 
 1. Abre el portal de **Azure AI Foundry** en [https://ai.azure.com](https://ai.azure.com).
-2. Navega a tu proyecto (`aip-contosoretail-<sufijo>`).
+2. Navega a tu proyecto (`aip-contosoretail-<suffix>`).
 3. En el menú lateral, ve a **Agents**.
 4. Haz clic en **+ New Agent**.
 5. Configura el agente:
