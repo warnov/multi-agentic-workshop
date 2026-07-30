@@ -562,11 +562,11 @@ To enable the Activity Protocol you must **publish** Anders to Microsoft 365 and
 
 ### Optional automation (no portal)
 
-Publishing from the portal is a UI shortcut over the Foundry REST API. To skip the manual steps, run the script in **PowerShell** to enable the `activity` protocol directly on the agent endpoint:
+Publishing from the portal is a UI shortcut over the Foundry REST API. To skip the manual steps, run the script with **PowerShell** to enable the `activity` protocol directly on the agent endpoint. The default Codespaces terminal is **bash**, so invoke it with `pwsh`:
 
-```powershell
+```bash
 cd /workspaces/multi-agentic-workshop/en/labs/foundry
-./setup/enable-activity-protocol.ps1 -Suffix <suffix>
+pwsh ./setup/enable-activity-protocol.ps1 -Suffix <suffix>
 ```
 
 > [!NOTE]
