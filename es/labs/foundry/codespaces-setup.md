@@ -237,13 +237,13 @@ Al finalizar, anota estos valores de la salida del script:
 En el panel de archivos del Codespace, abre:
 `es/labs/foundry/code/agents/AndersAgent/ms-foundry/appsettings.json`
 
-Reemplaza los valores `<sufijo>` con el sufijo que obtuviste en el paso anterior:
+Reemplaza los valores `<suffix>` con el sufijo que obtuviste en el paso anterior:
 
 ```json
 {
-  "FoundryProjectEndpoint": "https://ais-contosoretail-<sufijo>.services.ai.azure.com/api/projects/aip-contosoretail-<sufijo>",
+  "FoundryProjectEndpoint": "https://ais-contosoretail-<suffix>.services.ai.azure.com/api/projects/aip-contosoretail-<suffix>",
   "ModelDeploymentName": "gpt-deployment",
-  "FunctionAppBaseUrl": "https://func-contosoretail-<sufijo>.azurewebsites.net/api",
+  "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api",
   "TenantId": ""
 }
 ```
