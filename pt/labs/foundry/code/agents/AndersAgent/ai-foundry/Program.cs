@@ -91,6 +91,9 @@ var andersInstructions = """
 
     Sempre confirme a ação realizada ao usuário, incluindo a URL do relatório.
     Se os dados forem insuficientes ou inválidos, explique o que falta.
+    Se os campos vierem com casing diferente, adapte-os.
+    Se faltar startDate ou endDate, infira a partir das datas dos pedidos.
+    Se os totais por linha faltarem, calcule-os.
     Responda em português.
     """;
 
