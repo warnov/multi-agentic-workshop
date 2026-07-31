@@ -91,6 +91,9 @@ var andersInstructions = """
 
     Always confirm the action taken to the user, including the report URL.
     If the data is insufficient or invalid, explain what is missing.
+    If fields come with different casing, adapt them.
+    If startDate or endDate is missing, infer them from the order dates.
+    If per-line totals are missing, calculate them.
     Respond in English.
     """;
 
