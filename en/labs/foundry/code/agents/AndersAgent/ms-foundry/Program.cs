@@ -1,22 +1,23 @@
 using Azure.AI.Projects;
-using Azure.AI.Projects.OpenAI;
+using Azure.AI.Projects.Agents;
+using Azure.AI.Extensions.OpenAI;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using System.ClientModel;
-using System.ClientModel.Primitives;
 using System.Text.Json;
 using OpenAI.Responses;
 
 #pragma warning disable OPENAI001 // OpenAI preview API
 
 // =====================================================================
-//  Anders - Executor Agent (Microsoft Foundry - new experience)
+//  Anders - Executor Agent (Microsoft Foundry)
 //
-//  This version uses the Azure.AI.Projects + Azure.AI.Projects.OpenAI SDK
-//  with the Responses API (new Microsoft Foundry experience).
+//  Uses the Foundry projects (new) API: Azure.AI.Projects 2.x +
+//  Azure.AI.Projects.Agents + Azure.AI.Extensions.OpenAI.
 //
-//  The OpenAPI tool is configured via protocol method (BinaryContent)
-//  because OpenApiAgentTool types are internal in SDK 1.2.x.
+//  The agent object is deleted and recreated rather than versioned, so it
+//  is provisioned under the current object model and receives its own
+//  Entra agent identity, which Agent 365 registry sync depends on.
 // =====================================================================
 
 // --- Load configuration ---
@@ -94,26 +95,33 @@ var andersInstructions = """
     Respond in English.
     """;
 
-// Foundry project client (new experience)
+// Foundry project client
 AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
 
-// Check if the agent already exists
+var agentsClient = projectClient.AgentAdministrationClient;
+
+// Adding a version to a legacy agent object keeps the shared project
+// identity, so an existing agent is deleted instead of versioned.
 bool shouldCreateAgent = true;
-AgentRecord? existingAgent = null;
 
 Console.WriteLine($"[Foundry] Searching for existing agent '{agentName}'...");
 try
 {
-    existingAgent = projectClient.Agents.GetAgent(agentName);
-    Console.WriteLine($"[Foundry] Agent found: {existingAgent.Name} (ID: {existingAgent.Id})");
-    Console.Write("[Foundry] Do you want to overwrite it with a new version? (y/N): ");
-    var answer = Console.ReadLine();
-    shouldCreateAgent = answer?.Trim().Equals("y", StringComparison.OrdinalIgnoreCase) == true
-                     || answer?.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase) == true;
+    var existingAgent = agentsClient.GetAgent(agentName);
+    Console.WriteLine($"[Foundry] Agent found: {existingAgent.Value.Name}");
+    Console.Write("[Foundry] Delete it and recreate it from scratch? (y/N): ");
+    var answer = Console.ReadLine()?.Trim();
+    shouldCreateAgent = string.Equals(answer, "y", StringComparison.OrdinalIgnoreCase)
+                     || string.Equals(answer, "yes", StringComparison.OrdinalIgnoreCase);
 
-    if (!shouldCreateAgent)
+    if (shouldCreateAgent)
+    {
+        agentsClient.DeleteAgent(agentName);
+        Console.WriteLine($"[Foundry] Agent '{agentName}' deleted.");
+    }
+    else
     {
         Console.WriteLine("[Foundry] Keeping existing agent.");
     }
@@ -123,66 +131,55 @@ catch (ClientResultException ex) when (ex.Status == 404)
     Console.WriteLine($"[Foundry] No existing agent found with name '{agentName}'. A new one will be created.");
 }
 
-AgentRecord agentRecord;
-
 if (shouldCreateAgent)
 {
-    // Build the agent definition JSON including the OpenAPI tool
-    // (OpenApiAgentTool types are internal, using protocol method with BinaryContent)
-    Console.WriteLine("[Foundry] Creating/updating Anders agent with OpenAPI tool...");
+    Console.WriteLine("[Foundry] Creating Anders agent with OpenAPI tool...");
 
-    var openApiSpecJson = JsonSerializer.Deserialize<JsonElement>(openApiSpec);
-
-    var agentDefinitionJson = new
+    OpenApiFunctionDefinition openApiFunction = new(
+        "ContosoRetailAPI",
+        BinaryData.FromString(openApiSpec),
+        new OpenAPIAnonymousAuthenticationDetails())
     {
-        definition = new
-        {
-            kind = "prompt",
-            model = modelDeployment,
-            instructions = andersInstructions,
-            tools = new object[]
-            {
-                new
-                {
-                    type = "openapi",
-                    openapi = new
-                    {
-                        name = "ContosoRetailAPI",
-                        description = "Contoso Retail API for generating purchase order reports",
-                        spec = openApiSpecJson,
-                        auth = new { type = "anonymous" }
-                    }
-                }
-            }
-        }
+        Description = "Contoso Retail API for generating purchase order reports"
     };
 
-    var jsonContent = JsonSerializer.Serialize(agentDefinitionJson, new JsonSerializerOptions { WriteIndented = false });
-    var result = await projectClient.Agents.CreateAgentVersionAsync(
-        agentName,
-        BinaryContent.Create(BinaryData.FromString(jsonContent)),
-        new RequestOptions());
+    DeclarativeAgentDefinition agentDefinition = new(model: modelDeployment)
+    {
+        Instructions = andersInstructions,
+        Tools = { new OpenAPITool(openApiFunction) }
+    };
 
-    // Parse response to get agent info
-    var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
-    var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
-    Console.WriteLine($"[Foundry] Agent created/updated: {agentName} (v{version})");
+    ProjectsAgentVersion created = await agentsClient.CreateAgentVersionAsync(
+        agentName: agentName,
+        options: new(agentDefinition));
+
+    Console.WriteLine($"[Foundry] Agent created: {created.Name} (v{created.Version})");
 }
 
-// Get the registered agent
-agentRecord = projectClient.Agents.GetAgent(agentName);
-Console.WriteLine($"[Foundry] Agent retrieved: {agentRecord.Name} (ID: {agentRecord.Id})");
+// instance_identity is null on legacy agents and non-null on agents that
+// carry their own Entra identity, which is what Agent 365 syncs.
+var agentRecord = agentsClient.GetAgent(agentName);
+using (var agentJson = JsonDocument.Parse(agentRecord.GetRawResponse().Content.ToString()))
+{
+    var hasIdentity = agentJson.RootElement.TryGetProperty("instance_identity", out var identity)
+                      && identity.ValueKind != JsonValueKind.Null;
+    Console.WriteLine(hasIdentity
+        ? $"[Foundry] instance_identity: {identity}"
+        : "[Foundry] instance_identity: null/absent -> legacy agent, it will NOT sync to Agent 365.");
+}
 
 // =====================================================================
 //  PHASE 3: Interact with the agent (Responses API + Conversations)
 // =====================================================================
 
 // Create conversation for multi-turn
-ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
+ProjectConversation conversation = projectClient.ProjectOpenAIClient
+    .GetProjectConversationsClient()
+    .CreateProjectConversation();
 Console.WriteLine($"[Foundry] Conversation created: {conversation.Id}");
 
 // Get Responses client bound to the agent and conversation
-ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
+ProjectResponsesClient responseClient = projectClient.ProjectOpenAIClient.GetProjectResponsesClientForAgent(
     defaultAgent: agentName,
     defaultConversationId: conversation.Id);
 

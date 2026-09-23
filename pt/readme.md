@@ -48,7 +48,7 @@ Exemplos de perguntas operacionais:
 
 O fluxo analítico responde a perguntas de caráter estratégico e exploratório. Aqui o objetivo não é explicar um caso pontual, mas identificar sinais relevantes que ajudem a priorizar ações e gerar planos concretos.
 
-Nesse fluxo, **Julie** (Foundry) atua como agente orquestrador de campanhas de marketing, definido como um `workflow`. Julie coordena um fluxo de 5 etapas: (1) extrai do prompt do usuário o filtro de segmento de clientes, (2) chama o **SqlAgent** para gerar a consulta T‑SQL correspondente, (3) executa o T‑SQL contra o banco de dados do Fabric por meio da ferramenta OpenAPI (`SqlExecutor` da Azure Function `FxContosoRetail`), (4) para cada cliente retornado, chama o **MarketingAgent** (que usa o Bing Search para encontrar eventos relevantes e gerar uma mensagem de marketing personalizada) e (5) organiza tudo em um JSON de campanha de e‑mails.
+Nesse fluxo, **Julie** (Foundry) atua como agente orquestrador de campanhas de marketing, definido como um `workflow`. Julie coordena um fluxo de 5 etapas: (1) extrai do prompt do usuário o filtro de segmento de clientes, (2) chama o **SqlAgent** para gerar a consulta T‑SQL correspondente, (3) executa o T‑SQL contra o banco de dados do Fabric por meio da ferramenta OpenAPI (`SqlExecutor` da Azure Function `FxContosoRetail`), (4) para cada cliente retornado, chama o **MarketingAgent** (que usa o Web Search para encontrar eventos relevantes e gerar uma mensagem de marketing personalizada) e (5) organiza tudo em um JSON de campanha de e‑mails.
 
 Exemplos de perguntas analíticas e de planejamento:
 
@@ -78,9 +78,9 @@ Você pode consultar a documentação completa aqui: [Database Documentation](./
 ### <a id="capa-razonamiento"></a>Microsoft Foundry – Camada de raciocínio
 
 - **Anders (Executor Agent)**
-  Executa ações operacionais chamando serviços externos por meio de uma ferramenta OpenAPI. Recebe dados de pedidos e chama o endpoint `OrdersReporter` da Azure Function `FxContosoRetail`, que gera um relatório HTML e o publica no Blob Storage, retornando a URL do documento. Usa o SDK `Azure.AI.Agents.Persistent` com um modelo GPT‑4.1 para interpretar a solicitação, construir o payload JSON e orquestrar a chamada à API.
+  Executa ações operacionais chamando serviços externos por meio de uma ferramenta OpenAPI. Recebe dados de pedidos e chama o endpoint `OrdersReporter` da Azure Function `FxContosoRetail`, que gera um relatório HTML e o publica no Blob Storage, retornando a URL do documento. Usa o SDK `Azure.AI.Projects` com um modelo GPT‑5.1 para interpretar a solicitação, construir o payload JSON e orquestrar a chamada à API.
 - **Julie (Planner Agent)**
-  Agente orquestrador de campanhas de marketing definido como `kind: "workflow"`. Coordena três ferramentas: **SqlAgent** (`type: "agent"`), que gera consultas T‑SQL a partir de linguagem natural; uma Azure Function usada como ferramenta chamada **SqlExecutor** (`type: "openapi"`), que executa o SQL contra o banco de dados do Fabric (a mesma Function App `FxContosoRetail` utilizada anteriormente por Anders); e o **MarketingAgent** (`type: "agent"`), que usa o Bing Search para encontrar eventos relevantes e gerar mensagens de marketing personalizadas por cliente. O resultado final é uma campanha em JSON com rascunhos de e‑mail prontos para envio.
+  Agente orquestrador de campanhas de marketing definido como `kind: "workflow"`. Coordena três ferramentas: **SqlAgent** (`type: "agent"`), que gera consultas T‑SQL a partir de linguagem natural; uma Azure Function usada como ferramenta chamada **SqlExecutor** (`type: "openapi"`), que executa o SQL contra o banco de dados do Fabric (a mesma Function App `FxContosoRetail` utilizada anteriormente por Anders); e o **MarketingAgent** (`type: "agent"`), que usa o Web Search para encontrar eventos relevantes e gerar mensagens de marketing personalizadas por cliente. O resultado final é uma campanha em JSON com rascunhos de e‑mail prontos para envio.
 
 ### <a id="capa-orquestacion"></a>Copilot Studio – Camada de orquestração
 
@@ -213,7 +213,8 @@ Isso permite executar scripts locais e scripts baixados que estejam assinados. A
 
 ### Recursos do Azure
 
-- Uma **assinatura do Azure** ativa com permissões de **Owner** ou **Contributor**
+- Uma **assinatura do Azure** ativa na qual você tenha **Owner**, ou então **Contributor** junto com **User Access Administrator**. A implantação cria atribuições de função para a identidade gerenciada da Function App, e Contributor sozinho não consegue criá-las.
+- Para o **Lab 4**, a Julie é implantada como **agente hospedado** e executa com a sua própria identidade do Microsoft Entra. O deployer concede a essa identidade a função **Foundry User** no projeto, então você também precisa de **Foundry Project Manager** no escopo do projeto ou **Owner** no grupo de recursos.
 - O **nome do tenant temporário** atribuído para o workshop (fornecido no dia do evento)
 
 ---

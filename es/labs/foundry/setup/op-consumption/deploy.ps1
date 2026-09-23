@@ -132,8 +132,6 @@ Write-Host "[1/5] Verificando Azure CLI..." -ForegroundColor Green
 try {
     $azVersion = az version --output json | ConvertFrom-Json
     Write-Host "  Azure CLI v$($azVersion.'azure-cli') detectado." -ForegroundColor Gray
-    Write-Host "  Registrando provider Microsoft.Bing (si aplica)..." -ForegroundColor Gray
-    az provider register --namespace Microsoft.Bing --output none 2>$null
 } catch {
     Write-Error "Azure CLI no está instalado. Instálalo desde https://aka.ms/installazurecli"
     exit 1
@@ -420,9 +418,8 @@ Write-Host "  Function App:        $functionAppName" -ForegroundColor White
 Write-Host "  Function App Base URL:      $functionAppUrl/api" -ForegroundColor White
 Write-Host "  API OrdersReporter:          $apiUrl" -ForegroundColor White
 Write-Host "  Foundry Project Endpoint:    $($outputs.foundryProjectEndpoint.value)" -ForegroundColor White
-Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" -ForegroundColor White
-Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
-Write-Host "  Bing Connection ID (Julie):  $($outputs.bingConnectionId.value)" -ForegroundColor White
+Write-Host "  Subscription ID:             $($outputs.subscriptionId.value)" -ForegroundColor White
+Write-Host "  Resource Group:              $($outputs.resourceGroupName.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
     Write-Host "  Fabric SQL Connection:       actualizada desde parámetros" -ForegroundColor White
 }

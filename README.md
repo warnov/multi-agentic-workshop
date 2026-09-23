@@ -12,6 +12,8 @@ Choose your preferred language below to read the full workshop description and s
 
 Each language README describes the scenario, architecture and labs in detail for that language.
 
+For a historical record of substantial engineering changes to this workshop (e.g. the Julie hosted agent / Toolbox / Web Search / MCP migration), see [CHANGELOG.md](CHANGELOG.md).
+
 ---
 
 ### Workshop architects

@@ -21,10 +21,8 @@
 - [3.3 — Verify the OpenAPI specification](#33--verify-the-openapi-specification)
   - [Get the JSON specification](#get-the-json-specification)
   - [Explore the Swagger UI](#explore-the-swagger-ui)
-- [3.4 — The Anders agent: Two SDK versions](#34--the-anders-agent-two-sdk-versions)
-  - [Why two versions?](#why-two-versions)
-  - [Which version should I use?](#which-version-should-i-use)
-  - [Understanding the code (version `ms-foundry/` — recommended)](#understanding-the-code-version-ms-foundry--recommended)
+- [3.4 — The Anders agent](#34--the-anders-agent)
+  - [Understanding the code](#understanding-the-code)
     - [Phase 1 — Download the OpenAPI specification](#phase-1--download-the-openapi-specification)
     - [Phase 2 — Verify existing agent or create a new one](#phase-2--verify-existing-agent-or-create-a-new-one)
     - [Phase 3 — Interactive chat with the Responses API](#phase-3--interactive-chat-with-the-responses-api)
@@ -303,40 +301,21 @@ From the Swagger UI interface you can explore the endpoints and test them intera
 
 ---
 
-## 3.4 — The Anders agent: Two SDK versions
+## 3.4 — The Anders agent
 
-The Anders agent implementation is provided in **two separate versions**, each located under `en/labs/foundry/code/agents/AndersAgent/`:
+The Anders agent implementation lives under `en/labs/foundry/code/agents/AndersAgent/ms-foundry/` and is built on these packages:
 
-| Folder | SDK | API paradigm | Status |
-|--------|-----|--------------|--------|
-| `ai-foundry/` | `Azure.AI.Projects` + `Azure.AI.Agents.Persistent` | Persistent Agents (threads, runs, polling) | GA — kept for backward compatibility |
-| `ms-foundry/` | `Azure.AI.Projects` + `Azure.AI.Projects.OpenAI` | Responses API (conversations, project responses) | **Preview** (as of February 2026) — **recommended** |
+| Package | Role |
+|---------|------|
+| `Azure.AI.Projects` | Foundry project client |
+| `Azure.AI.Projects.Agents` | Agent administration: versions, definitions and tools |
+| `Azure.AI.Extensions.OpenAI` | Conversations and the Responses API |
 
-### Why two versions?
-
-At the end of 2025, Microsoft introduced a **new experience for Microsoft Foundry** based on the **Responses API** and a redesigned agent management surface. This new experience — exposed through the `Azure.AI.Projects.OpenAI` package — replaces the previous Persistent Agents model (`Azure.AI.Agents.Persistent`) with a more agile approach that uses **named and versioned agents**, **conversations**, and the **Responses API** instead of threads and runs with polling.
-
-The key differences between both approaches are:
-
-| Aspect | `ai-foundry/` (Persistent Agents) | `ms-foundry/` (Responses API) |
-|-------|-----------------------------------|-------------------------------|
-| **Agent lifecycle** | Created with a generated ID; searched by name by iterating the list | Created/updated by name with explicit versioning (`CreateAgentVersionAsync`) |
-| **Conversation model** | `PersistentAgentThread` + `ThreadRun` with polling | `ProjectConversation` + `ProjectResponsesClient` — synchronous response |
-| **Tool definition** | `OpenApiToolDefinition` with typed classes | Protocol method via `BinaryContent` (types are internal in SDK 1.2.x) |
-| **Chat pattern** | Create run → poll until completion → read messages | A single call to `CreateResponse()` returns the output directly |
-
-### Which version should I use?
-
-**The `ms-foundry/` version is recommended** for new development. It is aligned with the direction of the Microsoft Foundry platform and offers a simpler programming model — particularly the elimination of the polling loop in favor of a single synchronous response call.
-
-The `ai-foundry/` version is kept in this workshop for **backward compatibility**: attendees whose Azure AI Services resources were provisioned before the new experience was available can complete the lab using the Persistent Agents API.
-
-> [!IMPORTANT]
-> As of February 2026, the `Azure.AI.Projects.OpenAI` package and the Responses API are in **public preview**. API shapes, payload schemas, and SDK types may change before reaching general availability (GA). If you encounter issues such as missing or renamed properties (for example, the required `kind` field in the agent definition payload), check the latest [Azure.AI.Projects.OpenAI release notes](https://www.nuget.org/packages/Azure.AI.Projects.OpenAI) for breaking changes.
+The programming model uses **named and versioned agents**, **conversations**, and the **Responses API**: a single call to `CreateResponse()` returns the agent output directly, with no polling loop.
 
 ---
 
-### Understanding the code (version `ms-foundry/` — recommended)
+### Understanding the code
 
 Open the file `en/labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` and note that it is organized into **3 phases**:
 
@@ -443,7 +422,7 @@ ResponseResult response = responseClient.CreateResponse(input);
 Console.WriteLine(response.GetOutputText());
 ```
 
-The interaction pattern in the `ms-foundry/` version is simpler than the Persistent Agents approach:
+The interaction pattern is straightforward:
 1. A `ProjectConversation` is created (the conversation context)
 2. A `ProjectResponsesClient` is obtained, bound to the agent and the conversation
 3. Each user message is sent via `CreateResponse()`, which returns the output **synchronously** — without the need for a polling loop

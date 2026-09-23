@@ -14,10 +14,8 @@
   - [3.2 — Verificar la especificación OpenAPI](#32--verificar-la-especificación-openapi)
     - [Obtener la especificación JSON](#obtener-la-especificación-json)
     - [Explorar el Swagger UI](#explorar-el-swagger-ui)
-  - [3.3 — El agente Anders: Dos versiones de SDK](#33--el-agente-anders-dos-versiones-de-sdk)
-    - [¿Por qué dos versiones?](#por-qué-dos-versiones)
-    - [¿Cuál versión debo usar?](#cuál-versión-debo-usar)
-    - [Entendiendo el código (versión `ms-foundry/` — recomendada)](#entendiendo-el-código-versión-ms-foundry--recomendada)
+  - [3.3 — El agente Anders](#33--el-agente-anders)
+    - [Entendiendo el código](#entendiendo-el-código)
       - [Fase 1 — Descargar la especificación OpenAPI](#fase-1--descargar-la-especificación-openapi)
       - [Fase 2 — Verificar agente existente o crear uno nuevo](#fase-2--verificar-agente-existente-o-crear-uno-nuevo)
       - [Fase 3 — Chat interactivo con Responses API](#fase-3--chat-interactivo-con-responses-api)
@@ -128,40 +126,21 @@ Desde la interfaz de Swagger UI puedes explorar los endpoints y probarlos intera
 
 ---
 
-## 3.3 — El agente Anders: Dos versiones de SDK
+## 3.3 — El agente Anders
 
-La implementación del agente Anders se proporciona en **dos versiones separadas**, cada una ubicada bajo `es/labs/foundry/code/agents/AndersAgent/`:
+La implementación del agente Anders está en `es/labs/foundry/code/agents/AndersAgent/ms-foundry/` y se apoya en estos paquetes:
 
-| Carpeta | SDK | Paradigma de API | Estado |
-|---------|-----|------------------|--------|
-| `ai-foundry/` | `Azure.AI.Projects` + `Azure.AI.Agents.Persistent` | Persistent Agents (threads, runs, polling) | GA — se conserva por retrocompatibilidad |
-| `ms-foundry/` | `Azure.AI.Projects` + `Azure.AI.Projects.OpenAI` | Responses API (conversaciones, respuestas de proyecto) | **Preview** (a febrero 2026) — **recomendada** |
+| Paquete | Rol |
+|---------|-----|
+| `Azure.AI.Projects` | Cliente del proyecto Foundry |
+| `Azure.AI.Projects.Agents` | Administración de agentes: versiones, definiciones y herramientas |
+| `Azure.AI.Extensions.OpenAI` | Conversaciones y Responses API |
 
-### ¿Por qué dos versiones?
-
-A finales de 2025, Microsoft introdujo una **nueva experiencia para Microsoft Foundry** basada en la **Responses API** y una superficie de gestión de agentes rediseñada. Esta nueva experiencia — expuesta a través del paquete `Azure.AI.Projects.OpenAI` — reemplaza el modelo anterior de Persistent Agents (`Azure.AI.Agents.Persistent`) con un enfoque más ágil que utiliza **agentes con nombre y versionado**, **conversaciones** y la **Responses API** en lugar de threads y runs con polling.
-
-Las diferencias clave entre ambos enfoques son:
-
-| Aspecto | `ai-foundry/` (Persistent Agents) | `ms-foundry/` (Responses API) |
-|---------|-----------------------------------|-------------------------------|
-| **Ciclo de vida del agente** | Se crea con un ID generado; se busca por nombre iterando la lista | Se crea/actualiza por nombre con versionado explícito (`CreateAgentVersionAsync`) |
-| **Modelo de conversación** | `PersistentAgentThread` + `ThreadRun` con polling | `ProjectConversation` + `ProjectResponsesClient` — respuesta síncrona |
-| **Definición de herramientas** | `OpenApiToolDefinition` con clases tipadas | Protocol method vía `BinaryContent` (los tipos son internos en SDK 1.2.x) |
-| **Patrón de chat** | Crear run → hacer polling hasta completar → leer mensajes | Una sola llamada a `CreateResponse()` retorna la salida directamente |
-
-### ¿Cuál versión debo usar?
-
-**Se recomienda la versión `ms-foundry/`** para desarrollo nuevo. Está alineada con la dirección de la plataforma Microsoft Foundry y ofrece un modelo de programación más simple — particularmente la eliminación del loop de polling en favor de una sola llamada síncrona de respuesta.
-
-La versión `ai-foundry/` se conserva en este taller por **retrocompatibilidad**.
-
-> [!IMPORTANT]
-> A febrero de 2026, el paquete `Azure.AI.Projects.OpenAI` y la Responses API están en **preview pública**. Las formas de la API, schemas de payload y tipos del SDK pueden cambiar antes de alcanzar disponibilidad general (GA). Si encuentras problemas como propiedades faltantes o renombradas (por ejemplo, el campo `kind` requerido en el payload de definición del agente), consulta las últimas [notas de versión de Azure.AI.Projects.OpenAI](https://www.nuget.org/packages/Azure.AI.Projects.OpenAI) para conocer los cambios que rompen compatibilidad.
+El modelo de programación usa **agentes con nombre y versionado**, **conversaciones** y la **Responses API**: una sola llamada a `CreateResponse()` devuelve la salida del agente directamente, sin loop de polling.
 
 ---
 
-### Entendiendo el código (versión `ms-foundry/` — recomendada)
+### Entendiendo el código
 
 Abre el archivo `es/labs/foundry/code/agents/AndersAgent/ms-foundry/Program.cs` y observa que está organizado en **3 fases**:
 
@@ -268,7 +247,7 @@ ResponseResult response = responseClient.CreateResponse(input);
 Console.WriteLine(response.GetOutputText());
 ```
 
-El patrón de interacción en la versión `ms-foundry/` es más simple que el enfoque de Persistent Agents:
+El patrón de interacción es directo:
 1. Se crea una `ProjectConversation` (el contexto de conversación)
 2. Se obtiene un `ProjectResponsesClient`, vinculado al agente y la conversación
 3. Cada mensaje del usuario se envía vía `CreateResponse()` que retorna la salida **síncronamente** — sin necesidad de loop de polling
@@ -435,7 +414,7 @@ Este script habilita el acceso público de red en el Storage Account y reinicia 
 
 Actualmente el chat de Anders espera a que el agente complete toda su respuesta antes de mostrarla. Esto puede generar una pausa perceptible cuando el modelo razona y ejecuta la herramienta OpenAPI.
 
-**Tu reto:** modifica el loop de chat en `ms-foundry/Program.cs` para que la respuesta de Anders se imprima token a token a medida que llega, usando la API de streaming.
+**Tu reto:** modifica el loop de chat en `Program.cs` para que la respuesta de Anders se imprima token a token a medida que llega, usando la API de streaming.
 
 ### Pista
 

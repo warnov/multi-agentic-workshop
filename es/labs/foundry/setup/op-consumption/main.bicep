@@ -50,8 +50,6 @@ var appServicePlanName = 'asp-contosoretail-${suffix}'
 var functionAppName = 'func-contosoretail-${suffix}'
 var aiFoundryName = 'ais-contosoretail-${suffix}'
 var aiProjectName = 'aip-contosoretail-${suffix}'
-var bingGroundingName = 'bingsearch-${suffix}'
-var bingConnectionName = '${aiFoundryName}-bingsearchconnection'
 
 var tags = {
   project: 'taller-multi-agentic'
@@ -246,40 +244,6 @@ resource gptDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06
 }
 
 // ============================================================================
-// 10. Grounding with Bing Search + Connection para Foundry
-// ============================================================================
-
-#disable-next-line BCP081
-resource bingGrounding 'Microsoft.Bing/accounts@2020-06-10' = {
-  name: bingGroundingName
-  location: 'global'
-  sku: {
-    name: 'G1'
-  }
-  kind: 'Bing.Grounding'
-}
-
-#disable-next-line BCP081
-resource bingConnection 'Microsoft.CognitiveServices/accounts/connections@2025-04-01-preview' = {
-  parent: aiFoundry
-  name: bingConnectionName
-  properties: {
-    category: 'ApiKey'
-    target: 'https://api.bing.microsoft.com/'
-    authType: 'ApiKey'
-    credentials: {
-      key: bingGrounding.listKeys().key1
-    }
-    isSharedToAll: true
-    metadata: {
-      ApiType: 'Azure'
-      Location: bingGrounding.location
-      ResourceId: bingGrounding.id
-    }
-  }
-}
-
-// ============================================================================
 // Outputs
 // ============================================================================
 
@@ -291,6 +255,5 @@ output aiFoundryName string = aiFoundryName
 output aiFoundryEndpoint string = aiFoundry.properties.endpoint
 output aiProjectName string = aiProjectName
 output foundryProjectEndpoint string = aiProject.properties.endpoints['AI Foundry API']
-output bingGroundingName string = bingGrounding.name
-output bingConnectionName string = bingConnection.name
-output bingConnectionId string = bingConnection.id
+output subscriptionId string = subscription().subscriptionId
+output resourceGroupName string = resourceGroup().name

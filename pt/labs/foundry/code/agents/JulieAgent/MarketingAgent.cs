@@ -2,15 +2,20 @@
 //  MarketingAgent — Agente de marketing personalizado
 //
 //  Recebe o nome de um cliente e sua categoria de compra favorita.
-//  Usa o Bing Search para buscar eventos recentes ou próximos relacionados
-//  com essa categoria, seleciona o mais relevante e gera uma mensagem
+//  Usa Web Search (via um Toolbox de Foundry exposto como servidor MCP)
+//  para buscar eventos recentes ou próximos relacionados com essa
+//  categoria, seleciona o mais relevante e gera uma mensagem
 //  motivacional convidando o cliente a revisar o catálogo da
 //  Contoso Retail.
 // =====================================================================
 
 namespace JulieAgent;
 
-using Azure.AI.Projects.OpenAI;
+using Azure.AI.Projects.Agents;
+using OpenAI.Responses;
+
+#pragma warning disable AAIP001 // Azure.AI.Projects.Agents: Toolbox é uma API de pré-visualização
+#pragma warning disable OPENAI001 // OpenAI.Responses: McpTool é uma API de pré-visualização
 
 public static class MarketingAgent
 {
@@ -23,7 +28,7 @@ public static class MarketingAgent
         Seu fluxo de trabalho é o seguinte:
 
         1. Você recebe o nome completo de um cliente e sua categoria de compra favorita.
-        2. Use a ferramenta Bing Search para buscar eventos recentes ou próximos
+        2. Use a ferramenta Web Search para buscar eventos recentes ou próximos
            relacionados com essa categoria. Por exemplo:
            - Se a categoria é "Bikes", busque eventos de ciclismo.
            - Se a categoria é "Clothing", busque eventos de moda.
@@ -49,17 +54,24 @@ public static class MarketingAgent
 
     /// <summary>
     /// Constrói a definição do agente para a API do Microsoft Foundry.
-    /// MarketingAgent usa Bing Search (grounding) como ferramenta.
+    /// MarketingAgent usa Web Search como ferramenta, servida através de um
+    /// Toolbox de Foundry exposto como um servidor MCP remoto. Do ponto de
+    /// vista do agente é apenas mais um servidor MCP: o Toolbox só centraliza
+    /// sua gestão e versionamento no projeto.
     /// </summary>
-    public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string bingConnectionId)
+    public static DeclarativeAgentDefinition GetAgentDefinition(string modelDeployment, Uri toolboxMcpEndpoint)
     {
-        var bingGroundingAgentTool = new BingGroundingAgentTool(new BingGroundingSearchToolOptions(
-            searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionId)]));
+        McpTool mcpTool = ResponseTool.CreateMcpTool(
+            serverLabel: "marketing-websearch",
+            serverUri: toolboxMcpEndpoint,
+            serverDescription: "Toolbox de Foundry com a ferramenta Web Search",
+            toolCallApprovalPolicy: GlobalMcpToolCallApprovalPolicy.NeverRequireApproval);
+        ProjectsAgentTool webSearchTool = ProjectsAgentTool.AsProjectTool(mcpTool);
 
-        return new PromptAgentDefinition(modelDeployment)
+        return new DeclarativeAgentDefinition(modelDeployment)
         {
             Instructions = Instructions,
-            Tools = { bingGroundingAgentTool }
+            Tools = { webSearchTool }
         };
     }
 }

@@ -9,7 +9,7 @@ Esta seção do workshop cobre a **camada de raciocínio e execução** da arqui
 | Agente | Papel | Descrição |
 |--------|-------|-----------|
 | **Anders** | Executor Agent | Recebe solicitações de ações operacionais (como a geração de relatórios ou renderização de pedidos) e as executa interagindo com serviços externos como a Azure Function `FxContosoRetail`. Tipo: `kind: "prompt"` com ferramenta OpenAPI. |
-| **Julie** | Planner Workflow | Orquestra campanhas de marketing personalizadas. Recebe uma descrição de segmento de clientes e executa um fluxo de 5 etapas: (1) extrai o filtro de clientes, (2) invoca o **SqlAgent** para gerar T-SQL, (3) executa a consulta contra o Fabric via **Function App OpenAPI**, (4) invoca o **MarketingAgent** (com Bing Search) para gerar mensagens por cliente, (5) organiza o resultado como JSON de campanha de e-mails. Tipo: `kind: "workflow"` com 3 ferramentas (2 agentes + 1 OpenAPI). |
+| **Julie** | Planner Workflow | Orquestra campanhas de marketing personalizadas. Recebe uma descrição de segmento de clientes e executa um fluxo de 5 etapas: (1) extrai o filtro de clientes, (2) invoca o **SqlAgent** para gerar T-SQL, (3) executa a consulta contra o Fabric via **Function App OpenAPI**, (4) invoca o **MarketingAgent** (com Web Search) para gerar mensagens por cliente, (5) organiza o resultado como JSON de campanha de e-mails. Tipo: `kind: "workflow"` com 3 ferramentas (2 agentes + 1 OpenAPI). |
 
 ### Arquitetura geral
 
@@ -25,7 +25,7 @@ A camada Foundry se localiza no centro da arquitetura de três camadas:
 └─────────────────────┘
 ```
 
-Os agentes Anders e Julie utilizam modelos GPT-5.1 implantados no Azure AI Services para raciocinar sobre as informações do negócio. Anders consome diretamente a API do `FxContosoRetail` via ferramenta OpenAPI. Julie orquestra um workflow multi-agente: usa o **SqlAgent** (gera T-SQL), uma **Function App** (executa o SQL contra o Fabric via OpenAPI) e o **MarketingAgent** (gera mensagens personalizadas com Bing Search), coordenando tudo de forma autônoma como um agente do tipo `workflow`.
+Os agentes Anders e Julie utilizam modelos GPT-5.1 implantados no Azure AI Services para raciocinar sobre as informações do negócio. Anders consome diretamente a API do `FxContosoRetail` via ferramenta OpenAPI. Julie orquestra um workflow multi-agente: usa o **SqlAgent** (gera T-SQL), uma **Function App** (executa o SQL contra o Fabric via OpenAPI) e o **MarketingAgent** (gera mensagens personalizadas com Web Search), coordenando tudo de forma autônoma como um agente do tipo `workflow`.
 
 ---
 
@@ -53,7 +53,7 @@ Antes de iniciar os laboratórios, cada participante precisa implantar a infraes
   
   ✅ Isso só é necessário uma vez.
   
-- Uma **assinatura do Azure** ativa com permissões de Owner ou Contributor
+- Uma **assinatura do Azure** ativa na qual você tenha **Owner**, ou então **Contributor** junto com **User Access Administrator**. A implantação cria atribuições de função para a identidade gerenciada da Function App, e Contributor sozinho não consegue criá-las.
 
    - Quando seu tenant estiver pronto para trabalhar, anote o **número do tenant temporário** atribuído: se o usuário atribuído for usuario@azurehol3387.com, então seu número de tenant é 3387.
 
@@ -178,6 +178,27 @@ az role assignment create `
 >
 > A propagação do RBAC pode levar até 1 minuto. Aguarde antes de tentar criar agentes.
 
+### Permissões adicionais para agentes hospedados (Lab 4)
+
+A partir do **Lab 4**, a Julie é implantada como **agente hospedado**. Um agente hospedado executa com a sua própria identidade do Microsoft Entra, e essa identidade precisa da função **Foundry User** no projeto para conseguir alcançar os agentes de prompt `SqlAgent` e `MarketingAgent`.
+
+O deployer da Julie cria essa atribuição para você, então **o seu próprio usuário precisa conseguir criar atribuições de função**:
+
+- **Foundry Project Manager** no escopo do projeto, ou
+- **Owner** no grupo de recursos `rg-contoso-retail`.
+
+```powershell
+$sub = az account show --query id -o tsv
+$upn = az account show --query "user.name" -o tsv
+
+az role assignment create `
+    --assignee $upn `
+    --role "Foundry Project Manager" `
+    --scope "/subscriptions/$sub/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/ais-contosoretail-{suffix}/projects/aip-contosoretail-{suffix}"
+```
+
+> Se você não conseguir essas permissões, o deployer não falha: ele imprime o comando `az role assignment create` exato para que um administrador o execute. Veja o Lab 4 para os detalhes.
+
 ---
 
 ## Estrutura do código
@@ -205,17 +226,18 @@ labs/foundry/
     │       └── ...
     ├── agents/
     │   ├── AndersAgent/                   ← Console App: Agente Anders (kind: prompt + OpenAPI tool)
-    │   │   ├── ms-foundry/                ← Versão Responses API (recomendada)
-    │   │   │   ├── Program.cs
-    │   │   │   └── appsettings.json
-    │   │   └── ai-foundry/                ← Versão Persistent Agents API (alternativa)
-    │   │       └── ...
-    │   └── JulieAgent/                    ← Console App: Agente Julie (kind: workflow)
-    │       ├── Program.cs                 ← Cria os 3 agentes + chat com Julie
-    │       ├── JulieAgent.cs              ← Julie: workflow com 3 tools (SqlAgent, MarketingAgent, OpenAPI)
-    │       ├── SqlAgent.cs                ← Sub-agente: gera T-SQL a partir de linguagem natural
-    │       ├── MarketingAgent.cs          ← Sub-agente: gera mensagens com Bing Search
-    │       ├── db-structure.txt           ← DDL do BD injetado no SqlAgent
+    │   │   └── ms-foundry/
+    │   │       ├── Program.cs
+    │   │       └── appsettings.json
+    │   ├── JulieAgent/                    ← Console App: implanta os agentes + chat com Julie
+    │   │   ├── Program.cs                 ← Cria SqlAgent/MarketingAgent, implanta Julie, concede RBAC
+    │   │   ├── SqlAgent.cs                ← Sub-agente: gera T-SQL a partir de linguagem natural
+    │   │   ├── MarketingAgent.cs          ← Sub-agente: gera mensagens com Web Search (Toolbox)
+    │   │   ├── db-structure.txt           ← DDL do BD injetado no SqlAgent
+    │   │   └── appsettings.json
+    │   └── JulieHosted/                   ← A própria Julie (kind: hosted, Microsoft Agent Framework)
+    │       ├── Program.cs                 ← Orquestração em código, protocolo Responses
+    │       ├── hosted.csproj
     │       └── appsettings.json
     └── tests/
         ├── bruno/                         ← Coleção Bruno (REST client)
