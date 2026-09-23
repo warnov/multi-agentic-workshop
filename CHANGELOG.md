@@ -9,11 +9,12 @@ This file is intentionally **English-only and not duplicated** under `en/`, `es/
 `pt/`: unlike the lab documents, it targets maintainers/architects rather than
 workshop attendees.
 
-## [Unreleased] — V2-FY27: Julie hosted agent + Toolbox/Web Search/MCP migration
+## [V2-FY27] — 2026-09-23: Julie hosted agent + Toolbox/Web Search/MCP migration
 
 This entry covers the branch `V2-FY27`, which evolves **Lab 4 (Julie)** and, as a
 side effect, aligns **Lab 3 (Anders)** to the same current Foundry SDK surface.
-Applied identically across `en/`, `es/`, `pt/`.
+Applied identically across `en/`, `es/`, `pt/`. On 2026-09-23 this branch was
+merged into `master`, becoming the workshop's new main baseline.
 
 ### Added
 
