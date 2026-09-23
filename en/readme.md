@@ -48,7 +48,7 @@ Examples of operational questions:
 
 The analytical flow answers strategic and exploratory questions. Here the goal is not to explain a single case, but to identify relevant signals that help prioritize actions and generate concrete plans.
 
-In this flow, **Julie** (Foundry) acts as the orchestrator agent for marketing campaigns, defined as a `workflow`. Julie coordinates a 5‑step flow: (1) extracts the customer segment filter from the user’s prompt, (2) calls **SqlAgent** to generate the corresponding T‑SQL query, (3) executes the T‑SQL against the Fabric database via the OpenAPI tool (`SqlExecutor` in the `FxContosoRetail` Azure Function), (4) for each returned customer, calls **MarketingAgent** (which uses Bing Search to find relevant events and generates a personalized marketing message), and (5) organizes everything into a JSON email campaign.
+In this flow, **Julie** (Foundry) acts as the orchestrator agent for marketing campaigns, defined as a `workflow`. Julie coordinates a 5‑step flow: (1) extracts the customer segment filter from the user’s prompt, (2) calls **SqlAgent** to generate the corresponding T‑SQL query, (3) executes the T‑SQL against the Fabric database via the OpenAPI tool (`SqlExecutor` in the `FxContosoRetail` Azure Function), (4) for each returned customer, calls **MarketingAgent** (which uses Web Search to find relevant events and generates a personalized marketing message), and (5) organizes everything into a JSON email campaign.
 
 Examples of analytical and planning questions:
 
@@ -78,9 +78,9 @@ You can find the full documentation here: [Database Documentation](../assets/dat
 ### <a id="reasoning-layer"></a>Microsoft Foundry – Reasoning layer
 
 - **Anders (Executor Agent)**
-  Executes operational actions by calling external services through an OpenAPI tool. It receives order data and calls the `OrdersReporter` endpoint on the `FxContosoRetail` Azure Function, which generates an HTML report and publishes it to Blob Storage, returning the document URL. It uses the `Azure.AI.Agents.Persistent` SDK with a GPT‑4.1 model to interpret the request, build the JSON payload, and orchestrate the API call.
+  Executes operational actions by calling external services through an OpenAPI tool. It receives order data and calls the `OrdersReporter` endpoint on the `FxContosoRetail` Azure Function, which generates an HTML report and publishes it to Blob Storage, returning the document URL. It uses the `Azure.AI.Projects` SDK with a GPT‑5.1 model to interpret the request, build the JSON payload, and orchestrate the API call.
 - **Julie (Planner Agent)**
-  Orchestrator agent for marketing campaigns, defined as `kind: "workflow"`. It coordinates three tools: **SqlAgent** (`type: "agent"`), which generates T‑SQL queries from natural language; an Azure Function tool called **SqlExecutor** (`type: "openapi"`), which executes the SQL against the Fabric database (the same Function App `FxContosoRetail` used earlier by Anders); and **MarketingAgent** (`type: "agent"`), which uses Bing Search to find relevant events and generates personalized marketing messages per customer. The final result is a JSON campaign with email drafts ready to send.
+  Orchestrator agent for marketing campaigns, defined as `kind: "workflow"`. It coordinates three tools: **SqlAgent** (`type: "agent"`), which generates T‑SQL queries from natural language; an Azure Function tool called **SqlExecutor** (`type: "openapi"`), which executes the SQL against the Fabric database (the same Function App `FxContosoRetail` used earlier by Anders); and **MarketingAgent** (`type: "agent"`), which uses Web Search to find relevant events and generates personalized marketing messages per customer. The final result is a JSON campaign with email drafts ready to send.
 
 ### <a id="orchestration-layer"></a>Copilot Studio – Orchestration layer
 
@@ -213,7 +213,8 @@ This allows running local scripts and downloaded scripts that are signed. It onl
 
 ### Azure resources
 
-- An active **Azure subscription** with **Owner** or **Contributor** permissions
+- An active **Azure subscription** where you hold **Owner**, or **Contributor** together with **User Access Administrator**. The deployment creates role assignments for the Function App managed identity, and Contributor on its own cannot create them.
+- For **Lab 4**, Julie is deployed as a **hosted agent** running under its own Microsoft Entra identity. The deployer grants that identity the **Foundry User** role on the project, so you also need **Foundry Project Manager** at the project scope or **Owner** on the resource group.
 - The **temporary tenant name** assigned for the workshop (provided on the day of the event)
 
 ---

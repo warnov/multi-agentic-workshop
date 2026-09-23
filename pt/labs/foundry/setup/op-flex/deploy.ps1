@@ -132,8 +132,6 @@ Write-Host "[1/5] Verificando Azure CLI..." -ForegroundColor Green
 try {
     $azVersion = az version --output json | ConvertFrom-Json
     Write-Host "  Azure CLI v$($azVersion.'azure-cli') detectado." -ForegroundColor Gray
-    Write-Host "  Registrando provider Microsoft.Bing (se aplicável)..." -ForegroundColor Gray
-    az provider register --namespace Microsoft.Bing --output none 2>$null
 } catch {
     Write-Error "O Azure CLI não está instalado. Instale em https://aka.ms/installazurecli"
     exit 1
@@ -224,99 +222,153 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $templateFile = Join-Path $scriptDir "main.bicep"
 $deploymentName = "main"
 
-# Iniciar implantação em background (--no-wait)
-az deployment group create `
-    --resource-group $ResourceGroupName `
-    --template-file $templateFile `
-    --parameters tenantName=$TenantName location=$Location fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
-    --name $deploymentName `
-    --no-wait `
-    --output none
+# O ARM rejeita uma nova implantação enquanto a conta do Foundry tem outra operação em andamento.
+function Wait-ForFoundryAccountIdle {
+    param(
+        [string]$ResourceGroupName,
+        [string]$AccountName,
+        [int]$TimeoutSeconds = 300
+    )
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Não foi possível iniciar a implantação. Verifique se não há recursos soft-deleted (az cognitiveservices account list-deleted)."
-    exit 1
+    if ([string]::IsNullOrWhiteSpace($AccountName)) { return }
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        $state = az cognitiveservices account show `
+            --resource-group $ResourceGroupName `
+            --name $AccountName `
+            --query 'properties.provisioningState' `
+            --output tsv 2>$null
+
+        if ([string]::IsNullOrWhiteSpace($state)) { return }
+        if ($state -notin @('Creating', 'Updating', 'Deleting', 'Accepted')) { return }
+
+        Write-Host "  A conta do Foundry '$AccountName' está ocupada ($state). Aguardando 15s..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 15
+    }
+
+    Write-Warning "Tempo esgotado aguardando '$AccountName' ficar livre. Continuando mesmo assim."
 }
 
-# Aguardar o deployment aparecer no ARM (~5 segundos)
-$retries = 0
-do {
-    Start-Sleep -Seconds 3
-    $retries++
-    $depState = az deployment group show `
-        --resource-group $ResourceGroupName `
-        --name $deploymentName `
-        --query 'properties.provisioningState' `
-        --output tsv 2>$null
-} while (-not $depState -and $retries -lt 10)
-
-if (-not $depState) {
-    Write-Error "O deployment '$deploymentName' não foi registrado no Azure. Verifique erros de validação."
-    exit 1
-}
-
-# Acompanhamento recurso a recurso
-$completedOps = @{}
-$spinChars = @('|', '/', '-', '\\')
-$spinIdx = 0
-$deployFailed = $false
+$foundryAccountName = if ([string]::IsNullOrWhiteSpace($suffixResult)) { $null } else { "ais-contosoretail-$suffixResult" }
+$maxDeployAttempts = 3
+$deployAttempt = 0
+$depJson = $null
 
 while ($true) {
-    Start-Sleep -Seconds 3
+    $deployAttempt++
 
-    # Obter operações do deployment
-    $opsJson = az deployment operation group list `
+    Wait-ForFoundryAccountIdle -ResourceGroupName $ResourceGroupName -AccountName $foundryAccountName
+
+    if ($deployAttempt -gt 1) {
+        Write-Host "  Tentando a implantação novamente (tentativa $deployAttempt de $maxDeployAttempts)..." -ForegroundColor Yellow
+    }
+
+    # Iniciar implantação em background (--no-wait)
+    az deployment group create `
         --resource-group $ResourceGroupName `
+        --template-file $templateFile `
+        --parameters tenantName=$TenantName location=$Location fabricWarehouseSqlEndpoint=$FabricWarehouseSqlEndpoint fabricWarehouseDatabase=$FabricWarehouseDatabase fabricWarehouseConnectionString="$FabricWarehouseConnectionString" `
         --name $deploymentName `
-        --output json 2>$null
+        --no-wait `
+        --output none
 
-    if (-not $opsJson) { continue }
-    $ops = $opsJson | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Não foi possível iniciar a implantação. Verifique se não há recursos soft-deleted (az cognitiveservices account list-deleted)."
+        exit 1
+    }
 
-    foreach ($op in $ops) {
-        $resType = $op.properties.targetResource.resourceType
-        $resName = $op.properties.targetResource.resourceName
-        $status  = $op.properties.provisioningState
+    # Aguardar o deployment aparecer no ARM (~5 segundos)
+    $retries = 0
+    do {
+        Start-Sleep -Seconds 3
+        $retries++
+        $depState = az deployment group show `
+            --resource-group $ResourceGroupName `
+            --name $deploymentName `
+            --query 'properties.provisioningState' `
+            --output tsv 2>$null
+    } while (-not $depState -and $retries -lt 10)
 
-        if (-not $resType -or -not $resName) { continue }
+    if (-not $depState) {
+        Write-Error "O deployment '$deploymentName' não foi registrado no Azure. Verifique erros de validação."
+        exit 1
+    }
 
-        $key = "$resType/$resName"
+    # Acompanhamento recurso a recurso
+    $completedOps = @{}
+    $spinChars = @('|', '/', '-', '\\')
+    $spinIdx = 0
+    $deployFailed = $false
 
-        # Exibir apenas transições novas
-        $prevStatus = $completedOps[$key]
-        if ($prevStatus -ne $status) {
-            $completedOps[$key] = $status
-            $shortType = $resType -replace '^Microsoft\.', '' -replace '/providers/.*', ''
-            switch ($status) {
-                'Running'   { Write-Host "  ⏳ $shortType/$resName ..." -ForegroundColor Gray }
-                'Succeeded' { Write-Host "  ✅ $shortType/$resName" -ForegroundColor Green }
-                'Failed'    { Write-Host "  ❌ $shortType/$resName" -ForegroundColor Red; $deployFailed = $true }
+    while ($true) {
+        Start-Sleep -Seconds 3
+
+        # Obter operações do deployment
+        $opsJson = az deployment operation group list `
+            --resource-group $ResourceGroupName `
+            --name $deploymentName `
+            --output json 2>$null
+
+        if (-not $opsJson) { continue }
+        $ops = $opsJson | ConvertFrom-Json
+
+        foreach ($op in $ops) {
+            $resType = $op.properties.targetResource.resourceType
+            $resName = $op.properties.targetResource.resourceName
+            $status  = $op.properties.provisioningState
+
+            if (-not $resType -or -not $resName) { continue }
+
+            $key = "$resType/$resName"
+
+            # Exibir apenas transições novas
+            $prevStatus = $completedOps[$key]
+            if ($prevStatus -ne $status) {
+                $completedOps[$key] = $status
+                $shortType = $resType -replace '^Microsoft\.', '' -replace '/providers/.*', ''
+                switch ($status) {
+                    'Running'   { Write-Host "  ⏳ $shortType/$resName ..." -ForegroundColor Gray }
+                    'Succeeded' { Write-Host "  ✅ $shortType/$resName" -ForegroundColor Green }
+                    'Failed'    { Write-Host "  ❌ $shortType/$resName" -ForegroundColor Red; $deployFailed = $true }
+                }
             }
         }
+
+        # Verificar se o deployment terminou
+        $depJson = az deployment group show `
+            --resource-group $ResourceGroupName `
+            --name $deploymentName `
+            --query 'properties.provisioningState' `
+            --output tsv 2>$null
+
+        if ($depJson -eq 'Succeeded' -or $depJson -eq 'Failed' -or $depJson -eq 'Canceled') {
+            break
+        }
+
+        $spinIdx = ($spinIdx + 1) % $spinChars.Count
     }
 
-    # Verificar se o deployment terminou
-    $depJson = az deployment group show `
-        --resource-group $ResourceGroupName `
-        --name $deploymentName `
-        --query 'properties.provisioningState' `
-        --output tsv 2>$null
+    if ($depJson -eq 'Succeeded') { break }
 
-    if ($depJson -eq 'Succeeded' -or $depJson -eq 'Failed' -or $depJson -eq 'Canceled') {
-        break
-    }
-
-    $spinIdx = ($spinIdx + 1) % $spinChars.Count
-}
-
-if ($depJson -ne 'Succeeded') {
-    Write-Host ""
-    # Exibir erro detalhado
-    az deployment group show `
+    $deployErrorJson = az deployment group show `
         --resource-group $ResourceGroupName `
         --name $deploymentName `
         --query 'properties.error' `
-        --output json
+        --output json 2>$null
+
+    $isTransientConflict = $deployErrorJson -match 'RequestConflict' -or $deployErrorJson -match 'Another operation is in progress'
+
+    if ($isTransientConflict -and $deployAttempt -lt $maxDeployAttempts) {
+        Write-Host ""
+        Write-Host "  ⚠️  Conflito transitório: a conta do Foundry ainda tinha uma operação em andamento." -ForegroundColor Yellow
+        Write-Host "  Aguardando 45 segundos antes de tentar novamente..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 45
+        continue
+    }
+
+    Write-Host ""
+    Write-Host $deployErrorJson
     Write-Error "A implantação falhou. Verifique os erros acima."
     exit 1
 }
@@ -420,9 +472,8 @@ Write-Host "  Function App:        $functionAppName" -ForegroundColor White
 Write-Host "  Function App Base URL:      $functionAppUrl/api" -ForegroundColor White
 Write-Host "  API OrdersReporter:          $apiUrl" -ForegroundColor White
 Write-Host "  Foundry Project Endpoint:    $($outputs.foundryProjectEndpoint.value)" -ForegroundColor White
-Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" -ForegroundColor White
-Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
-Write-Host "  Bing Connection ID (Julie):  $($outputs.bingConnectionId.value)" -ForegroundColor White
+Write-Host "  Subscription ID:             $($outputs.subscriptionId.value)" -ForegroundColor White
+Write-Host "  Resource Group:              $($outputs.resourceGroupName.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
     Write-Host "  Fabric SQL Connection:       atualizada a partir dos parâmetros" -ForegroundColor White
 }

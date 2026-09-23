@@ -108,8 +108,6 @@ if (-not $account) {
     $account = az account show --output json | ConvertFrom-Json
 }
 Write-Host "  Assinatura: $($account.name) ($($account.id))" -ForegroundColor Gray
-Write-Host "  Registrando provider Microsoft.Bing (se aplicável)..." -ForegroundColor Gray
-az provider register --namespace Microsoft.Bing --output none 2>$null
 
 # --- 2. Criar Resource Group ---
 Write-Host "[2/5] Criando Resource Group '$ResourceGroupName'..." -ForegroundColor Green
@@ -352,9 +350,8 @@ Write-Host "  Function App:                $functionAppName" -ForegroundColor Wh
 Write-Host "  Function App Base URL:       $functionAppUrl/api" -ForegroundColor White
 Write-Host "  API OrdersReporter:          $apiUrl" -ForegroundColor White
 Write-Host "  Foundry Project Endpoint:    $($outputs.foundryProjectEndpoint.value)" -ForegroundColor White
-Write-Host "  Bing Grounding Resource:     $($outputs.bingGroundingName.value)" -ForegroundColor White
-Write-Host "  Bing Connection Name:        $($outputs.bingConnectionName.value)" -ForegroundColor White
-Write-Host "  Bing Connection Name (Julie): $($outputs.bingConnectionName.value)" -ForegroundColor White
+Write-Host "  Subscription ID:             $($outputs.subscriptionId.value)" -ForegroundColor White
+Write-Host "  Resource Group:              $($outputs.resourceGroupName.value)" -ForegroundColor White
 if ($hasCompleteFabricConfig) {
     Write-Host "  Fabric SQL Connection:       atualizada a partir dos parâmetros" -ForegroundColor White
 }

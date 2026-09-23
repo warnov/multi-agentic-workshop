@@ -9,7 +9,7 @@
 
 namespace JulieAgent;
 
-using Azure.AI.Projects.OpenAI;
+using Azure.AI.Projects.Agents;
 using System.Text.Json;
 
 public static class SqlAgent
@@ -95,9 +95,9 @@ public static class SqlAgent
     /// Construye la definición del agente para el API de Microsoft Foundry.
     /// SqlAgent no tiene herramientas externas — solo genera SQL.
     /// </summary>
-    public static PromptAgentDefinition GetAgentDefinition(string modelDeployment, string dbStructure, JsonElement? openApiSpec = null)
+    public static DeclarativeAgentDefinition GetAgentDefinition(string modelDeployment, string dbStructure, JsonElement? openApiSpec = null)
     {
-        var definition = new PromptAgentDefinition(modelDeployment)
+        var definition = new DeclarativeAgentDefinition(modelDeployment)
         {
             Instructions = openApiSpec.HasValue
                 ? GetInstructionsWithExecution(dbStructure)
@@ -106,12 +106,12 @@ public static class SqlAgent
 
         if (openApiSpec.HasValue)
         {
-            var openApiFunction = new OpenAPIFunctionDefinition(
-                name: "SqlExecutor",
-                spec: BinaryData.FromString(openApiSpec.Value.GetRawText()),
-                auth: new OpenAPIAnonymousAuthenticationDetails());
+            var openApiFunction = new OpenApiFunctionDefinition(
+                "SqlExecutor",
+                BinaryData.FromString(openApiSpec.Value.GetRawText()),
+                new OpenAPIAnonymousAuthenticationDetails());
 
-            definition.Tools.Add(new OpenAPIAgentTool(openApiFunction));
+            definition.Tools.Add(new OpenAPITool(openApiFunction));
         }
 
         return definition;

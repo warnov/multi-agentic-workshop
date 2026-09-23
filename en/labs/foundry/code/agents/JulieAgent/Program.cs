@@ -1,12 +1,17 @@
 using Azure.AI.Projects;
-using Azure.AI.Projects.OpenAI;
+using Azure.AI.Projects.Agents;
+using Azure.AI.Extensions.OpenAI;
+using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using System.ClientModel;
+using System.Net;
+using System.Text;
 using System.Text.Json;
 using OpenAI.Responses;
 using JulieAgent;
 
+#pragma warning disable AAIP001 // Azure.AI.Projects.Agents: Toolbox is a preview API
 #pragma warning disable OPENAI001 // OpenAI preview API
 
 // =====================================================================
@@ -34,8 +39,6 @@ var foundryEndpoint = config["FoundryProjectEndpoint"]
     ?? throw new InvalidOperationException("Missing FoundryProjectEndpoint in appsettings.json");
 var modelDeployment = config["ModelDeploymentName"]
     ?? throw new InvalidOperationException("Missing ModelDeploymentName in appsettings.json");
-var bingConnectionName = config["BingConnectionName"]
-    ?? throw new InvalidOperationException("Missing BingConnectionName in appsettings.json");
 
 // Base URL of the Function App with the SQL query executor.
 // Configured in appsettings.json once the function is deployed.
@@ -101,22 +104,6 @@ AIProjectClient projectClient = new(
     endpoint: new Uri(foundryEndpoint),
     tokenProvider: new DefaultAzureCredential());
 
-// --- Resolve the full ID of the Bing connection ---
-Console.WriteLine($"[Config] Resolving Bing connection '{bingConnectionName}'...");
-string bingConnectionId;
-try
-{
-    var bingConnection = await projectClient.Connections.GetConnectionAsync(bingConnectionName);
-    bingConnectionId = bingConnection.Value.Id;
-    Console.WriteLine($"[Config] Bing connection resolved: {bingConnectionId}");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"[Config] Could not resolve Bing connection: {ex.Message}");
-    Console.WriteLine($"[Config] Using name as-is: {bingConnectionName}");
-    bingConnectionId = bingConnectionName;
-}
-
 // =====================================================================
 //  PHASE 1: Create/verify the 3 agents in Microsoft Foundry
 // =====================================================================
@@ -128,55 +115,288 @@ Console.WriteLine("========================================");
 Console.WriteLine();
 
 // --- Helper to create or reuse an agent (typed definition) ---
-async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
+var agentsClient = projectClient.AgentAdministrationClient;
+
+// Adding a version to a legacy agent object keeps the shared project
+// identity, so an existing agent is deleted instead of versioned.
+async Task EnsureAgent(string agentName, ProjectsAgentDefinition agentDefinition)
 {
     Console.WriteLine($"[Foundry] Searching for agent '{agentName}'...");
-    AgentRecord? existingAgent = null;
-    var shouldOverride = false;
     try
     {
-        existingAgent = projectClient.Agents.GetAgent(agentName);
-        AgentRecord existing = existingAgent;
-        Console.WriteLine($"[Foundry] Agent '{agentName}' found (ID: {existing.Name})");
-        Console.Write($"[Foundry] Do you want to overwrite '{agentName}' with a new version? (y/N): ");
-        var answer = Console.ReadLine();
-        shouldOverride = answer?.Trim().Equals("y", StringComparison.OrdinalIgnoreCase) == true
-                      || answer?.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase) == true;
+        var existing = agentsClient.GetAgent(agentName);
+        Console.WriteLine($"[Foundry] Agent '{agentName}' found");
+        Console.Write($"[Foundry] Delete '{agentName}' and recreate it from scratch? (y/N): ");
+        var answer = Console.ReadLine()?.Trim();
+        var shouldRecreate = string.Equals(answer, "y", StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(answer, "yes", StringComparison.OrdinalIgnoreCase);
 
-        if (!shouldOverride)
+        if (!shouldRecreate)
         {
             Console.WriteLine($"[Foundry] Keeping existing '{agentName}'.");
             return;
         }
 
+        agentsClient.DeleteAgent(agentName);
+        Console.WriteLine($"[Foundry] Agent '{agentName}' deleted.");
     }
     catch (ClientResultException ex) when (ex.Status == 404)
     {
         Console.WriteLine($"[Foundry] Agent '{agentName}' not found. A new one will be created.");
     }
 
-    try
-    {
-        var result = await projectClient.Agents.CreateAgentVersionAsync(
-            agentName,
-            new AgentVersionCreationOptions(agentDefinition));
+    ProjectsAgentVersion created = await agentsClient.CreateAgentVersionAsync(
+        agentName,
+        new ProjectsAgentVersionCreationOptions(agentDefinition));
 
-        var responseJson = JsonDocument.Parse(result.GetRawResponse().Content.ToString());
-        var version = responseJson.RootElement.TryGetProperty("version", out var vProp) ? vProp.GetString() : "?";
-        Console.WriteLine($"[Foundry] Agent '{agentName}' created/updated (v{version})");
-    }
-    catch (ClientResultException ex) when (ex.Status == 400 && existingAgent is not null)
-    {
-        Console.WriteLine($"[Foundry] Could not create new version of '{agentName}': {ex.Message}");
-        Console.WriteLine($"[Foundry] Reusing the existing version of '{agentName}'.");
-    }
+    Console.WriteLine($"[Foundry] Agent '{agentName}' created (v{created.Version})");
+
+    // instance_identity is null on legacy agents and non-null on agents that
+    // carry their own Entra identity, which is what Agent 365 syncs.
+    using var agentJson = JsonDocument.Parse(agentsClient.GetAgent(agentName).GetRawResponse().Content.ToString());
+    var hasIdentity = agentJson.RootElement.TryGetProperty("instance_identity", out var identity)
+                      && identity.ValueKind != JsonValueKind.Null;
+    Console.WriteLine(hasIdentity
+        ? $"[Foundry] {agentName} instance_identity: {identity}"
+        : $"[Foundry] {agentName} instance_identity: null/absent -> legacy agent, it will NOT sync to Agent 365.");
 }
 
 
-// Create the 3 agents
+// --- Ensure the Web Search Toolbox used by MarketingAgent exists ---
+// Creating a Toolbox version is a data-plane call (SDK), just like creating
+// an agent: it requires no ARM resource and no key-based connection.
+const string marketingToolboxName = "marketing-websearch-toolbox";
+var toolboxesClient = agentsClient.GetAgentToolboxes();
+
+Console.WriteLine($"[Foundry] Looking for toolbox '{marketingToolboxName}'...");
+try
+{
+    toolboxesClient.Get(marketingToolboxName);
+    Console.WriteLine($"[Foundry] Toolbox '{marketingToolboxName}' already exists, reusing it.");
+}
+catch (ClientResultException ex) when (ex.Status == 404)
+{
+    Console.WriteLine($"[Foundry] Toolbox '{marketingToolboxName}' not found. Creating it.");
+    await toolboxesClient.CreateVersionAsync(
+        marketingToolboxName,
+        tools: new List<ToolboxTool> { new WebSearchToolboxTool() },
+        description: "Web Search for MarketingAgent (replaces Grounding with Bing Search)");
+    Console.WriteLine($"[Foundry] Toolbox '{marketingToolboxName}' created.");
+}
+
+// "Consumer" endpoint: always serves the default_version, so promoting a new
+// toolbox version never requires touching or recompiling MarketingAgent.
+var marketingToolboxEndpoint = new Uri($"{foundryEndpoint}/toolboxes/{marketingToolboxName}/mcp?api-version=v1");
+
+// Create the two prompt sub-agents that Julie orchestrates
 await EnsureAgent(SqlAgent.Name, SqlAgent.GetAgentDefinition(modelDeployment, dbStructure, openApiSpecJson));
-await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDeployment, bingConnectionId));
-await EnsureAgent(JulieOrchestrator.Name, JulieOrchestrator.GetAgentDefinition(modelDeployment, openApiSpecJson));
+await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDeployment, marketingToolboxEndpoint));
+
+// =====================================================================
+//  Julie: hosted agent deployed from source
+// =====================================================================
+
+const string julieAgentName = "Julie";
+
+// Foundry builds the uploaded source remotely, so no Docker or registry is needed locally.
+var hostedSourcePath = Path.GetFullPath(
+    Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "JulieHosted"));
+
+if (!Directory.Exists(hostedSourcePath))
+    throw new DirectoryNotFoundException($"Hosted agent source not found at {hostedSourcePath}");
+
+// An agent's kind is immutable, so a Julie left over from the workflow model
+// must be deleted before it can be recreated as a hosted agent.
+try
+{
+    var existingJulie = agentsClient.GetAgent(julieAgentName);
+    using var julieJson = JsonDocument.Parse(existingJulie.GetRawResponse().Content.ToString());
+    var existingKind = julieJson.RootElement
+        .GetProperty("versions").GetProperty("latest")
+        .GetProperty("definition").GetProperty("kind").GetString();
+
+    if (existingKind == "hosted")
+    {
+        Console.WriteLine($"[Foundry] Agent '{julieAgentName}' is already hosted. A new version will be added.");
+    }
+    else
+    {
+        Console.WriteLine($"[Foundry] Agent '{julieAgentName}' exists with kind '{existingKind}', which cannot be changed in place.");
+        Console.Write($"[Foundry] Delete '{julieAgentName}' and redeploy it as a hosted agent? (y/N): ");
+        var julieAnswer = Console.ReadLine()?.Trim();
+        var recreateJulie = string.Equals(julieAnswer, "y", StringComparison.OrdinalIgnoreCase)
+                         || string.Equals(julieAnswer, "yes", StringComparison.OrdinalIgnoreCase);
+
+        if (!recreateJulie)
+            throw new InvalidOperationException(
+                $"'{julieAgentName}' must be deleted before it can be deployed as a hosted agent.");
+
+        agentsClient.DeleteAgent(julieAgentName);
+        Console.WriteLine($"[Foundry] Agent '{julieAgentName}' deleted.");
+    }
+}
+catch (ClientResultException ex) when (ex.Status == 404)
+{
+    Console.WriteLine($"[Foundry] Agent '{julieAgentName}' not found. A new one will be created.");
+}
+
+Console.WriteLine($"[Foundry] Uploading Julie hosted agent source from {hostedSourcePath}...");
+
+// The SDK uploads the folder as-is and the remote build fails on local build
+// artifacts, so bin/ and obj/ are removed before packaging.
+foreach (var stale in new[] { "bin", "obj" })
+{
+    var staleDir = Path.Combine(hostedSourcePath, stale);
+    if (Directory.Exists(staleDir))
+    {
+        Directory.Delete(staleDir, recursive: true);
+        Console.WriteLine($"[Foundry] Removed local build output '{stale}' before upload.");
+    }
+}
+
+HostedAgentDefinition julieDefinition = new(cpu: "0.5", memory: "1Gi")
+{
+    Versions = { new ProtocolVersionRecord(ProjectsAgentProtocol.Responses, "2.0.0") },
+    CodeConfiguration = new(
+        runtime: "dotnet_10",
+        entryPoint: ["dotnet", "julie-hosted.dll"],
+        dependencyResolution: CodeDependencyResolution.RemoteBuild)
+};
+julieDefinition.EnvironmentVariables.Add("FOUNDRY_PROJECT_ENDPOINT", foundryEndpoint);
+julieDefinition.EnvironmentVariables.Add("AZURE_AI_MODEL_DEPLOYMENT_NAME", modelDeployment);
+// auto lets Julie fall back to clearly marked demo customers when Fabric SQL is missing.
+julieDefinition.EnvironmentVariables.Add("JULIE_DATA_MODE", config["JulieDataMode"] ?? "auto");
+
+ProjectsAgentVersion julieVersion = await agentsClient.CreateAgentVersionFromCodeAsync(
+    agentName: julieAgentName,
+    filePath: hostedSourcePath,
+    metadata: new AgentVersionFromCodeMetadata(julieDefinition));
+
+Console.WriteLine($"[Foundry] Julie version {julieVersion.Version} created. Waiting for provisioning...");
+
+for (var attempt = 1; attempt <= 60; attempt++)
+{
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    julieVersion = await agentsClient.GetAgentVersionAsync(julieAgentName, julieVersion.Version);
+    Console.WriteLine($"[Foundry] Provisioning status: {julieVersion.Status} ({attempt}/60)");
+
+    if (julieVersion.Status == AgentVersionStatus.Active) break;
+    if (julieVersion.Status == AgentVersionStatus.Failed)
+        throw new InvalidOperationException("Julie hosted agent provisioning failed.");
+}
+
+if (julieVersion.Status != AgentVersionStatus.Active)
+    throw new TimeoutException("Timed out waiting for Julie to become active.");
+
+await agentsClient.PatchAgentAsync(julieAgentName, new PatchAgentOptions
+{
+    AgentEndpoint = new AgentEndpointConfiguration
+    {
+        VersionSelector = new([new FixedRatioVersionSelectionRule(julieVersion.Version, 100)]),
+        ProtocolConfiguration = new() { Responses = new ResponsesProtocolConfiguration() }
+    }
+});
+Console.WriteLine($"[Foundry] Julie endpoint routed to version {julieVersion.Version}");
+
+// =====================================================================
+//  Grant the hosted agent identity access to the project
+//
+//  A hosted agent runs under its own Entra identity, which is recreated
+//  together with the agent object, so the role is re-assigned on every run
+//  instead of being a manual one-off step.
+//  'Foundry User' is required: 'Foundry Agent Consumer' only grants
+//  endpoints/interact and Julie gets 403 on agents/read when it looks up
+//  SqlAgent and MarketingAgent. The assignment must target the project
+//  scope; the account scope alone was not honoured.
+// =====================================================================
+
+const string foundryUserRoleId = "53ca6127-db72-4b80-b1b0-d745d6d5456d";
+
+string? juliePrincipalId = null;
+using (var julieIdentityJson = JsonDocument.Parse(agentsClient.GetAgent(julieAgentName).GetRawResponse().Content.ToString()))
+{
+    if (julieIdentityJson.RootElement.TryGetProperty("instance_identity", out var julieIdentity)
+        && julieIdentity.ValueKind == JsonValueKind.Object
+        && julieIdentity.TryGetProperty("principal_id", out var juliePrincipal))
+    {
+        juliePrincipalId = juliePrincipal.GetString();
+    }
+}
+
+// The ARM scope of the project (for Julie's RBAC) can no longer be derived
+// opportunistically from the Bing connection (removed). It is built
+// explicitly from the configured subscription/resource group plus the
+// account/project name, which are already embedded in FoundryProjectEndpoint.
+var subscriptionId = config["SubscriptionId"];
+var resourceGroupName = config["ResourceGroupName"];
+
+string? projectScope = null;
+if (!string.IsNullOrWhiteSpace(subscriptionId) && !string.IsNullOrWhiteSpace(resourceGroupName)
+    && !subscriptionId.StartsWith('<') && !resourceGroupName.StartsWith('<'))
+{
+    var foundryUri = new Uri(foundryEndpoint);
+    var accountName = foundryUri.Host.Split('.')[0];
+    var projectName = foundryUri.AbsolutePath.TrimEnd('/').Split('/')[^1];
+    projectScope = $"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}"
+                 + $"/providers/Microsoft.CognitiveServices/accounts/{accountName}/projects/{projectName}";
+}
+
+if (juliePrincipalId is null || projectScope is null)
+{
+    Console.WriteLine("[RBAC] Could not resolve Julie's identity or the project scope.");
+    Console.WriteLine("[RBAC] Assign the 'Foundry User' role to Julie manually before chatting.");
+}
+else
+{
+    await AssignFoundryUserAsync(projectScope, juliePrincipalId);
+}
+
+async Task AssignFoundryUserAsync(string scope, string principalId)
+{
+    Console.WriteLine($"[RBAC] Granting 'Foundry User' to Julie's identity {principalId}...");
+    var manualCommand = $"az role assignment create --role \"Foundry User\" "
+                      + $"--assignee-object-id {principalId} --assignee-principal-type ServicePrincipal "
+                      + $"--scope \"{scope}\"";
+    try
+    {
+        var subscriptionId = scope.Split('/')[2];
+        var armToken = await new DefaultAzureCredential().GetTokenAsync(
+            new TokenRequestContext(["https://management.azure.com/.default"]), default);
+
+        using var http = new HttpClient();
+        http.DefaultRequestHeaders.Authorization = new("Bearer", armToken.Token);
+
+        var payload = JsonSerializer.Serialize(new
+        {
+            properties = new
+            {
+                roleDefinitionId = $"/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/{foundryUserRoleId}",
+                principalId,
+                principalType = "ServicePrincipal"
+            }
+        });
+
+        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+        var armResponse = await http.PutAsync(
+            $"https://management.azure.com{scope}/providers/Microsoft.Authorization/roleAssignments/{Guid.NewGuid()}?api-version=2022-04-01",
+            content);
+
+        if (armResponse.IsSuccessStatusCode)
+            Console.WriteLine("[RBAC] Role assigned. It may take about a minute to take effect.");
+        else if (armResponse.StatusCode == HttpStatusCode.Conflict)
+            Console.WriteLine("[RBAC] Julie already had the role.");
+        else
+        {
+            Console.WriteLine($"[RBAC] Assignment failed ({(int)armResponse.StatusCode}): {await armResponse.Content.ReadAsStringAsync()}");
+            Console.WriteLine($"[RBAC] Run it manually: {manualCommand}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[RBAC] Assignment failed: {ex.Message}");
+        Console.WriteLine($"[RBAC] Run it manually: {manualCommand}");
+    }
+}
 
 Console.WriteLine();
 Console.WriteLine("[Foundry] All agents are ready.");
@@ -185,12 +405,8 @@ Console.WriteLine("[Foundry] All agents are ready.");
 //  PHASE 2: Interactive chat with Julie
 // =====================================================================
 
-ProjectConversation conversation = projectClient.OpenAI.Conversations.CreateProjectConversation();
-Console.WriteLine($"[Foundry] Conversation created: {conversation.Id}");
-
-ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
-    defaultAgent: JulieOrchestrator.Name,
-    defaultConversationId: conversation.Id);
+ProjectResponsesClient responseClient = projectClient.ProjectOpenAIClient
+    .GetProjectResponsesClientForAgentEndpoint(julieAgentName);
 
 Console.WriteLine();
 Console.WriteLine("=== Chat with Julie (type 'exit' to quit) ===");
@@ -248,33 +464,7 @@ while (true)
         else
         {
             Console.WriteLine();
-            Console.WriteLine("[No output text — checking conversation items...]");
-
-            // List conversation items
-            try
-            {
-                var convItems = projectClient.OpenAI.Conversations.GetProjectConversationItems(conversation.Id);
-                int count = 0;
-                foreach (var ci in convItems)
-                {
-                    count++;
-                    // Serialize each conversation item
-                    try
-                    {
-                        var ciJson = JsonSerializer.Serialize(ci, new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10 });
-                        Console.WriteLine($"  [DEBUG] ConvItem #{count}: {(ciJson.Length > 500 ? ciJson[..500] + "..." : ciJson)}");
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"  [DEBUG] ConvItem #{count}: {ci}");
-                    }
-                }
-                Console.WriteLine($"  [DEBUG] Total conversation items: {count}");
-            }
-            catch (Exception convEx)
-            {
-                Console.WriteLine($"  [DEBUG] Error reading conversation: {convEx.Message}");
-            }
+            Console.WriteLine("[No output text returned by the agent]");
         }
         // --- FIN DEBUG ---
     }

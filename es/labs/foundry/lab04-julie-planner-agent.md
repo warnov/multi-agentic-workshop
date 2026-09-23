@@ -1,10 +1,15 @@
-# Lab 4: Julie Planner Agent
+# Lab 4: Julie, la orquestadora de campañas (agente hospedado)
 
 ## Tabla de contenido
 
-- [Lab 4: Julie Planner Agent](#lab-4-julie-planner-agent)
+- [Lab 4: Julie, la orquestadora de campañas (agente hospedado)](#lab-4-julie-la-orquestadora-de-campañas-agente-hospedado)
 	- [Tabla de contenido](#tabla-de-contenido)
 	- [Introducción](#introducción)
+  - [Advanced Foundry Agents Concepts](#advanced-foundry-agents-concepts)
+    - [Workflow Agents](#workflow-agents)
+    - [Hosted Agents](#hosted-agents)
+    - [Toolbox-Based Tools (MCP)](#toolbox-based-tools-mcp)
+    - [Caso de uso implementado: campañas de retail personalizadas](#caso-de-uso-implementado-campañas-de-retail-personalizadas)
 	- [Continuidad del setup](#continuidad-del-setup)
 	- [Checklist rápido](#checklist-rápido)
 		- [1) Verificar valores de conexión SQL](#1-verificar-valores-de-conexión-sql)
@@ -15,44 +20,130 @@
 		- [Parte B — Usuario SQL y permisos en la base](#parte-b--usuario-sql-y-permisos-en-la-base)
 		- [Validación recomendada](#validación-recomendada)
 	- [Arquitectura del proyecto Julie (detalle)](#arquitectura-del-proyecto-julie-detalle)
-	- [¿Qué tipo de orquestación se escogió?](#qué-tipo-de-orquestación-se-escogió)
-	- [¿Cómo se implementó el workflow en este laboratorio?](#cómo-se-implementó-el-workflow-en-este-laboratorio)
+	- [¿Qué tipo de agente es Julie ahora?](#qué-tipo-de-agente-es-julie-ahora)
+	- [Cómo se implementa la orquestación](#cómo-se-implementa-la-orquestación)
+		- [El grafo](#el-grafo)
+		- [Modos de datos: funcionar sin Fabric](#modos-de-datos-funcionar-sin-fabric)
+		- [El bucle: un mensaje por cliente](#el-bucle-un-mensaje-por-cliente)
+		- [Ver el grafo](#ver-el-grafo)
 	- [Definición de agentes especializados](#definición-de-agentes-especializados)
 		- [SqlAgent](#sqlagent)
 		- [MarketingAgent](#marketingagent)
-		- [JulieOrchestrator](#julieorchestrator)
+		- [Julie (hospedada)](#julie-hospedada)
+	- [Toolbox, Web Search y MCP: cómo busca MarketingAgent](#toolbox-web-search-y-mcp-cómo-busca-marketingagent)
+		- [¿Qué es un Toolbox en Microsoft Foundry?](#qué-es-un-toolbox-en-microsoft-foundry)
+		- [Web Search: el motor detrás del Toolbox](#web-search-el-motor-detrás-del-toolbox)
+		- [MCP: el protocolo que conecta el agente con el Toolbox](#mcp-el-protocolo-que-conecta-el-agente-con-el-toolbox)
+		- [De la teoría a nuestro caso: cómo lo conectamos en MarketingAgent](#de-la-teoría-a-nuestro-caso-cómo-lo-conectamos-en-marketingagent)
+	- [¿Qué hace exactamente Program.cs?](#qué-hace-exactamente-programcs)
+	- [Identidad y permisos del agente hospedado](#identidad-y-permisos-del-agente-hospedado)
 	- [Pasos del laboratorio](#pasos-del-laboratorio)
 		- [Paso 1: Configurar appsettings.json](#paso-1-configurar-appsettingsjson)
 		- [Paso 2: Asegurarte de que los permisos de Fabric están configurados](#paso-2-asegurarte-de-que-los-permisos-de-fabric-están-configurados)
-		- [Paso 3: Ejecutar Julie](#paso-3-ejecutar-julie)
-		- [Paso 4: Probar el flujo end-to-end](#paso-4-probar-el-flujo-end-to-end)
+		- [Paso 3: Desplegar y ejecutar Julie](#paso-3-desplegar-y-ejecutar-julie)
+		- [Paso 4: Verificar la asignación de rol](#paso-4-verificar-la-asignación-de-rol)
+		- [Paso 5: Probar el flujo end-to-end](#paso-5-probar-el-flujo-end-to-end)
 		- [Validación del laboratorio](#validación-del-laboratorio)
+	- [Solución de problemas](#solución-de-problemas)
 	- [Challenges](#challenges)
 		- [Challenge 1: Mejorar el prompt de MarketingAgent para campañas actuales](#challenge-1-mejorar-el-prompt-de-marketingagent-para-campañas-actuales)
-			- [Contexto](#contexto)
-			- [Objetivo](#objetivo)
-			- [Parte A — Iterar el prompt en el Playground](#parte-a--iterar-el-prompt-en-el-playground)
-			- [Parte B — Llevar el prompt mejorado al código](#parte-b--llevar-el-prompt-mejorado-al-código)
-			- [Criterio de éxito](#criterio-de-éxito)
 		- [Challenge 2: Crear un agente no-code con Code Interpreter](#challenge-2-crear-un-agente-no-code-con-code-interpreter)
-			- [Contexto](#contexto-1)
-			- [Objetivo](#objetivo-1)
-			- [Pasos](#pasos)
-			- [Pruebas](#pruebas)
-			- [Criterio de éxito](#criterio-de-éxito-1)
-			- [Reflexión](#reflexión)
 
 ---
 
 ## Introducción
 
-En este laboratorio construirás y validarás a Julie como agente planner de campañas de marketing en Foundry. Julie se implementa como agente de tipo `workflow` y orquesta el flujo con dos sub-agentes: `SqlAgent` y `MarketingAgent`. `SqlAgent` puede usar la tool OpenAPI `SqlExecutor` (Function App `FxContosoRetail`) para ejecutar SQL contra la base y devolver los clientes segmentados. En este laboratorio, progresivamente, configurarás el entorno, verificarás permisos y conexión SQL, y ejecutarás el flujo end-to-end para obtener la salida final de campaña en formato JSON.
+En este laboratorio construirás y validarás a Julie, la orquestadora de campañas de marketing, como **agente hospedado** en Microsoft Foundry, escrito con el **Microsoft Agent Framework**.
+
+Julie recibe la descripción en lenguaje natural de un segmento de clientes y devuelve una campaña de correo en JSON. Lo hace como un **workflow determinista**: un grafo explícito de dos nodos, cada uno envolviendo a un agente de prompt, con `MarketingAgent` llamado una vez por cliente para que cada destinatario reciba un mensaje sobre la categoría que realmente compra.
+
+- `query-customers` — pide el segmento a `SqlAgent` (T-SQL ejecutado mediante la tool OpenAPI `SqlExecutor`), y cae a clientes de demostración claramente marcados cuando Fabric SQL no está configurado.
+- `write-campaign` — recorre esos clientes, pide a `MarketingAgent` un mensaje para cada uno y monta el JSON final.
+
+> ✅ El laboratorio funciona de principio a fin **incluso sin Fabric**, usando datos de demostración siempre marcados como tales. Ver [Modos de datos](#modos-de-datos-funcionar-sin-fabric).
+
+Progresivamente configurarás el entorno, verificarás permisos y conexión SQL, desplegarás el código fuente de Julie en Foundry y ejecutarás el flujo end-to-end para obtener la salida final de campaña en formato JSON.
+
+## Advanced Foundry Agents Concepts
+
+Este laboratorio amplía el escenario de Contoso Retail con tres capacidades complementarias:
+
+- **Workflow Agents**: orquestación explícita y determinista construida con Microsoft Agent Framework.
+- **Hosted Agents**: aplicaciones de agentes personalizadas desplegadas y operadas por Microsoft Foundry.
+- **Toolbox-Based Tools (MCP)**: herramientas administradas de forma centralizada y expuestas a través de un único endpoint compatible con el Model Context Protocol (MCP).
+
+Juntos, estos conceptos muestran cómo coordinar agentes especializados, conectarlos con datos y herramientas empresariales gobernadas de forma centralizada, y desplegar la orquestación como un agente de Foundry.
+
+### Workflow Agents
+
+Un workflow es un grafo explícito de nodos y aristas. El grafo define el orden de ejecución y los datos que pasan entre los pasos.
+
+Julie utiliza dos nodos:
+
+- `query-customers` obtiene el segmento de clientes mediante `SqlAgent`.
+- `write-campaign` invoca `MarketingAgent` una vez por cliente y produce el JSON de la campaña.
+
+El workflow se crea con `WorkflowBuilder` y se representa mediante un objeto `Workflow`. `Workflow` no es un agente y no expone un endpoint HTTP. `workflow.AsAIAgent(...)` adapta el grafo a la interfaz `AIAgent` para que pueda recibir solicitudes y devolver respuestas.
+
+El primer nodo hereda de `ChatProtocolExecutor`. Este executor del framework adapta el protocolo de chat de Foundry, incluidos los valores `ChatMessage` entrantes y `TurnToken`, a los mensajes tipados del workflow. Después, el nodo emite un objeto `CustomerQuery` para el siguiente nodo.
+
+Los agentes de prompt especializados siguen siendo instancias de `AIAgent` dentro de los nodos del workflow. Esta estructura permite que los nodos controlen los datos tipados, el manejo de errores, el comportamiento alternativo y la iteración por cliente, sin perder las capacidades de los agentes de prompt.
+
+### Hosted Agents
+
+Julie se despliega como un agente hospedado de Foundry. El proyecto hospedado contiene una aplicación web que:
+
+1. Crea el workflow.
+2. Convierte el workflow en un `AIAgent`.
+3. Registra el agente con el protocolo Responses de Foundry.
+4. Inicia el servidor web.
+
+El deployer local sube el código fuente del proyecto hospedado mediante `CreateAgentVersionFromCodeAsync`. Foundry realiza la compilación remota, crea el contenedor administrado y expone el agente hospedado mediante su endpoint. Este proceso no requiere Docker, un Dockerfile ni Azure Container Registry.
+
+Foundry administra el runtime hospedado, la identidad, las versiones, el endpoint y la integración operativa. El agente hospedado utiliza su identidad administrada para acceder al proyecto y a los agentes de prompt que invoca.
+
+### Toolbox-Based Tools (MCP)
+
+Además de las herramientas embebidas directamente en la definición de un agente (el patrón que usa Anders con `OpenAPITool`), Foundry ofrece un segundo modelo: un **Toolbox** que centraliza un conjunto de herramientas detrás de un único endpoint compatible con **MCP** (Model Context Protocol), un estándar abierto para exponer herramientas a agentes de IA.
+
+`MarketingAgent` usa este modelo para su herramienta de **Web Search**: en vez de una conexión con clave (como exigía Grounding with Bing Search), el agente se conecta al endpoint MCP de un Toolbox mediante `McpTool` + `AsProjectTool` — el mismo mecanismo genérico que usarías para conectarte a cualquier servidor MCP externo.
+
+Esto habilita un tercer patrón de integración, además de los de Workflow Agents y Hosted Agents:
+
+- La herramienta se versiona y gobierna a nivel de **proyecto**, no del agente.
+- Se puede reemplazar o versionar sin recompilar ni redesplegar el agente que la consume.
+- El mismo mecanismo de conexión (MCP) sirve tanto para herramientas propias de Foundry (un Toolbox) como para servidores MCP de terceros.
+
+Ver [Toolbox, Web Search y MCP: cómo busca MarketingAgent](#toolbox-web-search-y-mcp-cómo-busca-marketingagent) para la teoría completa, los detalles del protocolo y el recorrido paso a paso de la implementación.
+
+### Caso de uso implementado: campañas de retail personalizadas
+
+Julie implementa un workflow para campañas de retail:
+
+1. El usuario describe en lenguaje natural el segmento de clientes objetivo.
+2. `SqlAgent` genera la consulta T-SQL para identificar a los clientes y su categoría de producto preferida.
+3. `SqlExecutor` ejecuta la consulta contra Fabric Warehouse.
+4. `query-customers` convierte el resultado en registros tipados `Customer`.
+5. `write-campaign` llama a `MarketingAgent` una vez por cliente, pasando su nombre y categoría preferida.
+6. Julie devuelve un mensaje de marketing personalizado por cliente en un documento JSON de campaña.
+
+`MarketingAgent` utiliza Web Search (vía un Toolbox de Foundry) para incorporar información actual a los mensajes. El resultado incluye el nombre de la campaña, el origen de los datos, los indicadores de datos de demostración, las advertencias y los mensajes personalizados.
+
+El workflow admite tres modos de datos:
+
+- `auto`: usa Fabric cuando está disponible y datos de demostración claramente marcados cuando no lo está.
+- `real`: exige datos de Fabric y muestra los errores de SQL.
+- `demo`: utiliza los clientes ficticios integrados sin consultar Fabric.
+
+Los clientes de demostración utilizan direcciones `@example.invalid`, y la respuesta incluye los campos `dataSource`, `isDemoData` y `warning` para que los datos de prueba no se confundan con datos de producción.
+
+> **Requisito sobre el tipo de agente:** el `kind` de un agente es inmutable. Si un agente existente tiene otro tipo, el deployer lo recrea como agente hospedado.
 
 ## Continuidad del setup
 
 Este laboratorio asume que ya completaste:
 
-- El despliegue base de infraestructura de Foundry (`es/labs/foundry/README.md`)
+- El despliegue base de infraestructura de Foundry (`es/labs/foundry/setup.md` o `codespaces-setup.md`)
 - El flujo de datos en Fabric del **Lab 1** (`../fabric/lab01-data-setup.md`)
 
 ## Checklist rápido
@@ -76,6 +167,8 @@ Si no estás siguiendo toda la secuencia de laboratorios, para Lab 4 también pu
 ### 3) Comportamiento cuando no se pasan valores de Fabric
 
 Si no proporcionas estos valores durante el setup, el despliegue de infraestructura no falla, pero la conexión SQL para Lab 4 no se configura automáticamente y debe ajustarse manualmente en la Function App.
+
+En esa situación `SqlExecutor` devuelve un HTTP 400 y `SqlAgent` no puede devolver filas. Con el valor por defecto `JULIE_DATA_MODE=auto`, Julie **termina igualmente con éxito** usando clientes de demostración, y la respuesta lo dice explícitamente. Ver [Modos de datos](#modos-de-datos-funcionar-sin-fabric).
 
 ## Configuración manual de permisos en Fabric (obligatorio para Lab 4)
 
@@ -126,71 +219,174 @@ ALTER ROLE db_datareader ADD MEMBER [func-contosoretail-siwhb];
 
 ## Arquitectura del proyecto Julie (detalle)
 
-Esta solución está organizada en 4 clases principales dentro de `es/labs/foundry/code/agents/JulieAgent/`:
+La solución está ahora repartida en **dos proyectos**:
 
-- `SqlAgent.cs`: define el agente que transforma lenguaje natural en T-SQL.
-- `MarketingAgent.cs`: define el agente que redacta mensajes personalizados apoyado en Bing.
-- `JulieAgent.cs`: define a Julie como orquestadora `workflow` en formato CSDL YAML e invoca sub-agentes.
-- `Program.cs`: carga configuración, crea/verifica agentes en Foundry y ejecuta el chat.
-
-## ¿Qué tipo de orquestación se escogió?
-
-Se escogió una orquestación de tipo **workflow** para Julie.
-
-- En un agente `prompt`, el modelo responde directamente con su instrucción y tools simples.
-- En un agente `workflow`, el modelo coordina pasos y herramientas especializadas para cumplir una tarea compuesta.
-
-Aquí Julie usa `workflow` porque el caso requiere una secuencia multi-etapa:
-
-1. interpretar segmento de negocio,
-2. generar SQL,
-3. generar mensajes por cliente,
-4. consolidar todo en JSON final.
-
-## ¿Cómo se implementó el workflow en este laboratorio?
-
-En la versión actual del laboratorio, Julie se construye con el enfoque **tipado del SDK** usando `WorkflowAgentDefinition`.
-
-En `JulieAgent.cs`, `GetAgentDefinition(...)` retorna explícitamente `WorkflowAgentDefinition`:
-
-```csharp
-public static WorkflowAgentDefinition GetAgentDefinition(string modelDeployment, JsonElement? openApiSpec = null)
+```text
+es/labs/foundry/code/agents/
+├── JulieAgent/            ← deployer + cliente de chat local (se ejecuta en tu máquina)
+│   ├── SqlAgent.cs             definición del agente de prompt que genera T-SQL
+│   ├── MarketingAgent.cs       definición del agente de prompt con Web Search (Toolbox)
+│   ├── Program.cs              crea los sub-agentes, despliega Julie, asigna RBAC, abre el chat
+│   ├── db-structure.txt        esquema de la BD inyectado en SqlAgent
+│   └── appsettings.json
+└── JulieHosted/           ← la propia agente (se ejecuta dentro de Foundry)
+    ├── Program.cs              grafo del workflow, protocolo Responses, nodos de consulta y bucle
+    ├── hosted.csproj
+    └── appsettings.json
 ```
 
-La definición se construye con `WorkflowAgentDefinition` y un `workflowYaml` CSDL, luego se materializa con la factoría del SDK:
+> 🔎 `JulieAgent.cs`, que contenía la definición del workflow en CSDL YAML, **ya no existe**. Su trabajo lo hace ahora `JulieHosted/Program.cs`.
+
+> ⚠️ `JulieHosted` es deliberadamente hermano de `JulieAgent`, no una subcarpeta. Si estuviera anidado, el `.csproj` padre absorbería sus fuentes y la compilación fallaría con `CS8802` (múltiples puntos de entrada).
+
+## ¿Qué tipo de agente es Julie ahora?
+
+Julie es un **agente hospedado** cuyo comportamiento es un **workflow de Agent Framework**: una aplicación en contenedor que Foundry compila a partir de tu código fuente, ejecuta, escala y expone a través del protocolo **Responses**.
+
+- `SqlAgent` y `MarketingAgent` siguen siendo **agentes de prompt**. Conservan sus instrucciones, sus herramientas (OpenAPI, Web Search) y su versionado, y se siguen viendo y editando en el playground del portal. Julie llama a cada uno desde dentro de uno de sus nodos.
+- Julie no tiene modelo ni instrucciones propias: es el grafo más dos nodos de código.
+
+## Cómo se implementa la orquestación
+
+`JulieHosted/Program.cs` construye un `AIAgent` y lo registra con las extensiones de hosting de Foundry:
 
 ```csharp
-var workflowYaml = $$"""
-kind: workflow
-trigger:
-  kind: OnConversationStart
-  id: julie_workflow
-  actions:
-    - kind: InvokeAzureAgent
-      id: sql_step
-      conversationId: =System.ConversationId
-      agent:
-        name: {{SqlAgent.Name}}
-    - kind: InvokeAzureAgent
-      id: marketing_step
-      conversationId: =System.ConversationId
-      agent:
-        name: {{MarketingAgent.Name}}
-    - kind: EndConversation
-      id: end_conversation
-name: {{Name}}
-""";
+Workflow workflow = new WorkflowBuilder(queryCustomers)
+    .AddEdge(queryCustomers, writeCampaign, label: "clientes")
+    .WithOutputFrom(writeCampaign)
+    .Build();
 
-return ProjectsOpenAIModelFactory.WorkflowAgentDefinition(workflowYaml: workflowYaml);
+AIAgent julie = workflow.AsAIAgent(
+    name: "Julie",
+    includeExceptionDetails: true,
+    includeWorkflowOutputsInResponse: true);
+
+var builder = AgentHost.CreateBuilder(args);
+builder.Services.AddFoundryResponses(julie);
+builder.RegisterProtocol("responses", endpoints => endpoints.MapFoundryResponses());
 ```
 
-> Nota técnica: Julie queda **workflow-only** y orquesta sub-agentes mediante acciones `InvokeAzureAgent` del YAML CSDL; la ejecución SQL por OpenAPI se encapsula en `SqlAgent` cuando la spec está disponible. El trigger `OnConversationStart` con `EndConversation` define un flujo secuencial que ejecuta los dos pasos y cierra la conversación del workflow.
+`Workflow.AsAIAgent(...)` devuelve un `AIAgent` normal (un `WorkflowHostAgent`), y por eso el workflow se puede servir por el mismo protocolo Responses que cualquier otro agente hospedado.
 
-La orquestación actual usa 2 sub-agentes:
+### El grafo
 
-- `SqlAgent` (tool tipo `agent`)
-- `MarketingAgent` (tool tipo `agent`)
+```mermaid
+flowchart LR
+    A[query-customers] -->|clientes| B[write-campaign]
+    B --> D([JSON de campaña])
+    A -.->|una vez| S[SqlAgent]
+    S -.-> A
+    B -.->|una vez por cliente| M[MarketingAgent]
+    M -.-> B
+```
 
+Dos nodos, cada uno envolviendo a un agente de prompt:
+
+| Nodo | Qué hace |
+|---|---|
+| `query-customers` | Pide el segmento a `SqlAgent`, interpreta las filas y **cae a clientes de demostración** cuando Fabric SQL no está disponible |
+| `write-campaign` | Recorre los clientes, llama a `MarketingAgent` una vez por cada uno y monta el JSON |
+
+### Modos de datos: funcionar sin Fabric
+
+`JULIE_DATA_MODE` decide qué pasa cuando el lado SQL no está disponible:
+
+| Modo | Comportamiento |
+|---|---|
+| `auto` (por defecto) | Intenta `SqlAgent`; si falla o no devuelve nada, usa clientes de demostración claramente marcados |
+| `real` | Nunca cae al plan B — un fallo de SQL hace fallar la ejecución, que es lo que quieres al diagnosticar |
+| `demo` | No consulta SQL en absoluto, útil para ensayos sin conexión |
+
+El deployer lo pasa desde `appsettings.json`:
+
+```json
+"JulieDataMode": "auto"
+```
+
+El plan B es **explícito, nunca silencioso**. Los clientes de demostración usan direcciones `@example.invalid`, y la campaña lleva `dataSource`, `isDemoData` y un `warning` que explica exactamente por qué no se usaron datos reales.
+
+### El bucle: un mensaje por cliente
+
+Esta es la parte que hace útil la campaña. `write-campaign` llama a `MarketingAgent` **una vez por cliente**, pasándole el nombre y la categoría favorita de ese cliente:
+
+```csharp
+[YieldsOutput(typeof(string))]
+internal sealed class WriteCampaign(AIAgent marketingAgent) : Executor<CustomerQuery>("write-campaign")
+{
+    public override async ValueTask HandleAsync(
+        CustomerQuery query, IWorkflowContext context, CancellationToken cancellationToken = default)
+    {
+        List<object> messages = [];
+
+        foreach (var customer in query.Customers)
+        {
+            if (string.IsNullOrWhiteSpace(customer.Email)) continue;
+
+            var reply = await marketingAgent.RunAsync(
+                $"Cliente: {customer.FullName}. Categoría favorita: {customer.FavoriteCategory}.",
+                cancellationToken: cancellationToken);
+
+            messages.Add(new
+            {
+                to = customer.Email,
+                subject = $"{customer.FirstName}, novedades en {customer.FavoriteCategory}",
+                body = reply.Text
+            });
+        }
+        // ... serializa la campaña y la emite
+    }
+}
+```
+
+Un cliente que compra **Bikes** recibe un mensaje sobre un evento de ciclismo; uno que compra **Clothing**, uno sobre la semana de la moda. Cada destinatario, su propio texto.
+
+> 💡 La API de grafos no tiene fan-out dinámico (N clientes → N invocaciones paralelas del mismo nodo), así que el bucle vive dentro del nodo. Eso es lo que hace posible hoy la personalización por cliente.
+
+### Ver el grafo
+
+El workflow puede imprimirse a sí mismo como DOT de Graphviz, y el agente lo hace al arrancar:
+
+```csharp
+Console.WriteLine(workflow.ToDotString());
+```
+
+Esta es la salida real del grafo de Julie:
+
+```dot
+digraph Workflow {
+  rankdir=TD;
+  node [shape=box, style=filled, fillcolor=lightblue];
+  edge [color=black, arrowhead=vee];
+
+  "query-customers" [fillcolor=lightgreen, label="query-customers\n(Start)"];
+  "write-campaign" [label="write-campaign"];
+  "query-customers" -> "write-campaign" [label="customers"];
+}
+```
+
+Guárdalo como `julie.dot` y renderízalo con [Graphviz](https://graphviz.org/download/):
+
+```bash
+dot -Tsvg julie.dot -o julie.svg
+```
+
+Lo valioso no es el dibujo en sí: el diagrama se genera **a partir del grafo en ejecución**, así que no puede desviarse del código.
+
+### Comportamiento durante el arranque
+
+La aplicación hospedada resuelve los agentes de prompt antes de construir el grafo. Si falta alguna configuración de arranque, crea un workflow de un solo nodo que informa del error mediante el mismo endpoint Responses:
+
+```csharp
+catch (Exception ex)
+{
+    StartupFailure failure = new(ex.Message);
+    workflow = new WorkflowBuilder(failure).WithOutputFrom(failure).Build();
+}
+```
+
+El contenedor arranca y la respuesta contiene `WORKFLOW_ERROR: ...` con la causa del problema.
+
+El grafo ejecuta la secuencia declarada: consulta de clientes, generación de la campaña personalizada y salida de la campaña. El bucle por cliente está implementado dentro de `write-campaign`.
 
 ## Definición de agentes especializados
 
@@ -247,7 +443,7 @@ return new PromptAgentDefinition(modelDeployment)
 
 ### MarketingAgent
 
-`MarketingAgent.cs` también es `prompt`, pero incorpora tool de Bing grounding por `connection.id`:
+`MarketingAgent.cs` también es `prompt`, pero incorpora Web Search a través de un Toolbox de Foundry expuesto como servidor MCP:
 
 Instrucciones completas:
 
@@ -258,7 +454,7 @@ personalizados para clientes de Contoso Retail.
 Tu flujo de trabajo es el siguiente:
 
 1. Recibes el nombre completo de un cliente y su categoría de compra favorita.
-2. Usas la herramienta de Bing Search para buscar eventos recientes o próximos
+2. Usas la herramienta de Web Search para buscar eventos recientes o próximos
 	relacionados con esa categoría. Por ejemplo:
 	- Si la categoría es "Bikes", busca eventos de ciclismo.
 	- Si la categoría es "Clothing", busca eventos de moda.
@@ -285,163 +481,266 @@ de Contoso Retail.
 Racional de diseño:
 
 - Separar marketing en un agente propio desacopla creatividad de la lógica SQL.
-- Bing grounding aporta contexto actual sin “contaminar” a Julie con búsquedas web.
+- Web Search aporta contexto actual sin "contaminar" a Julie con búsquedas web.
 - Limitar formato/salida facilita consolidación posterior en JSON de campaña.
+- El Toolbox centraliza la herramienta a nivel de proyecto: se puede versionar o cambiar de motor de búsqueda sin recompilar `MarketingAgent`.
 
 ```csharp
-var bingGroundingAgentTool = new BingGroundingAgentTool(new BingGroundingSearchToolOptions(
-	searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnectionName)]));
+McpTool mcpTool = ResponseTool.CreateMcpTool(
+	serverLabel: "marketing-websearch",
+	serverUri: toolboxMcpEndpoint,
+	serverDescription: "Toolbox de Foundry con la herramienta Web Search",
+	toolCallApprovalPolicy: GlobalMcpToolCallApprovalPolicy.NeverRequireApproval);
+ProjectsAgentTool webSearchTool = ProjectsAgentTool.AsProjectTool(mcpTool);
 
-return new PromptAgentDefinition(modelDeployment)
+return new DeclarativeAgentDefinition(modelDeployment)
 {
 	Instructions = Instructions,
-	Tools = { bingGroundingAgentTool }
+	Tools = { webSearchTool }
 };
 ```
 
-### JulieOrchestrator
+> 🔎 **Toolbox vs. tool directo**: a diferencia de Anders (`OpenAPITool` embebido directamente), MarketingAgent consume Web Search a través de un **Toolbox** de Foundry expuesto como servidor MCP. Ver la sección [Toolbox, Web Search y MCP](#toolbox-web-search-y-mcp-cómo-busca-marketingagent) más abajo para la explicación completa de la teoría y de cómo se integra en este caso de uso.
 
-`JulieAgent.cs` define el agente principal `workflow` que coordina los otros dos agentes con CSDL YAML.
+### Julie (hospedada)
 
-Instrucciones completas:
+Julie **no tiene instrucciones ni modelo propios**. Ese es justo el sentido del cambio: la orquestación es el grafo, no un prompt. El trabajo del modelo ocurre dentro de `SqlAgent` y `MarketingAgent`, cada uno con su propio despliegue y sus herramientas.
 
-```text
-Eres Julie, la agente planificadora y orquestadora de campañas de marketing
-de Contoso Retail.
+Lo que antes era un prompt largo lleno de "primero llama a esto, luego a lo otro" es ahora la forma del grafo más un nodo de código:
 
-Tu responsabilidad es coordinar la creación de campañas de marketing
-personalizadas para segmentos específicos de clientes.
+| Antes (YAML de workflow / herramientas) | Ahora (workflow de Agent Framework) |
+|---|---|
+| El orden, escrito en prosa o en acciones YAML | El orden son las aristas del grafo |
+| Un modelo decide si obedece | El runtime ejecuta las aristas |
+| El formato de salida se pide en el prompt | La salida la monta `WriteCampaign` en C# |
+| Podía inventar destinatarios | No puede: el bucle solo recorre filas que vinieron del SQL |
 
-Cuando recibas una solicitud de campaña sigues estos pasos:
+El problema de las alucinaciones desaparece por construcción. La antigua versión workflow inventaba destinatarios como *John Doe* y *Jane Smith* cuando el SQL no devolvía nada; aquí el bucle no tiene nada que recorrer, así que la campaña vuelve vacía y con una nota.
 
-1. EXTRACCIÓN: Analiza el prompt del usuario y extrae la descripción
-	del segmento de clientes. Resume esa descripción en una frase clara.
+## Toolbox, Web Search y MCP: cómo busca MarketingAgent
 
-2. GENERACIÓN SQL: Invoca a SqlAgent pasándole la descripción del segmento.
-	SqlAgent te retornará una consulta T-SQL.
+Esta sección profundiza en la teoría detrás de la herramienta de búsqueda de `MarketingAgent`: qué es un Toolbox, qué es Web Search, cómo los conecta el protocolo MCP, y cómo se traduce todo eso en el código real de este laboratorio.
 
-3. EJECUCIÓN SQL: Envía el T-SQL a tu herramienta OpenAPI (SqlExecutor)
-	para ejecutarlo contra la base de datos. La herramienta retornará los
-	resultados como datos de clientes.
+### ¿Qué es un Toolbox en Microsoft Foundry?
 
-4. MARKETING PERSONALIZADO: Para CADA cliente retornado, invoca a
-	MarketingAgent pasándole el nombre del cliente y su categoría favorita.
-	MarketingAgent buscará eventos relevantes en Bing y generará un mensaje
-	personalizado.
+Un **Toolbox** es un recurso de Foundry que agrupa un conjunto curado de herramientas (búsqueda web, APIs, otros servidores MCP, etc.) detrás de un **único endpoint compatible con MCP**. En vez de que cada agente declare sus propias herramientas una por una, el Toolbox las centraliza a nivel de **proyecto**, y cualquier agente que apunte a ese endpoint las "hereda" automáticamente.
 
-5. ORGANIZACIÓN FINAL: Con todos los mensajes generados, organiza el
-	resultado como un JSON de campaña con el siguiente formato:
+Microsoft describe el ciclo de vida de un Toolbox en cuatro pilares:
 
-```json
-{
-  "campaign": "Nombre descriptivo de la campaña",
-  "generatedAt": "YYYY-MM-DDTHH:mm:ss",
-  "totalEmails": N,
-  "emails": [
-	 {
-		"to": "email@ejemplo.com",
-		"customerName": "Nombre Apellido",
-		"favoriteCategory": "Categoría",
-		"subject": "Asunto del correo generado automáticamente",
-		"body": "Mensaje de marketing personalizado"
-	 }
-  ]
-}
+| Pilar | Qué resuelve |
+|---|---|
+| **Build** | Crear el Toolbox y configurar qué herramientas contiene (una llamada de data-plane vía SDK, sin Bicep/ARM de por medio) |
+| **Discover** | Cualquier cliente MCP (incluido un agente) puede listar qué herramientas expone el Toolbox sin necesidad de conocerlas de antemano |
+| **Consume** | Los agentes se conectan al endpoint MCP del Toolbox para invocar las herramientas en tiempo de ejecución |
+| **Govern** | El Toolbox versiona su contenido (`v1`, `v2`, ...) y centraliza permisos/autenticación a nivel de proyecto, independientemente de cada agente que lo consuma |
+
+El punto clave de diseño es que el Toolbox **desacopla la herramienta del agente**: se puede añadir, quitar o versionar una herramienta dentro del Toolbox sin tocar ni recompilar ningún agente que lo consuma — algo imposible con el patrón de "tool embebido directamente" que usa Anders.
+
+En el SDK de .NET esto se refleja en **dos familias de tipos distintas**:
+
+| Familia | Ejemplos | Dónde se puede usar |
+|---|---|---|
+| `ProjectsAgentTool` (tool directo) | `OpenAPITool`, `BingGroundingTool`, `AzureAISearchTool` | Directamente en `Tools` de un `DeclarativeAgentDefinition` — el patrón de Anders |
+| `ToolboxTool` (tool de toolbox) | `WebSearchToolboxTool`, `AzureAISearchToolboxTool`, `OpenApiToolboxTool`, `MCPToolboxTool` | **Solo** dentro de una versión de Toolbox (`AgentToolboxes.CreateVersion(...)`); nunca directamente en la definición de un agente |
+
+### Web Search: el motor detrás del Toolbox
+
+`WebSearchToolboxTool` es la herramienta que agregamos al Toolbox de `MarketingAgent`. Es el motor de búsqueda web **ya disponible con carácter general (GA)** de Microsoft Foundry, administrado íntegramente por Microsoft:
+
+- **No requiere ningún recurso externo**: a diferencia de Grounding with Bing Search (que exigía crear una cuenta `Microsoft.Bing/accounts` y una conexión con API key, como hacía la versión anterior de este laboratorio), Web Search no necesita ninguna cuenta, conexión ni credencial adicional propia — Microsoft administra el recurso subyacente por ti.
+- **Sigue teniendo costo**: aunque no requiere aprovisionar nada, Web Search se factura igual que Grounding with Bing Search (son el mismo motor por debajo). No es gratis solo porque no haya que crear un recurso.
+- **Es la recomendación oficial de Microsoft** para reemplazar Grounding with Bing Search en proyectos nuevos.
+- **Solo existe como `ToolboxTool`**: no hay (todavía) un `WebSearchTool` directo para agentes de prompt en el SDK — por eso este cambio requirió introducir un Toolbox, y no fue un simple *swap* del tipo de herramienta.
+
+> 💡 Esto es distinto de [**Web IQ**](https://aka.ms/WebIQLearn): todavía funciona con acceso por invitación, aunque se espera que a futuro sea la opción recomendada.
+
+### MCP: el protocolo que conecta el agente con el Toolbox
+
+**MCP (Model Context Protocol)** es un estándar abierto, basado en JSON-RPC 2.0, para exponer herramientas a agentes de IA a través de una interfaz uniforme: un cliente MCP abre una sesión contra un servidor MCP, puede listar qué herramientas expone (`list_tools`) e invocarlas (`call_tool`), sin importar qué tecnología hay detrás del servidor.
+
+Cada Toolbox de Foundry **es, ni más ni menos, un servidor MCP** que aloja las herramientas que configuraste. Expone dos variantes de endpoint:
+
+| Endpoint | Patrón | Cuándo usarlo |
+|---|---|---|
+| **Developer** (versión específica) | `{project_endpoint}/toolboxes/{nombre}/versions/{version}/mcp?api-version=v1` | Probar o validar una versión concreta antes de promoverla a default |
+| **Consumer** (siempre la versión por defecto) | `{project_endpoint}/toolboxes/{nombre}/mcp?api-version=v1` | Conectar agentes — al usar este endpoint, promover una nueva versión del Toolbox nunca exige tocar ni recompilar el agente |
+
+La autenticación contra el endpoint del Toolbox usa Microsoft Entra ID con la propia identidad del llamador (el agente, en el caso de un agente hospedado; el proceso que invoca a la API, en el caso de un agente de prompt) — no hace falta gestionar tokens ni API keys por separado, ya que Web Search tampoco necesita autenticarse contra ningún tercero.
+
+**¿Cómo conecta un agente de *prompt* (no hospedado) con ese servidor MCP?** A diferencia de los agentes hospedados — que usan `HostedMcpToolboxAITool` de Agent Framework, resuelto en tiempo de ejecución vía un esquema lógico `foundry-toolbox://` propio del sandbox de Foundry —, un agente de prompt como `MarketingAgent` usa el mecanismo **genérico** de MCP del SDK de OpenAI, en dos pasos:
+
+```csharp
+// 1) Un McpTool genérico, apuntando a CUALQUIER servidor MCP por URL http(s)
+//    (el endpoint "consumer" del Toolbox es solo un caso particular)
+McpTool mcpTool = ResponseTool.CreateMcpTool(
+    serverLabel: "marketing-websearch",
+    serverUri: toolboxMcpEndpoint,
+    toolCallApprovalPolicy: GlobalMcpToolCallApprovalPolicy.NeverRequireApproval);
+
+// 2) El puente que lo hace compatible con la definición declarativa del agente
+ProjectsAgentTool webSearchTool = ProjectsAgentTool.AsProjectTool(mcpTool);
 ```
 
-REGLAS:
-- El campo "subject" debe ser un asunto de correo atractivo y relevante.
-- El campo "body" es el mensaje que generó MarketingAgent para ese cliente.
-- Responde siempre en español.
-- Si algún cliente no tiene email, omítelo del resultado.
-- Genera un nombre descriptivo para la campaña basado en el segmento.
+Este detalle es importante: **el mismo mecanismo funciona con cualquier servidor MCP externo**, no solo con un Toolbox de Foundry. Un Toolbox no es más que la implementación propia de Foundry de un servidor MCP, con el beneficio añadido de versionado y gobierno centralizado a nivel de proyecto — pero el "cableado" del lado del agente es idéntico al que usarías para conectarte a cualquier servidor MCP público.
+
+### De la teoría a nuestro caso: cómo lo conectamos en MarketingAgent
+
+El flujo completo, desde que `Program.cs` arranca hasta que `MarketingAgent` responde con un evento real, es:
+
+```mermaid
+flowchart LR
+    J[Julie<br/>hosted] -->|AsAIAgent.RunAsync| M[MarketingAgent<br/>prompt agent]
+    M -->|McpTool + AsProjectTool| T[Toolbox MCP endpoint<br/>marketing-websearch-toolbox]
+    T -->|contiene| W[WebSearchToolboxTool]
+    W -->|busca| WEB([Web])
 ```
 
-Racional de diseño:
+Paso a paso, tal como está implementado en [Program.cs](code/agents/JulieAgent/Program.cs) y [MarketingAgent.cs](code/agents/JulieAgent/MarketingAgent.cs):
 
-- `workflow` se eligió porque hay una secuencia dependiente de pasos (SQL → marketing).
-- Julie no “adivina” resultados: delega la generación de SQL y de contenido a sub-agentes especializados.
-- Centralizar la salida final en Julie asegura un único formato JSON consistente para consumo externo.
+1. **`Program.cs`** crea (o reutiliza, si ya existe) una versión de Toolbox llamada `marketing-websearch-toolbox` que contiene un único `WebSearchToolboxTool` — sin conexión ni credenciales, igual que crear un agente.
+2. Calcula la URL del endpoint **consumer** del Toolbox a partir del endpoint del proyecto: `{foundryEndpoint}/toolboxes/marketing-websearch-toolbox/mcp?api-version=v1`.
+3. Pasa esa URL a `MarketingAgent.GetAgentDefinition(modelDeployment, toolboxMcpEndpoint)`, que construye el `McpTool` + `AsProjectTool` y lo adjunta como única herramienta del agente.
+4. Cuando **Julie** (agente hospedado, sin cambios) invoca a `MarketingAgent` como sub-agente — vía `projectClient.AsAIAgent(...).RunAsync(...)`, el mismo mecanismo que usa para llamar a `SqlAgent` —, el modelo de `MarketingAgent` decide invocar la herramienta de búsqueda; Foundry abre una sesión MCP contra el Toolbox, ejecuta la búsqueda con `WebSearchToolboxTool` y devuelve los resultados al modelo como cualquier otra llamada a herramienta.
 
-## ¿Qué hace Program.cs exactamente?
+Esto ya se validó de punta a punta en producción: al probar el flujo completo, Julie generó una campaña de marketing citando un evento real y vigente (*UCI Gran Fondo World Series 2026*) para un cliente del segmento "Bikes" — confirmando que la cadena completa Toolbox → MCP → agente de prompt → agente hospedado funciona igual que funcionaba antes con Bing, pero sin necesitar ninguna conexión ni recurso externo.
 
-`Program.cs` no contiene la lógica de negocio de campaña; su rol es operativo:
+Con esto, el mapa de las tres formas de consumir herramientas que conviven en este taller queda así:
+
+| Agente | Tipo | Cómo consume su herramienta |
+|---|---|---|
+| **Anders** | prompt | `OpenAPITool` embebido directamente en la definición del agente |
+| **MarketingAgent** | prompt | `McpTool` + `AsProjectTool` apuntando al endpoint MCP de un **Toolbox** |
+| **Julie** | hospedado (workflow) | No tiene herramientas propias — orquesta a `SqlAgent` y `MarketingAgent` como sub-agentes desde código |
+
+## ¿Qué hace exactamente Program.cs?
+
+`JulieAgent/Program.cs` no contiene lógica de negocio de campañas; su papel es operativo:
 
 1. Cargar `appsettings.json`.
 2. Leer `db-structure.txt`.
-3. Descargar spec OpenAPI de la Function App (si está disponible).
-4. Resolver el ID completo de la conexión Bing (el API requiere el ARM resource ID, no solo el nombre).
-5. Crear o reutilizar agentes en Foundry.
-6. Abrir chat interactivo con Julie.
+3. Descargar la spec OpenAPI de la Function App (si está disponible).
+4. Crear o reutilizar el Toolbox de Web Search que usa `MarketingAgent` (sin conexión ni credenciales: es una llamada de data-plane, igual que crear un agente).
+5. Crear o reutilizar los sub-agentes de **prompt** en Foundry.
+6. Desplegar a **Julie** como agente hospedado desde la carpeta de código `JulieHosted`.
+7. Conceder a la identidad de Julie el rol que necesita sobre el proyecto.
+8. Abrir un chat interactivo con Julie.
 
-El helper `EnsureAgent(...)` implementa el patrón **buscar → decidir override → crear versión** con tipos del SDK:
-
-```csharp
-async Task EnsureAgent(string agentName, AgentDefinition agentDefinition)
-{
-	...
-	var result = await projectClient.Agents.CreateAgentVersionAsync(
-		agentName,
-		new AgentVersionCreationOptions(agentDefinition));
-	...
-}
-```
-
-Luego registra los 3 agentes en orden. En la implementación actual, `SqlAgent` recibe también la spec OpenAPI cuando está disponible:
+El helper `EnsureAgent(...)` implementa el patrón **buscar → decidir sobrescritura → crear versión** para los dos agentes de prompt:
 
 ```csharp
 await EnsureAgent(SqlAgent.Name, SqlAgent.GetAgentDefinition(modelDeployment, dbStructure, openApiSpecJson));
-await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDeployment, bingConnectionId));
-await EnsureAgent(JulieOrchestrator.Name, JulieOrchestrator.GetAgentDefinition(modelDeployment, openApiSpecJson));
+await EnsureAgent(MarketingAgent.Name, MarketingAgent.GetAgentDefinition(modelDeployment, marketingToolboxEndpoint));
 ```
 
-Finalmente, el chat usa `ProjectResponsesClient` con Julie como agente por defecto:
+Julie se despliega desde el código fuente con `CreateAgentVersionFromCodeAsync`:
 
 ```csharp
-ProjectResponsesClient responseClient = projectClient.OpenAI.GetProjectResponsesClientForAgent(
-	defaultAgent: JulieOrchestrator.Name,
-	defaultConversationId: conversation.Id);
+HostedAgentDefinition julieDefinition = new(cpu: "0.5", memory: "1Gi")
+{
+    Versions = { new ProtocolVersionRecord(ProjectsAgentProtocol.Responses, "2.0.0") },
+    CodeConfiguration = new(
+        runtime: "dotnet_10",
+        entryPoint: ["dotnet", "julie-hosted.dll"],
+        dependencyResolution: CodeDependencyResolution.RemoteBuild)
+};
+julieDefinition.EnvironmentVariables.Add("FOUNDRY_PROJECT_ENDPOINT", foundryEndpoint);
+julieDefinition.EnvironmentVariables.Add("AZURE_AI_MODEL_DEPLOYMENT_NAME", modelDeployment);
+
+ProjectsAgentVersion julieVersion = await agentsClient.CreateAgentVersionFromCodeAsync(
+    agentName: julieAgentName,
+    filePath: hostedSourcePath,
+    metadata: new AgentVersionFromCodeMetadata(julieDefinition));
 ```
 
-Con esto, el código local se limita a orquestar infraestructura de agente; la ejecución del workflow ocurre dentro de Foundry en cada `CreateResponse(...)`.
+Después el deployer consulta el estado hasta que la versión llega a `active` y enruta el endpoint del agente hacia ella:
 
-> **Nota sobre la conexión Bing:** `Program.cs` resuelve el nombre de la conexión Bing (ej: `ais-contosoretail-geoxs-bingsearchconnection`) a su ARM resource ID completo usando `projectClient.Connections.GetConnectionAsync()`. Esto es necesario porque `BingGroundingSearchConfiguration(projectConnectionId:)` espera el ID completo, no solo el nombre.
+```csharp
+await agentsClient.PatchAgentAsync(julieAgentName, new PatchAgentOptions
+{
+    AgentEndpoint = new AgentEndpointConfiguration
+    {
+        VersionSelector = new([new FixedRatioVersionSelectionRule(julieVersion.Version, 100)]),
+        ProtocolConfiguration = new() { Responses = new ResponsesProtocolConfiguration() }
+    }
+});
+```
 
-> Nota: el `Program.cs` descarga OpenAPI con reintentos para tolerar fallas DNS intermitentes; esa spec se pasa a `SqlAgent` para habilitar la tool `SqlExecutor` y ejecutar SQL desde el sub-agente.
+Por último, el chat apunta al endpoint del agente hospedado:
 
----
+```csharp
+ProjectResponsesClient responseClient = projectClient.ProjectOpenAIClient
+    .GetProjectResponsesClientForAgentEndpoint(julieAgentName);
+```
+
+> ⚠️ **La salida de compilación local rompe el build remoto.** El SDK sube la carpeta tal cual; un `bin/` u `obj/` obsoleto hace que la compilación remota falle con `CS2001`. El deployer borra ambas carpetas antes de empaquetar. Por la misma razón se eliminaron los archivos sobrantes de `dotnet new web` (como la carpeta `Properties/`): las subcarpetas no se suben, pero la compilación las busca y falla con `MSB3030`.
+
+> ⚠️ **Versiones de paquetes.** El quickstart oficial fija `Azure.AI.Projects 2.1.0-beta.4`, que es **incompatible** con Agent Framework y produce `NU1605`. Ambos proyectos de este laboratorio usan `Azure.AI.Projects 3.0.0-beta.2`.
+
+## Identidad y permisos del agente hospedado
+
+Un agente hospedado se ejecuta con **su propia identidad de Microsoft Entra**, expuesta como `instance_identity.principal_id` en el objeto agente. Esa identidad nace **sin ningún rol**, así que Julie ni siquiera puede leer las definiciones de `SqlAgent` y `MarketingAgent` hasta que le concedas acceso.
+
+Síntoma cuando falta el rol:
+
+```text
+HTTP 403: Forbidden
+Identity(object id: ...) does not have permissions for
+Microsoft.CognitiveServices/accounts/AIServices/agents/read actions.
+```
+
+Dos cosas conviene saber:
+
+| Rol | Qué concede | ¿Suficiente para Julie? |
+|---|---|---|
+| `Foundry Agent Consumer` | solo `.../endpoints/interact/action` | ❌ No — Julie sigue recibiendo 403 en `agents/read` |
+| `Foundry User` | data actions `Microsoft.CognitiveServices/*` | ✅ Sí |
+
+- El rol debe asignarse en el ámbito del **proyecto** (`.../accounts/<cuenta>/projects/<proyecto>`). Asignarlo solo en el ámbito de la cuenta no fue suficiente en la práctica.
+- El `principal_id` **cambia cada vez que se borra y se recrea el objeto agente**, que es exactamente lo que ocurre al migrar a Julie de `workflow` a `hosted`.
+
+Por este último punto, **el deployer hace la asignación él mismo** en cada ejecución, justo después de que Julie quede activa:
+
+```text
+[RBAC] Concediendo 'Foundry User' a la identidad de Julie 95c37595-306b-434c-9033-da90333cc2bd...
+[RBAC] Rol asignado. Puede tardar aproximadamente un minuto en hacerse efectivo.
+```
+
+Si tu cuenta no puede crear asignaciones de rol, el deployer no se cae: imprime el comando exacto para que lo ejecutes.
+
+```bash
+az role assignment create \
+  --role "Foundry User" \
+  --assignee-object-id <principal-id> \
+  --assignee-principal-type ServicePrincipal \
+  --scope "/subscriptions/<sub>/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/ais-contosoretail-<suffix>/projects/aip-contosoretail-<suffix>"
+```
+
+> 🔐 Para que el deployer pueda hacerlo por ti, tu propia cuenta necesita **Foundry Project Manager** sobre el proyecto u **Owner** en el grupo de recursos. Ver `setup.md`.
 
 ## Pasos del laboratorio
 
 ### Paso 1: Configurar appsettings.json
 
-Abre `es/labs/foundry/code/agents/JulieAgent/appsettings.json` y reemplaza todos los valores `<suffix>` y `<subscription-id>` con los outputs del despliegue (Paso 8 del setup):
+Abre `es/labs/foundry/code/agents/JulieAgent/appsettings.json` y reemplaza todos los valores `<suffix>` con los outputs del despliegue:
 
 ```json
 {
   "FoundryProjectEndpoint": "https://ais-contosoretail-<suffix>.services.ai.azure.com/api/projects/aip-contosoretail-<suffix>",
   "ModelDeploymentName": "gpt-deployment",
   "FunctionAppBaseUrl": "https://func-contosoretail-<suffix>.azurewebsites.net/api",
-  "BingConnectionName": "ais-contosoretail-<suffix>-bingsearchconnection"
+  "SubscriptionId": "<subscription-id>",
+  "ResourceGroupName": "rg-contoso-retail",
+  "JulieDataMode": "auto"
 }
 ```
 
-Todos estos valores los obtienes de la salida del script de despliegue (o del portal → recurso AI Foundry → **Project settings** → **Overview**).
-
-> Para obtener el `BingConnectionName` directamente, ejecuta:
-> ```bash
-> az cognitiveservices account connection list \
->     --name ais-contosoretail-<suffix> \
->     --resource-group rg-contoso-retail \
->     --query "[?contains(name,'bing')].name" -o tsv
-> ```
-> Reemplaza `<suffix>` con tu sufijo. El comando retorna el nombre de la conexión listo para pegar.
+Todos estos valores se obtienen de la salida del script de despliegue (o del portal → recurso de AI Foundry → **Project settings** → **Overview**). `SubscriptionId` y `ResourceGroupName` solo se usan para conceder a Julie el rol **Foundry User** sobre el proyecto; no tienen relación con la herramienta de Web Search de `MarketingAgent`, que no necesita ninguna conexión ni credencial.
 
 ### Paso 2: Asegurarte de que los permisos de Fabric están configurados
 
-Antes de ejecutar, confirma que ya completaste la sección **Configuración manual de permisos en Fabric** de este mismo documento (Partes A y B). Si no lo hiciste, la Function App no podrá ejecutar SQL contra el Warehouse y `SqlAgent` fallará.
+Antes de ejecutar, confirma que ya completaste la sección **Configuración manual de permisos en Fabric** de este documento (Partes A y B). Si no lo has hecho, la Function App no podrá ejecutar SQL contra el Warehouse y `SqlAgent` fallará.
 
-### Paso 3: Ejecutar Julie
+### Paso 3: Desplegar y ejecutar Julie
 
 Desde la terminal, en la raíz del repositorio:
 
@@ -451,60 +750,147 @@ dotnet run
 ```
 
 Al arrancar, el programa:
+
 1. Descarga la spec OpenAPI de la Function App (puede tardar unos segundos).
-2. Crea o actualiza los tres agentes en Foundry: `SqlAgent`, `MarketingAgent` y `Julie`.
-3. Abre un chat interactivo en la terminal.
+2. Pregunta si quieres recrear `SqlAgent` y `MarketingAgent`. Responde `n` para conservar los existentes.
+3. Comprueba el `kind` de la `Julie` existente. Si todavía es un `workflow`, pide permiso para borrarla, porque el `kind` no se puede cambiar sobre la marcha.
+4. Sube la carpeta `JulieHosted` y espera a que Foundry la compile y la aprovisione.
+5. Asigna el rol `Foundry User` a la nueva identidad de Julie.
+6. Abre un chat interactivo en la terminal.
 
-Verás mensajes como:
+Salida esperada:
 
+```text
+[Foundry] Buscando agente 'SqlAgent'...
+[Foundry] Agente 'SqlAgent' encontrado
+[Foundry] ¿Borrar 'SqlAgent' y recrearlo desde cero? (s/N): n
+[Foundry] Se conserva 'SqlAgent' existente.
+...
+[Foundry] Agente 'Julie' no encontrado. Se creará uno nuevo.
+[Foundry] Subiendo el código del agente hospedado Julie desde .../JulieHosted...
+[Foundry] Versión 1 de Julie creada. Esperando el aprovisionamiento...
+[Foundry] Estado del aprovisionamiento: creating (1/60)
+[Foundry] Estado del aprovisionamiento: creating (2/60)
+[Foundry] Estado del aprovisionamiento: active (3/60)
+[Foundry] Endpoint de Julie enrutado a la versión 1
+[RBAC] Concediendo 'Foundry User' a la identidad de Julie 95c37595-...
+[RBAC] Rol asignado. Puede tardar aproximadamente un minuto en hacerse efectivo.
+
+[Foundry] Todos los agentes están listos.
+
+=== Chat con Julie (escribe 'salir' para terminar) ===
 ```
-Agente SqlAgent creado/actualizado.
-Agente MarketingAgent creado/actualizado.
-Agente Julie creado/actualizado.
-Chat iniciado. Escribe tu solicitud de campaña (o 'exit' para salir):
->
+
+> ⏱️ El primer despliegue tarda unos minutos porque Foundry compila el proyecto de forma remota. Las ejecuciones siguientes con el código sin cambios son mucho más rápidas.
+
+### Paso 4: Verificar la asignación de rol
+
+```bash
+az role assignment list \
+  --scope "/subscriptions/<sub>/resourceGroups/rg-contoso-retail/providers/Microsoft.CognitiveServices/accounts/ais-contosoretail-<suffix>/projects/aip-contosoretail-<suffix>" \
+  --query "[?roleDefinitionName=='Foundry User'].{principal:principalId, role:roleDefinitionName}" -o table
 ```
 
-### Paso 4: Probar el flujo end-to-end
+El `principal_id` de Julie debe aparecer en la lista. Si no aparece, ejecuta el comando `az role assignment create` de la sección anterior.
+
+### Paso 5: Probar el flujo end-to-end
 
 Escribe un prompt describiendo el segmento de clientes para la campaña. Por ejemplo:
 
-```
-Crea una campaña para clientes cuya categoría favorita sea Bikes
-```
-
-```
-Genera una campaña para los 5 clientes más recientes que hayan comprado en la categoría Clothing
+```text
+Crea una campaña para clientes que hayan comprado bicicletas
 ```
 
-Julie invocará a `SqlAgent` (que generará y ejecutará el SQL contra Fabric), luego a `MarketingAgent` (que buscará eventos en Bing y redactará el mensaje personalizado para cada cliente), y finalmente consolidará todo en un JSON de campaña:
+```text
+Genera una campaña para clientes cuya categoría favorita sea Clothing
+```
+
+El grafo se ejecuta en orden: `query-customers` obtiene el segmento y `write-campaign` pide a `MarketingAgent` un mensaje por cliente:
 
 ```json
 {
-  "campaign": "Campaña Bikes - Primavera 2026",
-  "generatedAt": "2026-03-13T10:30:00",
-  "totalEmails": 3,
-  "emails": [
+  "campaignName": "Campaña de Contoso Retail",
+  "dataSource": "fabric",
+  "isDemoData": false,
+  "warning": null,
+  "messageCount": 2,
+  "messages": [
     {
-      "to": "cliente@ejemplo.com",
-      "customerName": "Ana García",
-      "favoriteCategory": "Bikes",
-      "subject": "¡Ana, prepárate para la temporada ciclista!",
-      "body": "Hola Ana, ..."
+      "to": "ana.torres@ejemplo.com",
+      "subject": "Ana, novedades en Bikes",
+      "body": "Hola Ana Torres, el Tour de Francia 2026, del 4 al 26 de julio..."
+    },
+    {
+      "to": "luis.garcia@ejemplo.com",
+      "subject": "Luis, novedades en Clothing",
+      "body": "Hola Luis García, la Semana de la Moda de Milán, del 22 al 28 de septiembre de 2026..."
     }
   ]
 }
 ```
 
-> La primera ejecución puede tardar **30–60 segundos** porque el workflow pasa por SQL execution + Bing search + generación de texto para cada cliente del segmento.
+> ✅ Los dos cuerpos son **distintos**: uno habla de ciclismo y el otro de moda, porque cada uno salió de su propia llamada a `MarketingAgent` con la categoría de ese cliente.
+
+**Sin Fabric configurado**, la ejecución sigue teniendo éxito. Esta es salida real del entorno del laboratorio:
+
+```json
+{
+  "campaignName": "Campaña de Contoso Retail (DATOS DE DEMOSTRACIÓN)",
+  "dataSource": "demo",
+  "isDemoData": true,
+  "warning": "Fabric SQL no está disponible (HTTP 400 (invalid_request_error: tool_user_error)). Estos clientes son ficticios.",
+  "messageCount": 3,
+  "messages": [
+    { "to": "ana.torres@example.invalid",  "subject": "Ana, novedades en Bikes",        "body": "...Tour de Francia 2026..." },
+    { "to": "luis.garcia@example.invalid", "subject": "Luis, novedades en Clothing",    "body": "...semanas de la moda de Nueva York, Londres, Milán y París..." },
+    { "to": "mia.chen@example.invalid",    "subject": "Mia, novedades en Accessories",  "body": "...CES 2026, auriculares con IA, relojes inteligentes..." }
+  ]
+}
+```
+
+La mitad de marketing funciona exactamente igual que con datos reales — tres clientes, tres temas distintos — mientras que `dataSource`, `isDemoData` y `warning` hacen imposible confundir el resultado con clientes reales.
+
+Con `JULIE_DATA_MODE=real` la misma situación falla en lugar de continuar, con estado `Failed` y el error completo de `SqlExecutor`, que es lo que quieres mientras diagnosticas la conexión:
+
+```text
+[DEBUG] Status: Failed
+"Message": "{ \"error\": \"Validation Error\", \"message\": \"('HTTP error 400: Bad Request', ...
+            \"func_call_name\": \"sqlExecutor\", \"spec_id\": \"SqlExecutor\" ... }"
+```
 
 ### Validación del laboratorio
 
 El laboratorio se considera completado cuando:
 
-- [ ] Los tres agentes aparecen creados en el portal de Foundry (AI Foundry → tu proyecto → **Agents**).
-- [ ] Un prompt de campaña retorna un JSON con al menos un email generado.
-- [ ] El `body` de cada email incluye una referencia a un evento o tendencia actual buscada en Bing.
+- [ ] `SqlAgent`, `MarketingAgent` y `Julie` aparecen en el portal de Foundry (AI Foundry → tu proyecto → **Agents**).
+- [ ] `Julie` figura como agente **hosted** con una versión `active`.
+- [ ] La identidad de Julie tiene el rol `Foundry User` sobre el proyecto.
+- [ ] Los logs del agente muestran el grafo DOT impreso al arrancar, con los dos nodos.
+- [ ] Un prompt de campaña devuelve un mensaje **por cliente**, cada uno sobre su propia categoría.
+- [ ] Con Fabric configurado, la respuesta lleva `"dataSource": "fabric"`.
+- [ ] Sin Fabric, la ejecución sigue teniendo éxito y lleva `"isDemoData": true` más un aviso — nada se hace pasar por real.
+
+---
+
+## Solución de problemas
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| La respuesta vuelve **vacía** pero nada ha fallado | `includeWorkflowOutputsInResponse` se quedó en su valor por defecto `false` | Ponlo a `true` en `AsAIAgent(...)` |
+| `Workflow does not support ChatProtocol` | El nodo inicial solo acepta `List<ChatMessage>` | Haz que el nodo inicial herede de `ChatProtocolExecutor`, que también maneja `TurnToken` |
+| La campaña aparece **dos veces** en una respuesta | Un nodo agente reenvió sus mensajes entrantes, así que el grafo corrió por el turno del usuario y otra vez por la respuesta | Envuelve el agente dentro de un nodo, o pon `ForwardIncomingMessages = false` |
+| Todos los clientes reciben el mismo texto genérico | Se está llamando a `MarketingAgent` una vez para todo el segmento | Llámalo dentro del bucle, una vez por cliente, como hace `WriteCampaign` |
+| `"isDemoData": true` de forma inesperada | Fabric SQL no es accesible y `JULIE_DATA_MODE=auto` cayó al plan B | Lee el campo `warning`; pon `JULIE_DATA_MODE=real` para ver el fallo en crudo |
+| Estado `Failed` mencionando `SqlExecutor` | Fabric SQL no está configurado **y** `JULIE_DATA_MODE=real` | Completa la sección de Fabric, o vuelve a `auto` para mantener el laboratorio en marcha |
+| Un nodo propio entre dos nodos agente se salta | No está soportado por la API de grafos | Envuelve cada agente dentro de un nodo propio |
+| `HTTP 424 session_not_ready` | El contenedor murió en el arranque | Mantén la construcción del grafo dentro del `try/catch` que cae al workflow de error de un solo nodo |
+| `HTTP 403 ... agents/read` | La identidad de Julie no tiene rol, o solo tiene `Foundry Agent Consumer` | Asigna `Foundry User` en el ámbito del **proyecto** y espera ~1 minuto |
+| Estado `Failed` mencionando `SqlExecutor` | La conexión SQL de Fabric no está configurada | Completa la sección de permisos de Fabric y la configuración de la Function App |
+| El build remoto falla con `CS2001` | Se subió un `bin/` u `obj/` local | El deployer los borra; no los vuelvas a crear entre la compilación y la subida |
+| El build remoto falla con `MSB3030` | El proyecto referencia una subcarpeta que no se sube (por ejemplo `Properties/`) | Elimina los archivos sobrantes generados por `dotnet new web` |
+| `NU1605` package downgrade | `Azure.AI.Projects 2.1.0-beta.4` del quickstart | Usa `3.0.0-beta.2` en ambos proyectos |
+| `CS8802` múltiples puntos de entrada | `JulieHosted` anidado dentro de `JulieAgent` | Mantén `JulieHosted` como carpeta hermana |
+| Julie no puede pasar de workflow a hosted | El `kind` de un agente es inmutable | Deja que el deployer borre y recree el objeto agente |
 
 ---
 
@@ -514,7 +900,7 @@ El laboratorio se considera completado cuando:
 
 #### Contexto
 
-Al probar el flujo de Julie, es posible que MarketingAgent genere mensajes basados en noticias o eventos desactualizados (por ejemplo, eventos de 2024). Esto ocurre porque el prompt actual no restringe a Bing Search para que filtre por fecha, ni le indica al agente que descarte resultados antiguos.
+Al probar el flujo de Julie, es posible que MarketingAgent genere mensajes basados en noticias o eventos desactualizados (por ejemplo, eventos de años anteriores). Esto ocurre porque el prompt actual no restringe a Web Search para que filtre por fecha, ni le indica al agente que descarte resultados antiguos.
 
 #### Objetivo
 
@@ -554,7 +940,7 @@ Una vez que tengas un prompt que funcione correctamente en el playground:
 
 #### Contexto
 
-Azure AI Foundry ofrece una experiencia visual **no-code/low-code** para crear agentes directamente desde el portal. Además de Bing Grounding (que ya usamos), Foundry ofrece otras herramientas integradas. En este challenge usarás **Code Interpreter** — una herramienta que permite al agente escribir y ejecutar código Python para analizar datos, hacer cálculos y generar gráficas.
+Azure AI Foundry ofrece una experiencia visual **no-code/low-code** para crear agentes directamente desde el portal. Además de Web Search (que ya usamos en `MarketingAgent`), Foundry ofrece otras herramientas integradas. En este challenge usarás **Code Interpreter** — una herramienta que permite al agente escribir y ejecutar código Python para analizar datos, hacer cálculos y generar gráficas.
 
 #### Objetivo
 
@@ -571,7 +957,7 @@ Crear un agente llamado **"SalesAnalyst"** desde la interfaz visual de Azure AI 
    - **Model:** Selecciona `gpt-deployment`
    - **Instructions:** Copia y pega las siguientes instrucciones:
 
-```
+```text
 Eres SalesAnalyst, un analista de datos de ventas de Contoso Retail.
 
 Tu rol es recibir datos de ventas (en texto, CSV o como descripción),
@@ -615,9 +1001,8 @@ c. `"Calcula el crecimiento porcentual de cada categoría entre Q1 y Q2 y ordén
 
 #### Reflexión
 
-- ¿En qué se diferencia Code Interpreter de las otras herramientas (Bing Grounding, OpenAPI)?
+- ¿En qué se diferencia Code Interpreter de las otras herramientas (Web Search, OpenAPI)?
 - ¿Qué tipo de tareas del negocio podrías automatizar con un agente que ejecuta código?
 - Compara la experiencia de crear este agente visualmente vs. la creación programática de los agentes anteriores:
   - ¿Qué ventajas tiene cada enfoque?
-  - ¿Qué limitaciones tiene el enfoque no-code que el SDK no tiene?
-
+  - ¿Qué limitaciones tiene el enfoque no-code que no tiene el SDK?
