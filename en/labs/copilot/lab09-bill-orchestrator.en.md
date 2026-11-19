@@ -16,40 +16,41 @@ By completing this lab, you will learn:
 
 ## Let's Start
 
-1. Open the **Bill** agent that we created in the previous lab, “Ric”.
+1. Open the **Bill** agent that we created in the previous lab.
 
    ![imagen](img/image1_Bill.png)
 
 2. Now we will connect the agents.
-3. Navigate to the **Agents** section.
+3. Navigate to the **Tools** section.
 
-   ![imagen](img/image2_Bill.png)
+   ![imagen](img/image2_Bill_Tools.png)
 
 ---
 
 ## Agent Mark
 
-1. Click **Add Agent** and then select **Connect to an external agent**.
+1. Search for "Fabric" and then select "Fabric IQ Data MCP" tool.
+2. Click **Add Agent** and then select **Connect to an external agent**.
 
    ![imagen](img/image3_Bill.png)
 
-2. Select **Microsoft Fabric**, then select **create a new connection**.
-3. In the connector window, click **create**.
-4. A pop-up window will ask you to select the user. Select the user you have been using throughout the labs.
+3. Select **Microsoft Fabric**, then select **create a new connection**.
+4. In the connector window, click **create**.
+5. A pop-up window will ask you to select the user. Select the user you have been using throughout the labs.
 
    ![imagen](img/image4_Bill.png)
 
-5. Once signed in, the Fabric connection is ready and you can choose the agents defined in the Fabric environment. Click **Next**.
-6. In the agent selection window, choose **Mark** and click **Next**.
+6. Once signed in, the Fabric connection is ready and you can choose the agents defined in the Fabric environment. Click **Next**.
+7. In the agent selection window, choose **Mark** and click **Next**.
 
    ![imagen](img/image5_Bill.png)
 
-7. In the configuration window, add a description that will guide the orchestrator on what Mark will do when invoked. Add the following description:  
+8. In the configuration window, add a description that will guide the orchestrator on what Mark will do when invoked. Add the following description:  
    **"Provides detailed information about customer purchase orders"** and click **Add**.
 
    ![imagen](img/image6_Bill.png)
 
-8. Done, Mark has been added.
+9. Done, Mark has been added.
 
 ---
 
