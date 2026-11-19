@@ -78,19 +78,32 @@ By completing this lab, you will learn:
    ![imagen](img/image7.3_Bill.png)
 
 4. For **Authentication type**, the only option now is **Microsoft Entra ID User Login** so the agent delegates authentication to the end user. In the next field, add the Azure AI Foundry project URL.
-5. Navigate to the Azure AI Foundry portal where Anders was created. In the **Overview** section, copy the endpoint link and paste it into the Copilot Studio window.
+5. Navigate to the Azure AI Foundry portal where Anders was created. In the **Home** section, locate copy the endpoint link (Azure AI Project Endpoint) and paste it into the Copilot Studio window.
 
-   ![imagen](img/image8_Bill.png)
+   ![imagen](img/image8.1_Bill.png)
 
-6. Repeat step 4 from Mark: select the lab user and continue with the connection. Click **Next**.
 7. In the agent configuration window, provide the following values:
+   - **Display Name**: "Anders" or "Ander Connection"
+   - **Azure AI Project Endpoint:** Connection from previous step.
+
+8. Once finished, click **Create** and follow the instructions to select the current user.
+
+   ![imagen](img/image9.1_Bill.png)
+
+9. The Anders agent has been connected, press the "**Next**" button.
+
+   ![imagen](img/image9.2_Bill.png)
+
+7. In the agent configuration window, provide the following values and then press the "Add to agent" to save and close:
    - **Name**: "Anders"
    - **Description**: "Anders receives the complete list of orders returned by Mark to generate a report"
    - **Agent ID**: "Anders"
 
-   ![imagen](img/image9_Bill.png)
+   ![imagen](img/image9.3_Bill.png)
 
-8. Once finished, click **Add**. Anders has now been added.
+8. **Done**, Anders has been added to the "**Connected agents**" section.
+
+   ![imagen](img/image9.4_Bill.png)
 
 ---
 
