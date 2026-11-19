@@ -62,15 +62,22 @@ By completing this lab, you will learn:
 > [!IMPORTANT]
 > Before connecting Anders, make sure you have **published it to Microsoft 365 and Teams** from the Foundry portal (step *"Publish Anders so Copilot Studio can consume it"* in Lab 3). Copilot Studio invokes Foundry agents with the **Activity Protocol**; if Anders only exposes the Responses API protocol, the connection fails with `HTTP 400 – endpoint does not support activity`.
 
+> [!IMPORTANT]
 > For a **Microsoft Foundry agent**, the new Copilot Studio Microsoft Copilot harness handles it differently from the Fabric case: you add it as a Connected agent, not as a Tool.
 
-1. Repeat the same process used for Mark, but select **Azure AI Foundry** as the external connector.
-2. Repeat step 1 from Mark and select **Azure AI Foundry**, then create a connection.
-3. In the connection window, the configuration details are different from those used with Mark.
+1. Locate and select the "**Connected Agents +**" option.
 
-   ![imagen](img/image7_Bill.png)
+   ![imagen](img/image7.1_Bill.png)
 
-4. For **Authentication type**, keep **Microsoft Entra** so the agent delegates authentication to the end user. In the next field, add the Azure AI Foundry project URL.
+2. In the Add a connected agent pop-up click the "**+ Add**" option and then select "**Add Foundry Agent**".
+
+   ![imagen](img/image7.2_Bill.png)
+
+3. In the connection window, we will create a new connection.
+
+   ![imagen](img/image7.3_Bill.png)
+
+4. For **Authentication type**, the only option now is **Microsoft Entra ID User Login** so the agent delegates authentication to the end user. In the next field, add the Azure AI Foundry project URL.
 5. Navigate to the Azure AI Foundry portal where Anders was created. In the **Overview** section, copy the endpoint link and paste it into the Copilot Studio window.
 
    ![imagen](img/image8_Bill.png)
