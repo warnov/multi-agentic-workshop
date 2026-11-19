@@ -109,11 +109,25 @@ By completing this lab, you will learn:
 
 ## Agent Charles
 
-Repeat the same process used for Mark and Anders, but select **Charles** as an internal agent created in your environment.
+> [!IMPORTANT]
+> For other **Microsoft Copilot Studio agent**, the new Copilot Studio Microsoft Copilot harness handles thme as a Connected agent and not a tool.
 
-![imagen](img/image10_Bill.png)  
-![imagen](img/image11_Bill.png)  
-![imagen](img/image12_Bill.png)
+1. Locate and select the "**Connected Agents +**" option.
+
+   ![imagen](img/image7.1_Bill.png)
+
+2. In the Add a connected agent pop-up click the "**Charles**" agent listed.
+
+   ![imagen](img/image10.2_Bill.png)
+
+3. Enter the below **description** and then press "**Connect**"
+
+**Description:** Helps users answer product questions using SharePoint content and perform market or competitor comparisons using public information when
+requested.
+
+![imagen](img/image10.3_Bill.png)  
+
+4. **Done**, **Charles** has been added to the "**Connected agents**" section.
 
 ---
 
