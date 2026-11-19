@@ -29,6 +29,9 @@ By completing this lab, you will learn:
 
 ## Agent Mark
 
+> [!IMPORTANT]
+> The new Microsoft Copilot Harness uses **Tools** to bring Agents built on Fabric.
+
 1. Search for "Fabric" and then select "Fabric IQ Data MCP" tool.
 
    ![imagen](img/image3_Bill.png)
@@ -46,7 +49,7 @@ By completing this lab, you will learn:
 
    **NOTE**: By default, the Agent it will use the credentials of the user using the Agent but once added you can edit the Authentication mode to use the Maker/Other account. 
 
-   "Provides detailed information about customer purchase orders."
+   **Description:** "Provides detailed information about customer purchase orders."
 
    ![imagen](img/image4.3_Bill.png)
 
@@ -58,6 +61,8 @@ By completing this lab, you will learn:
 
 > [!IMPORTANT]
 > Before connecting Anders, make sure you have **published it to Microsoft 365 and Teams** from the Foundry portal (step *"Publish Anders so Copilot Studio can consume it"* in Lab 3). Copilot Studio invokes Foundry agents with the **Activity Protocol**; if Anders only exposes the Responses API protocol, the connection fails with `HTTP 400 – endpoint does not support activity`.
+
+> For a **Microsoft Foundry agent**, the new Copilot Studio Microsoft Copilot harness handles it differently from the Fabric case: you add it as a Connected agent, not as a Tool.
 
 1. Repeat the same process used for Mark, but select **Azure AI Foundry** as the external connector.
 2. Repeat step 1 from Mark and select **Azure AI Foundry**, then create a connection.
