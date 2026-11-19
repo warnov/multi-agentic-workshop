@@ -131,10 +131,12 @@ requested.
 
 ---
 
-## Instructions for Bill
+## Update Instructions for Bill
 
 Together with the instructors, we will analyze the structure of the instructions.  
 Now, copy the following instructions into the Bill agent.
+
+1. Update the instructions as per below:
 
 **Start of instructions:**
 
@@ -268,6 +270,10 @@ Mental summary
 ```
 
 **End of instructions.**
+
+2. Once updated **Save** the agent changes.
+
+![imagen](img/image10.4_Bill.png)  
 
 ---
 
