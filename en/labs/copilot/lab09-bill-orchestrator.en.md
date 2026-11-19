@@ -30,27 +30,27 @@ By completing this lab, you will learn:
 ## Agent Mark
 
 1. Search for "Fabric" and then select "Fabric IQ Data MCP" tool.
-2. Click **Add Agent** and then select **Connect to an external agent**.
 
    ![imagen](img/image3_Bill.png)
 
-3. Select **Microsoft Fabric**, then select **create a new connection**.
-4. In the connector window, click **create**.
-5. A pop-up window will ask you to select the user. Select the user you have been using throughout the labs.
+2. Select the **+ Add**, button in the next window and wait for the agents to populate.
+3. Locate the "**Mark**" agent created in Fabric earlier and select the "**Connect**" button.
 
-   ![imagen](img/image4_Bill.png)
+   ![imagen](img/image4.1_Bill.png)
 
-6. Once signed in, the Fabric connection is ready and you can choose the agents defined in the Fabric environment. Click **Next**.
-7. In the agent selection window, choose **Mark** and click **Next**.
+4. Under the **Tools** section locate and select the "**Mark**" tool to open its properties.
 
-   ![imagen](img/image5_Bill.png)
+   ![imagen](img/image4.2_Bill.png)
 
-8. In the configuration window, add a description that will guide the orchestrator on what Mark will do when invoked. Add the following description:  
-   **"Provides detailed information about customer purchase orders"** and click **Add**.
+5. In the **Fabric IQ** window locate the **Description** field enter the below and **Save** changes:
 
-   ![imagen](img/image6_Bill.png)
+   **NOTE**: By default, the Agent it will use the credentials of the user using the Agent but once added you can edit the Authentication mode to use the Maker/Other account. 
 
-9. Done, Mark has been added.
+   "Provides detailed information about customer purchase orders."
+
+   ![imagen](img/image4.3_Bill.png)
+
+8. Done, Mark has been added.
 
 ---
 
