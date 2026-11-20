@@ -43,7 +43,7 @@ By completing this lab, you will learn:
 
    ![imagen](img/image14_Charlie.png)
 
-10. Now, in the Microsoft 365 app, you will see a pop-up window. Select **Add**.
+10. Now, in the Teams/Microsoft 365 app, you will see a pop-up window. Select **Add**.
 
    ![imagen](img/image15.1_Bill.png)
 
