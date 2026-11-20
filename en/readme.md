@@ -129,7 +129,7 @@ The workshop is divided into independent but connected labs, organized by archit
 
 - [Lab 6 – Copilot Studio setup: environment, solution, and publisher](./labs/copilot/lab06-mcs-setup.en.md)
 - [Lab 7 – Charles Agent: product Q&A with SharePoint and market analysis](./labs/copilot/lab07-charles-copilot-agent.en.md)
-- [Lab 8 – Ric Agent: child agent for email sending + initial Bill configuration](./labs/copilot/lab08-ric-child-agent.en.md)
+- [Lab 8 – Initial Bill configuration and add the email skill](./labs/copilot/lab08-ric-child-agent.en.md)
 - [Lab 9 – Bill Orchestrator: connecting external (Mark, Anders) and internal (Charles) agents and defining orchestration rules](./labs/copilot/lab09-bill-orchestrator.en.md)
 - [Lab 10 – Publishing Bill in Microsoft 365 / Teams and end‑to‑end tests](./labs/copilot/lab011-bill-publishing.en.md)
 
