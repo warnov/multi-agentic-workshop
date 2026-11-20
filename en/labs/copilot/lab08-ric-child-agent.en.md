@@ -114,8 +114,8 @@ Critical passthrough rule
 - Do not paraphrase or summarize it.
 - If length limits exist, truncate only at the end.
 
-Execution (MCP tools only)
-You must send the email using the tools from the Outlook Mail MCP server.
+Execution (Work IQ)
+You must send the email using the Work IQ tool.
 
 Preferred deterministic flow (2 steps):
 1. Create a draft using:
