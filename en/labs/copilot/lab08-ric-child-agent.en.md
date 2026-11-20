@@ -45,7 +45,7 @@ By completing this lab, you will obtain:
    "send by email"
    "send it by mail"
    "email this to me"
-   → Delegate directly to Ric.
+   → Delegate directly to the email skill.
    ```
 6. Select **Save**.
 
