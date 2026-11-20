@@ -13,40 +13,41 @@ By completing this lab, you will learn:
 
 ---
 
-## Publishing process
+## Publish the agent
 
-1. Now, select the **Publish** button in the upper-right corner. A pop-up window will open to confirm that you really want to publish your agent.
+1. Select the **Publish** button in the upper-right corner. A pop-up window will open, here we will first select the **+ Add channel**.
 
-   ![imagen](img/image1_Publish_Bill.png)  
-   ![imagen](img/image2_Publish_Bill.png)
+   ![imagen](img/image10_Charlie.png)
 
-2. Select **Publish** to confirm publishing your agent. A message will appear indicating that your agent is being published. You do not need to keep that pop-up window open. You will receive a notification when the agent has been published.
+2. Select **Teams + Microsoft 365**
 
-   ![imagen](img/image3_Publish_Bill.png)
+   ![imagen](img/image11_Charlie.png)
 
-3. When the agent finishes publishing, you will see the notification at the top of the agent page.
-4. Now, before testing the agent, let’s configure a channel. Select the **Channels** section as shown below.
+3. Here we will configure our Agent information before we publish.
+4. Select the **About info** option and populate fields as follows (Anything not indicated leave as-is):
 
-   ![imagen](img/image4_Publish_Bill.png)
+  - **Short description:** "Answers concrete requests about customers, orders, and billing."
+  - **Long description:** "Answers concrete requests about customers, orders, and billing. The agent objective is to reconstruct transactional facts precisely and produce visual artifacts that summarize the order and billing information."
 
-5. In the **Channels** section, select **Teams and Microsoft 365 Copilot**.
+6. Press the **Add Channel** to commit chantes and continue to publish the Agent.
+   
+   ![imagen](img/image12.1_bill.png)
 
-   ![imagen](img/image5_Publish_Bill.png)
+7. Now that the channel is configured, press the **Publish agent**
 
-6. Now, in the side panel, select the **Turn on Microsoft 365** option and then select **Add channel**.
+   ![imagen](img/image13_Charlie.png)
 
-   ![imagen](img/image6_Publish_Bill.png)
+8. The window will close and you should see on the top right corner a Publishing status.
 
-7. It will take time for the channel to be added. When finished, a green notification will appear at the top of the side panel. If you see a pop-up message asking you to publish again, select **Publish** and wait for it to complete.
-8. Select **See agent in Microsoft 365** to open a new tab.
+9. Once the Agent is published you should see a pop-up indicating that the Agent has been published. in this same window press the "**View in Teams + Microsoft 365**" link  
 
-   ![imagen](img/image7_Publish_Bill.png)
+   ![imagen](img/image14_Charlie.png)
 
-9. Now, in the Microsoft 365 application, you will see a pop-up window. Select **Add**.
+10. Now, in the Microsoft 365 app, you will see a pop-up window. Select **Add**.
 
-   ![imagen](img/image8_Publish_Bill.png)
+   ![imagen](img/image15.1_Bill.png)
 
-10. Now our agent is ready to be tested!
+11. Now our agent is ready to be tested!
 
 ---
 
