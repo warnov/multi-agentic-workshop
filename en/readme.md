@@ -87,9 +87,9 @@ You can find the full documentation here: [Database Documentation](../assets/dat
 - **Charles (Product Q&A Agent)**
   Product analyst agent that answers questions using documentation stored in SharePoint as its knowledge base. It can also perform competitive analysis and market comparisons using public information on demand.
 - **Bill (Orchestrator)**
-  Central orchestrator. Detects user intent and delegates to the appropriate agent: connects external Fabric agents (Mark) and Foundry agents (Anders) with internal Copilot Studio agents (Charles, Ric). It is published in Microsoft 365 and Teams.
-- **Ric (Child Agent)**
-  Child agent of Bill responsible for sending emails to the user with the requested information (for example, query results or links to reports).
+  Central orchestrator. Detects user intent and delegates to the appropriate agent: connects external Fabric agents (Mark) and Foundry agents (Anders) with internal Copilot Studio agents (Charles). It is published in Microsoft 365 and Teams.
+  - **Email Skill**
+    Email Skill responsible for sending emails to the user with the requested information (for example, query results or links to reports).
 
 ### <a id="interoperability-layer"></a>Agent Interoperability Layer
 
