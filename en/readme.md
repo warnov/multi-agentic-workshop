@@ -6,7 +6,7 @@ The architecture is organized into three well‑defined layers:
 
 - **Microsoft Fabric** as the data layer: hosts the retail SQL database and a Data Agent that answers natural-language questions.
 - **Microsoft Foundry** as the reasoning and execution layer: agents that generate HTML reports via OpenAPI and plan marketing campaigns by querying the database.
-- **Copilot Studio** as the orchestration and conversational experience layer: an orchestrator agent that connects all agents, a product agent with knowledge in SharePoint, and a child agent that sends email.
+- **Copilot Studio** as the orchestration and conversational experience layer: an orchestrator agent that connects all agents, a product agent with knowledge in SharePoint, and a skill that sends email.
 
 We will explore orchestration capabilities in both Copilot Studio and Microsoft Foundry.
 
