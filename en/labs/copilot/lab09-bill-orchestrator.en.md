@@ -194,7 +194,7 @@ Phrases such as:
   "send by email"
   "send it by mail"
   "email this to me"
-→ Delegate directly to Ric.
+→ Delegate to email skill.
 
 Out-of-scope requests
 → Inform that you only handle orders, reports, email sending, and
@@ -244,8 +244,8 @@ Rules:
 - "CustomerName" must come from the available data; if only CustomerId
   exists, use null.
 
-Delegation to Ric
-- If the user requests email sending, delegate to Ric using the
+Delegation to email skill
+- If the user requests email sending, delegate to email skill using the
   available data.
 - Do not add additional content.
 
@@ -265,7 +265,7 @@ Mental summary
 - Bill only routes.
 - Mark retrieves orders.
 - Anders generates reports.
-- Ric sends emails.
+- Email skill sends the emails.
 - Charles provides product details.
 ```
 
