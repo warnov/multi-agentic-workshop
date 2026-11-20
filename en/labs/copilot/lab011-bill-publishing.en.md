@@ -53,11 +53,11 @@ By completing this lab, you will learn:
 
 ## Test Bill
 
-Let’s test Bill from the Microsoft 365 application.
+Let’s test Bill from Teams or the Microsoft 365 application (Here we will use Teams as it opens by default when we publish).
 
 1. Select Bill from your agents.
 
-   ![imagen](img/image9_Publish_Bill.png)
+   ![imagen](img/image9_Publish_Bill.1.png)
 
 2. **Test prompt — Scenario 1:**
 
