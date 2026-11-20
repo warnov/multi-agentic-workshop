@@ -1,8 +1,8 @@
-# Lab 4: Julie, the Campaign Orchestrator (hosted agent)
+# Lab 5: Julie, the Campaign Orchestrator (hosted agent)
 
 ## Table of contents
 
-- [Lab 4: Julie, the Campaign Orchestrator (hosted agent)](#lab-4-julie-the-campaign-orchestrator-hosted-agent)
+- [Lab 5: Julie, the Campaign Orchestrator (hosted agent)](#lab-4-julie-the-campaign-orchestrator-hosted-agent)
 	- [Table of contents](#table-of-contents)
 	- [Introduction](#introduction)
   - [Advanced Foundry Agents Concepts](#advanced-foundry-agents-concepts)
@@ -15,7 +15,7 @@
 		- [1) Verify SQL connection values](#1-verify-sql-connection-values)
 		- [2) Alternative if you are not following the full lab sequence](#2-alternative-if-you-are-not-following-the-full-lab-sequence)
 		- [3) Behavior when Fabric values are not provided](#3-behavior-when-fabric-values-are-not-provided)
-	- [Manual configuration of permissions in Fabric (required for Lab 4)](#manual-configuration-of-permissions-in-fabric-required-for-lab-4)
+	- [Manual configuration of permissions in Fabric (required for Lab 5)](#manual-configuration-of-permissions-in-fabric-required-for-lab-5)
 		- [Part A — Workspace access](#part-a--workspace-access)
 		- [Part B — SQL user and database permissions](#part-b--sql-user-and-database-permissions)
 		- [Recommended validation](#recommended-validation)
@@ -170,7 +170,7 @@ If you do not provide these values during setup, the infrastructure deployment d
 
 In that situation `SqlExecutor` returns an HTTP 400 and `SqlAgent` cannot return rows. With the default `JULIE_DATA_MODE=auto`, Julie **still completes successfully** using demo customers, and the answer says so explicitly. See [Data modes](#data-modes-working-without-fabric).
 
-## Manual configuration of permissions in Fabric (required for Lab 4)
+## Manual configuration of permissions in Fabric (required for Lab 5)
 
 After deployment, make sure that the Managed Identity of the Function App has access to the workspace and to the `retail` SQL database.
 

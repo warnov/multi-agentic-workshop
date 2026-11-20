@@ -379,7 +379,8 @@ labs/foundry/
 | Lab   | File                                                            | Description                                                  |
 | ----- | --------------------------------------------------------------- | ------------------------------------------------------------ |
 | Lab 3 | [Anders — Executor Agent](lab03-anders-executor-agent.en.md)   | Create the executor agent that generates reports and interacts with Contoso Retail services. |
-| Lab 4 | [Julie — Planner Agent](lab04-julie-planner-agent.en.md)       | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
+| Lab 4 | [Anders — Enterprise Knowledge powered by Foundry IQ](lab04-anders-foundryiq.en.md)       |  Create a knowledge base using Foundry IQ to empower Anders with business knowledge. |
+| Lab 5 | [Julie — Planner Agent](lab05-julie-planner-agent.en.md)       | Create the marketing campaign orchestrator agent using the workflow pattern with sub-agents (SqlAgent, MarketingAgent) and an OpenAPI tool. |
 
 ---
 

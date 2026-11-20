@@ -16,38 +16,42 @@ By completing this lab, you will learn:
 
 ## Let's Start
 
-1. Open the **Bill** agent that we created in the previous lab, “Ric”.
+1. Open the **Bill** agent that we created in the previous lab.
 
    ![imagen](img/image1_Bill.png)
 
 2. Now we will connect the agents.
-3. Navigate to the **Agents** section.
+3. Navigate to the **Tools** section.
 
-   ![imagen](img/image2_Bill.png)
+   ![imagen](img/image2_Bill_Tools.png)
 
 ---
 
 ## Agent Mark
 
-1. Click **Add Agent** and then select **Connect to an external agent**.
+> [!IMPORTANT]
+> The new Microsoft Copilot Harness uses **Tools** to bring Agents built on Fabric.
+
+1. Search for "Fabric" and then select "Fabric IQ Data MCP" tool.
 
    ![imagen](img/image3_Bill.png)
 
-2. Select **Microsoft Fabric**, then select **create a new connection**.
-3. In the connector window, click **create**.
-4. A pop-up window will ask you to select the user. Select the user you have been using throughout the labs.
+2. Select the **+ Add**, button in the next window and wait for the agents to populate.
+3. Locate the "**Mark**" agent created in Fabric earlier and select the "**Connect**" button.
 
-   ![imagen](img/image4_Bill.png)
+   ![imagen](img/image4.1_Bill.png)
 
-5. Once signed in, the Fabric connection is ready and you can choose the agents defined in the Fabric environment. Click **Next**.
-6. In the agent selection window, choose **Mark** and click **Next**.
+4. Under the **Tools** section locate and select the "**Mark**" tool to open its properties.
 
-   ![imagen](img/image5_Bill.png)
+   ![imagen](img/image4.2_Bill.png)
 
-7. In the configuration window, add a description that will guide the orchestrator on what Mark will do when invoked. Add the following description:  
-   **"Provides detailed information about customer purchase orders"** and click **Add**.
+5. In the **Fabric IQ** window locate the **Description** field enter the below and **Save** changes:
 
-   ![imagen](img/image6_Bill.png)
+   **NOTE**: By default, the Agent it will use the credentials of the user using the Agent but once added you can edit the Authentication mode to use the Maker/Other account. 
+
+   **Description:** "Provides detailed information about customer purchase orders."
+
+   ![imagen](img/image4.3_Bill.png)
 
 8. Done, Mark has been added.
 
@@ -58,43 +62,81 @@ By completing this lab, you will learn:
 > [!IMPORTANT]
 > Before connecting Anders, make sure you have **published it to Microsoft 365 and Teams** from the Foundry portal (step *"Publish Anders so Copilot Studio can consume it"* in Lab 3). Copilot Studio invokes Foundry agents with the **Activity Protocol**; if Anders only exposes the Responses API protocol, the connection fails with `HTTP 400 – endpoint does not support activity`.
 
-1. Repeat the same process used for Mark, but select **Azure AI Foundry** as the external connector.
-2. Repeat step 1 from Mark and select **Azure AI Foundry**, then create a connection.
-3. In the connection window, the configuration details are different from those used with Mark.
+> [!IMPORTANT]
+> For a **Microsoft Foundry agent**, the new Copilot Studio Microsoft Copilot harness handles it differently from the Fabric case: you add it as a Connected agent, not as a Tool.
 
-   ![imagen](img/image7_Bill.png)
+1. Locate and select the "**Connected Agents +**" option.
 
-4. For **Authentication type**, keep **Microsoft Entra** so the agent delegates authentication to the end user. In the next field, add the Azure AI Foundry project URL.
-5. Navigate to the Azure AI Foundry portal where Anders was created. In the **Overview** section, copy the endpoint link and paste it into the Copilot Studio window.
+   ![imagen](img/image7.1_Bill.png)
 
-   ![imagen](img/image8_Bill.png)
+2. In the Add a connected agent pop-up click the "**+ Add**" option and then select "**Add Foundry Agent**".
 
-6. Repeat step 4 from Mark: select the lab user and continue with the connection. Click **Next**.
+   ![imagen](img/image7.2_Bill.png)
+
+3. In the connection window, we will create a new connection.
+
+   ![imagen](img/image7.3_Bill.png)
+
+4. For **Authentication type**, the only option now is **Microsoft Entra ID User Login** so the agent delegates authentication to the end user. In the next field, add the Azure AI Foundry project URL.
+5. Navigate to the Azure AI Foundry portal where Anders was created. In the **Home** section, locate copy the endpoint link (Azure AI Project Endpoint) and paste it into the Copilot Studio window.
+
+   ![imagen](img/image8.1_Bill.png)
+
 7. In the agent configuration window, provide the following values:
+   - **Display Name**: "Anders" or "Ander Connection"
+   - **Azure AI Project Endpoint:** Connection from previous step.
+
+8. Once finished, click **Create** and follow the instructions to select the current user.
+
+   ![imagen](img/image9.1_Bill.png)
+
+9. The Anders agent has been connected, press the "**Next**" button.
+
+   ![imagen](img/image9.2_Bill.png)
+
+7. In the agent configuration window, provide the following values and then press the "Add to agent" to save and close:
    - **Name**: "Anders"
    - **Description**: "Anders receives the complete list of orders returned by Mark to generate a report"
    - **Agent ID**: "Anders"
 
-   ![imagen](img/image9_Bill.png)
+   ![imagen](img/image9.3_Bill.png)
 
-8. Once finished, click **Add**. Anders has now been added.
+8. **Done**, Anders has been added to the "**Connected agents**" section.
+
+   ![imagen](img/image9.4_Bill.png)
 
 ---
 
 ## Agent Charles
 
-Repeat the same process used for Mark and Anders, but select **Charles** as an internal agent created in your environment.
+> [!IMPORTANT]
+> For other **Microsoft Copilot Studio agent**, the new Copilot Studio Microsoft Copilot harness handles thme as a Connected agent and not a tool.
 
-![imagen](img/image10_Bill.png)  
-![imagen](img/image11_Bill.png)  
-![imagen](img/image12_Bill.png)
+1. Locate and select the "**Connected Agents +**" option.
+
+   ![imagen](img/image7.1_Bill.png)
+
+2. In the Add a connected agent pop-up click the "**Charles**" agent listed.
+
+   ![imagen](img/image10.2_Bill.png)
+
+3. Enter the below **description** and then press "**Connect**"
+
+**Description:** Helps users answer product questions using SharePoint content and perform market or competitor comparisons using public information when
+requested.
+
+![imagen](img/image10.3_Bill.png)  
+
+4. **Done**, **Charles** has been added to the "**Connected agents**" section.
 
 ---
 
-## Instructions for Bill
+## Update Instructions for Bill
 
 Together with the instructors, we will analyze the structure of the instructions.  
 Now, copy the following instructions into the Bill agent.
+
+1. Update the instructions as per below:
 
 **Start of instructions:**
 
@@ -152,7 +194,7 @@ Phrases such as:
   "send by email"
   "send it by mail"
   "email this to me"
-→ Delegate directly to Ric.
+→ Delegate to email skill.
 
 Out-of-scope requests
 → Inform that you only handle orders, reports, email sending, and
@@ -202,8 +244,8 @@ Rules:
 - "CustomerName" must come from the available data; if only CustomerId
   exists, use null.
 
-Delegation to Ric
-- If the user requests email sending, delegate to Ric using the
+Delegation to email skill
+- If the user requests email sending, delegate to email skill using the
   available data.
 - Do not add additional content.
 
@@ -218,16 +260,21 @@ Style
 - Do not include technical jargon or additional explanations.
 
 Mental summary
+- Make sure that for every request you use Work IQ tool for additional context
 - Bill does not process data.
 - Bill does not validate data.
 - Bill only routes.
 - Mark retrieves orders.
 - Anders generates reports.
-- Ric sends emails.
+- Email skill sends the emails.
 - Charles provides product details.
 ```
 
 **End of instructions.**
+
+2. Once updated **Save** the agent changes.
+
+![imagen](img/image10.4_Bill.png)  
 
 ---
 

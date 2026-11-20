@@ -1,4 +1,14 @@
-# MCS – Let’s build the Charles agent
+# MCS – Let’s build the Charles agent using the new Microsoft Copilot Harness
+
+## 💯 Microsoft Copilot Harness
+
+The [Microsoft Copilot harness](https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview) is designed for reasoning-heavy, multi-step work. Instead of designing every conversation path manually, you describe the agent's purpose and behavior, then connect the knowledge and capabilities it needs.
+
+**Microsoft Copilot harness versus standard harness**
+
+- The standard harness organizes agent behavior around topics, prompts, branching logic, and defined conversation paths. The Microsoft Copilot harness uses natural-language instructions and goal-driven orchestration to reason about what to do next.
+
+- The Microsoft Copilot harness also brings agent configuration, testing, evaluation, and monitoring into a unified, tab-based authoring surface. Agents can't be transferred between the standard and Microsoft Copilot harnesses because each uses a different architecture.
 
 ## 🎯 Mission summary
 
@@ -24,12 +34,10 @@ By completing this lab, you will:
 
    ![imagen](img/image1_Charlie.png)
 
-2. Select the **Configure** tab and complete the following properties:
+2. Ensure you are in the **Build** tab and complete the following properties:
    - **Edit the name to**: Charles
-   - **Description**: "Helps users answer product questions using SharePoint content and perform market or competitor comparisons using public information when explicitly requested".
-   - **Leave the AI model as default.**
 
-3. Add the agent instructions as indicated below:
+3. Add the agent **instructions** in the indicated section below:
 
    ![imagen](img/image2_Charlie.png)
 
@@ -61,6 +69,7 @@ By completing this lab, you will:
    - If important information is missing, indicate it instead of making assumptions.
    ```
 
+4. Save the changes (Top right corner - Save Icon).
 ---
 
 ## SharePoint creation
@@ -73,33 +82,35 @@ By completing this lab, you will:
    ![imagen](img/image3_Charlie.png)
 
 3. Open SharePoint.
-4. Create a new site by selecting **+ create a site** in the upper-left corner.
-5. Select **Teams Site**.
+4. Create a new site by selecting **Build** in the left menu.
+5. Ensure the **Teams Site** is selected.
+6. Choose the Standard team template.
 
    ![imagen](img/image4_Charlie.png)
 
-6. Choose a standard team template and select **Use Template**.
-7. For the name, use **Product Repository**.
-8. For Privacy settings: **Public – anyone in the organization can access this site**.
-9. In the **add members** section, select your user and select **Finish**.
+7. Select **Use Template** in the confirmation screen.
+8. For the name, use **Product Repository**.
+9. For Privacy settings: **Public – anyone in the organization can access this site**.
+10. Select the **Create site**.
+11. While you wait **add a member**, type your user and select **Go to site** (once the button is enabled).
 
 Great! Now we have our SharePoint site. Go to the **Documents** section:
 
 ![imagen](img/image5_Charlie.png)
 
-10. Create a new folder and name it **Products**.
+10. Create a new folder and name it **Products** (Press the "**+ Create or upload**" button to do so)".
 11. When ready, upload the file **Product_Catalog** that you downloaded from the GitHub repository [taller-multi-agentic/assets/Product_Catalog.docx](https://github.com/warnov/taller-multi-agentic/blob/main/assets/Product_Catalog.docx).
 12. The knowledge base is ready! Let’s go back to the agent configuration.
 
 ---
 
-## Configure knowledge sources
+## Configure knowledge sources in the Agent
 
-In the agent **Overview** section, add the agent knowledge sources as shown below:
+In the agent **Build** section, add the agent knowledge sources as shown below:
 
 ![imagen](img/image6_Charlie.png)
 
-**Make sure the “Web Search” option is enabled.**
+The **Add knowledge** window opens with the options as below.
 
 ![imagen](img/image7_Charlie.png)
 
@@ -111,39 +122,43 @@ In the agent **Overview** section, add the agent knowledge sources as shown belo
 3. Now select **Add to agent** to complete the process.
 
    ![imagen](img/image9_Charlie.png)
-
 ---
 
 ## Publish the agent
 
-1. Select the **Publish** button in the upper-right corner. A pop-up window will open to confirm that you really want to publish your agent.
+1. Select the **Publish** button in the upper-right corner. A pop-up window will open, here we will first select the **+ Add channel**.
 
    ![imagen](img/image10_Charlie.png)
 
-2. Select **Publish** to confirm publishing your agent. A message will appear indicating that the agent is being published. You do not need to keep that window open. You will receive a notification when the agent is published.
+2. Select **Teams + Microsoft 365**
 
    ![imagen](img/image11_Charlie.png)
 
-3. When the agent finishes publishing, you will see the notification at the top of the agent page.
-4. Now, before testing the agent, let’s configure a channel. Select the **Channels** section as shown below.
+3. Here we will configure our Agent information before we publish.
+4. Select the **About info** option and populate fields as follows (Anything not indicated leave as-is):
 
+  - **Short description:** "Helps users answer product questions."
+  - **Long description:** "Helps users answer product questions using SharePoint content and perform market or competitor comparisons using public information when explicitly requested"
+
+6. Press the **Add Channel** to commit chantes and continue to publish the Agent.
+   
    ![imagen](img/image12_Charlie.png)
 
-5. In the **Channels** section, select **Teams and Microsoft 365 Copilot**.
+7. Now that the channel is configured, press the **Publish agent**
 
    ![imagen](img/image13_Charlie.png)
 
-6. Now, in the side panel, select **Turn on Microsoft 365** and then select **Add Channel**.
+8. The window will close and you should see on the top right corner a Publishing status.
+
+9. Once the Agent is published you should see a pop-up indicating that the Agent has been published. in this same window press the "**View in Teams + Microsoft 365**" link  
 
    ![imagen](img/image14_Charlie.png)
 
-7. Adding the channel will take a moment. When it completes, a green notification will appear at the top of the side panel. If a pop-up appears asking you to publish again, select **Publish** and wait for it to complete.
-8. Select **See agent in Microsoft 365** to open a new tab.
-9. Now, in the Microsoft 365 app, you will see a pop-up window. Select **Add**.
+10. Now, in the Microsoft 365 app, you will see a pop-up window. Select **Add**.
 
    ![imagen](img/image15_Charlie.png)
 
-10. Now our agent is ready to be tested!
+11. Now our agent is ready to be tested!
 
 ---
 

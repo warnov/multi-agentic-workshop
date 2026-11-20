@@ -1,16 +1,21 @@
-# Bill & Child Customer Notifications Agent
+# Bill as Customer Notifications Agent that uses skills and Work IQ.
 
 ## 🎯 Mission summary
 
-In this hands-on lab, you will create the initial definition of Bill and execute the main instructions to create Ric as a child agent.  
-As a child agent, Ric will be responsible for sending an email to the user with the required information when requested.
+In this hands-on lab, you will create the initial definition of Bill using the new [Microsoft Copilot Harness](https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview) and define the main instructions for the agent.
+
+While doing so, you'll also explore the Microsoft Copilot harness capability by iteratively refining a skill: The "Email Skill" will be responsible for sending an email to the user with the required information when requested.
+
+## 🧠 What is a Skill?
+
+Skills are reusable capabilities available to Microsoft Copilot harness agents in Copilot Studio. Each skill provides focused guidance for a specific scenario, business process, or task by defining when it should be used, what information to collect, which tools to call, and how the agent should respond.
 
 ## 🔎 Objectives
 
 By completing this lab, you will obtain:
 
 - Initial construction of the Bill agent based on the instructions described in this document.
-- Creation of Ric as a child agent for Bill.
+- Creation of the email skill for Bill to use.
 - Testing the workflow.
 
 ---
@@ -19,26 +24,20 @@ By completing this lab, you will obtain:
 
 ### Configure Bill agent instructions
 
-1. **Navigate** to Microsoft Copilot Studio. Make sure the **MultiAgentWrkshp** environment is selected in the upper-right corner, in the **environment selector**.
-2. Select **Agents** and click **+ Create Blank Agent**.
-3. In the **Details** card, click **Edit** to change the name and add a description:
+1. **Navigate** to Microsoft Copilot Studio. Make sure the correct environment is selected in the upper-right corner, in the **environment selector**.
+2. Select **Agents** and click **Agent** from the options.
+
+   ![imagen](img/image1_Charlie.png)  
+
+3. Change the name:
    - **Name**: Bill
-   - **Description**: Central orchestrator for all retail customer support activities
-   - Select **Save** to save the agent (it may take a moment for the changes to become visible).
-
-   ![imagen](img/image1_4f5190e7.png)  
-   ![imagen](img/image2_4f5190e7.png)
-
-4. Select **Edit** in the **Instructions** section of the agent **Overview** tab:
-
-   ![imagen](img/image3_4f5190e7.png)
 
 5. Copy and paste the following instructions into the instructions input field:
 
    ```text
    You are Bill, an orchestrator agent. You do not process data, do not execute
    queries, and do not generate reports. You only detect the user's intent and
-   delegate the request to the correct agent with the minimum possible
+   delegate the request to the correct agent or skill with the minimum possible
    transformation.
 
    Email sending requests
@@ -46,67 +45,38 @@ By completing this lab, you will obtain:
    "send by email"
    "send it by mail"
    "email this to me"
-   → Delegate directly to Ric.
+   → Delegate directly to the email skill.
    ```
-
 6. Select **Save**.
 
-   ![imagen](img/image4_4f5190e7.png)
+   ![imagen](img/image2_Bill.png)
 
-7. Select the **Settings** button in the upper-right corner of the screen.
+7. Under the **Knowledge** section remove the "Search all websites" pre-set option.
 
-   ![imagen](img/image5_4f5190e7.png)
-
-   Review the page and make sure the following settings are applied:
-
-   | Setting | Value |
-   |---|---|
-   | Use generative AI orchestration for agent responses | **Yes** |
-   | Deep reasoning | **Disabled** |
-   | Allow other agents to connect to and use this agent | **Enabled** |
-   | Continue using retired models | **Disabled** |
-   | Content moderation | **Moderate** |
-   | Collect user reactions to agent messages | **Enabled** |
-   | Use general knowledge | **Disabled** |
-   | Use web information | **Disabled** |
-   | File upload | **Enabled** |
-   | Code interpreter | **Disabled** |
-
-   ![imagen](img/image6_4f5190e7.png)  
-   ![imagen](img/image7_4f5190e7.png)  
    ![imagen](img/image8_4f5190e7.png)
 
-8. Click **Save**.
-9. Click the **X** in the upper-right corner to close the settings menu.
-
-   ![imagen](img/image9_4f5190e7.png)
-
+8. Click **Save** to save the Agent.
 ---
 
-## Add Ric as a Child Agent
+## Add a Skill to Bill
 
-1. **Navigate** to the **Agents** tab within the Bill agent (this is where you add specialist agents) and select **Add**.
+Lets use the new Microsoft Copilot harness capability to add a skill to Biil, rhe "Email Skill" will be responsible for sending an email to the user with the required information when requested.
+
+1. Under the Skills section press the "**+**" option then select the **Create from blank** option.
 
    ![imagen](img/image10_4f5190e7.png)
 
-2. Select **New child agent**.
+3. **Name** your skill "email-skill".
+4. **Description** "This skill is responsible for sending emails to the user with the information when required."
+   
+### Skill instructions
 
-   ![imagen](img/image11_4f5190e7.png)
-
-3. **Name** your agent **Ric**.
-4. Select **The agent chooses – Based on description** from the **When will this be used?** dropdown.
-5. Set the **Description** to: "This agent is responsible for sending emails to the user with the information when required."
-
-   ![imagen](img/image12_4f5190e7.png)
-
-### Ric instructions
-
-Add the following instructions to Ric:
+Add the following skill instructions:
 
 ```text
-Role
-You are Ric, an agent specialized in email notification.
-Your only responsibility is to send an email that contains the most recent
+Skill specialized in email notification.
+
+Responsible to send an email that contains the most recent
 information provided by the user in the chat, or the exact content explicitly
 provided by the parent agent.
 
@@ -144,8 +114,8 @@ Critical passthrough rule
 - Do not paraphrase or summarize it.
 - If length limits exist, truncate only at the end.
 
-Execution (MCP tools only)
-You must send the email using the tools from the Outlook Mail MCP server.
+Execution (Work IQ)
+You must send the email using the Work IQ tool.
 
 Preferred deterministic flow (2 steps):
 1. Create a draft using:
@@ -183,37 +153,46 @@ After sending:
   "I couldn't send the email. Please try again or verify the recipient."
 - Do not reveal technical errors.
 ```
-
+   ![imagen](img/image12_4f5190e7.png)
+   
+5. Click **Save** to save the skill information.
 ---
 
-## Add MCP Server
+## Bill will use Work IQ to send the email by the skill. 
 
-Now we will add the **Email Management MCP Server** as an agent tool.
+## 🧠 What is a **Work IQ**?
 
-1. In **Tools**, select **+ Add**.
-2. Search for **Email Management MCP Server** and select the connector.
+**Work IQ** is a workplace intelligence layer that enables agents to access and reason over organizational and business data, context, and tools. It continuously builds a semantic understanding across Microsoft 365 and external systems with built-in, permission-aware governance.
+
+
+By default, **Work IQ** is enabled when an Agent is created, we will verify its configuration to ensure that the skill and agent can send emails on behalf of the user.
+
+1. Click the **Work IQ** tool under the Tools section.
 
    ![imagen](img/image13_4f5190e7.png)
 
-3. The pop-up window will ask you to create a new Office 365 connection. Select **Create**.
+3. The pop-up window will select the ">" in the **Outlook mail** section.
 
    ![imagen](img/image14_4f5190e7.png)
 
-4. Select the user and click **Add and configure**.
+4. Since Bill's skill needs to send its output by email the Work IQ don't need Full access. So, ensure that the **Access level** is set to **Read-write**.
 
    ![imagen](img/image15_4f5190e7.png)
 
-Done! You can now test Ric.
+Done! You can now test Bill's skill.
 
 ---
 
-## Test Ric
+## Test Bill's Skill
 
-Run the following prompt in Bill’s test window:
+1. From the top menu select the **Preview** tab.
+
+2. Enter the below prompt and verify your account got the [email](https://outlook.office.com/). 
 
 ```text
 Send an email with the following information: The purchase orders from the customer CID-069 are up to date
 ```
+   ![imagen](img/image16.1_4f5190e7.png)
 
 ---
 
@@ -223,6 +202,6 @@ Great job! Ric is complete and can now send emails.
 
 This is what you completed in this lab:
 
-- ✅ Create an orchestrator agent
-- ✅ Create a child agent
-- ✅ Add an MCP Server as a tool
+- ✅ Create an orchestrator agent.
+- ✅ Create a skill.
+- ✅ Configured Work IQ for email routing.

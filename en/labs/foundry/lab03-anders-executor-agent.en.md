@@ -588,5 +588,5 @@ This script enables public network access on the Storage Account and restarts th
 
 ## Next step
 
-Continue with [Lab 4 — Julie (Planner Agent)](lab04-julie-planner-agent.en.md).
-``
+Continue with [Lab 4 — Anders — Enterprise Knowledge powered by Foundry IQ](lab04-anders-foundryiq.en.md).
+
