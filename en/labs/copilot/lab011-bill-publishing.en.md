@@ -9,7 +9,7 @@ In this lab, we will publish the Bill agent and perform tests through the Micros
 By completing this lab, you will learn:
 
 - How to publish the agent using the Microsoft 365 and Microsoft Teams channel.
-- How to query the agent from Microsoft 365.
+- How to query the agent.
 
 ---
 
